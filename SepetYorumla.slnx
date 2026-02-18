@@ -1,3 +1,7 @@
 <Solution>
   <Project Path="SepetYorumla.Core/SepetYorumla.Core.csproj" Id="0f30149d-72b6-4589-ad78-31d6186986ae" />
+  <Project Path="SepetYorumla.DataAccess/SepetYorumla.DataAccess.csproj" Id="5a0a26c3-8ff9-465a-8430-ed443201074d" />
+  <Project Path="SepetYorumla.Models/SepetYorumla.Models.csproj" Id="9f8db052-d72f-415d-aec8-08dc941fcb96" />
+  <Project Path="SepetYorumla.Service/SepetYorumla.Service.csproj" Id="66ed7490-5e25-493e-ab7a-c0af90da48f9" />
+  <Project Path="SepetYorumla.WebApi/SepetYorumla.WebApi.csproj" Id="94cb63c4-39c6-40d0-b6a4-3d145e27e2b2" />
 </Solution>
