@@ -9,6 +9,9 @@ public class Basket : Entity<Guid>
   public bool IsActive { get; set; } = true;
 
   // Navigation properties
+  public Guid UserId { get; set; }
+  public virtual User User { get; set; } = default!;
   public virtual ICollection<Product> Products { get; set; } = new List<Product>();
   public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+  public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 }

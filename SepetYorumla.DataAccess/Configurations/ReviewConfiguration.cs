@@ -12,8 +12,16 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
 
     builder.HasKey(r => r.Id);
 
-    builder.Property(r => r.Comment)
-      .HasMaxLength(1000)
+    builder.Property(r => r.Id)
+      .HasColumnName("Id")
+      .IsRequired();
+
+    builder.Property(r => r.CreatedDate)
+      .HasColumnName("CreatedDate")
+      .IsRequired();
+
+    builder.Property(r => r.UpdatedDate)
+      .HasColumnName("UpdatedDate")
       .IsRequired(false);
 
     builder.Property(r => r.StarRating)
@@ -30,6 +38,11 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
     builder.HasOne(r => r.Basket)
       .WithMany(b => b.Reviews)
       .HasForeignKey(r => r.BasketId)
+      .OnDelete(DeleteBehavior.Cascade);
+
+    builder.HasOne(r => r.User)
+      .WithMany(u => u.Reviews)
+      .HasForeignKey(r => r.UserId)
       .OnDelete(DeleteBehavior.Cascade);
   }
 }

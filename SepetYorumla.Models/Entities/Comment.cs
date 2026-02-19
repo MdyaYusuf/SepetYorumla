@@ -2,10 +2,9 @@
 
 namespace SepetYorumla.Models.Entities;
 
-public class Review : Entity<Guid>
+public class Comment : Entity<int>
 {
-  public decimal StarRating { get; set; }
-  public bool IsThumbsUp { get; set; }
+  public required string Text { get; set; }
   public bool IsActive { get; set; } = true;
 
   // Navigation properties

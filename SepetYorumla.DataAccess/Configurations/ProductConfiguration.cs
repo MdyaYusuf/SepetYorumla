@@ -12,6 +12,18 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
     builder.HasKey(p => p.Id);
 
+    builder.Property(p => p.Id)
+      .HasColumnName("Id")
+      .IsRequired();
+
+    builder.Property(p => p.CreatedDate)
+      .HasColumnName("CreatedDate")
+      .IsRequired();
+
+    builder.Property(p => p.UpdatedDate)
+      .HasColumnName("UpdatedDate")
+      .IsRequired(false);
+
     builder.Property(p => p.Name)
       .HasMaxLength(200)
       .IsRequired();
@@ -29,10 +41,12 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
       .IsRequired(false);
 
     builder.Property(p => p.Brand)
-      .HasMaxLength(100);
+      .HasMaxLength(100)
+      .IsRequired(false);
 
     builder.Property(p => p.Model)
-      .HasMaxLength(100);
+      .HasMaxLength(100)
+      .IsRequired(false);
 
     builder.Property(p => p.IsActive)
       .HasDefaultValue(true)
