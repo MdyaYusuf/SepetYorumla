@@ -11,10 +11,13 @@ public class BaseDbContext : DbContext
     
   }
 
+  public DbSet<Category> Categories { get; set; }
+  public DbSet<Product> Products { get; set; }
+  public DbSet<Basket> Baskets { get; set; }
+  public DbSet<Review> Reviews { get; set; }
+
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
   }
-
-  public DbSet<Category> Categories { get; set; }
 }
