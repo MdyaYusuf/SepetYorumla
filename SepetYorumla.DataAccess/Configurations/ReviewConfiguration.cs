@@ -38,11 +38,11 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
     builder.HasOne(r => r.Basket)
       .WithMany(b => b.Reviews)
       .HasForeignKey(r => r.BasketId)
-      .OnDelete(DeleteBehavior.Cascade);
+      .OnDelete(DeleteBehavior.ClientCascade); // EF Core handles this cleanup
 
     builder.HasOne(r => r.User)
       .WithMany(u => u.Reviews)
       .HasForeignKey(r => r.UserId)
-      .OnDelete(DeleteBehavior.Cascade);
+      .OnDelete(DeleteBehavior.Cascade); // SQL Server handles this cleanup
   }
 }

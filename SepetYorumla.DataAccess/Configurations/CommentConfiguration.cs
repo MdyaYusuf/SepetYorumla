@@ -32,14 +32,15 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
       .HasDefaultValue(true)
       .IsRequired();
 
+    // To fix the "Multiple Cascade Path error" we share responsibilities between EF Core and SQL Server
     builder.HasOne(c => c.User)
       .WithMany(u => u.Comments)
       .HasForeignKey(c => c.UserId)
-      .OnDelete(DeleteBehavior.Cascade);
+      .OnDelete(DeleteBehavior.ClientCascade); // EF Core handles this cleanup
 
     builder.HasOne(c => c.Basket)
       .WithMany(b => b.Comments)
       .HasForeignKey(c => c.BasketId)
-      .OnDelete(DeleteBehavior.Cascade);
+      .OnDelete(DeleteBehavior.Cascade); // SQL Server handles this cleanup
   }
 }
