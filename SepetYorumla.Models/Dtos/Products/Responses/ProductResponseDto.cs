@@ -8,4 +8,5 @@ public sealed record ProductResponseDto(
   string? ImageUrl,
   string? Brand,
   string? Model,
-  int CategoryId);
+  int CategoryId,
+  string CategoryName);

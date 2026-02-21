@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SepetYorumla.DataAccess\SepetYorumla.DataAccess.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -10,6 +10,7 @@ public interface IRepository<TEntity, TId>
   Task<List<TEntity>> GetAllAsync(
     bool enableTracking = false,
     bool withDeleted = false,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
     Expression<Func<TEntity, bool>>? filter = null,
     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
     CancellationToken cancellationToken = default);

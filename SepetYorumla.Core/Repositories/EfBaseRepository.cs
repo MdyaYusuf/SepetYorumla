@@ -16,7 +16,7 @@ public class EfBaseRepository<TContext, TEntity, TId> : IRepository<TEntity, TId
     _context = context;
   }
 
-  public async Task<List<TEntity>> GetAllAsync(bool enableTracking = false, bool withDeleted = false, Expression<Func<TEntity, bool>>? filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, CancellationToken cancellationToken = default)
+  public async Task<List<TEntity>> GetAllAsync(bool enableTracking = false, bool withDeleted = false, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null, Expression<Func<TEntity, bool>>? filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, CancellationToken cancellationToken = default)
   {
     IQueryable<TEntity> query = _context.Set<TEntity>();
 
@@ -28,6 +28,11 @@ public class EfBaseRepository<TContext, TEntity, TId> : IRepository<TEntity, TId
     if (withDeleted)
     {
       query = query.IgnoreQueryFilters();
+    }
+
+    if (include != null)
+    {
+      query = include(query);
     }
 
     if (filter != null)

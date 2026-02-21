@@ -10,8 +10,6 @@ builder.Services.AddOpenApi();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddDataAccessDependencies(builder.Configuration);
 
-builder.Services.AddSingleton<GeneralMapper>();
-
 var app = builder.Build();
 
 app.UseExceptionHandler();

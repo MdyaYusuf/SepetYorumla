@@ -20,24 +20,35 @@ public partial class GeneralMapper
 {
   public partial Category CreateToEntity(CreateCategoryRequest request);
   public partial void UpdateEntityFromRequest(UpdateCategoryRequest request, Category entity);
-  public partial CategoryResponseDto EntityToResponse(Category entity);
+  public partial CategoryResponseDto EntityToResponseDto(Category entity);
+  public partial List<CategoryResponseDto> EntityToResponseDtoList(List<Category> entities);
 
   public partial Product CreateToEntity(CreateProductRequest request);
   public partial void UpdateEntityFromRequest(UpdateProductRequest request, Product entity);
-  public partial ProductResponseDto EntityToResponse(Product entity);
+  [MapProperty("Category.Name", nameof(ProductResponseDto.CategoryName))]
+  public partial ProductResponseDto EntityToResponseDto(Product entity);
+  public partial List<ProductResponseDto> EntityToResponseDtoList(List<Product> entities);
 
   public partial Basket CreateToEntity(CreateBasketRequest request);
   public partial void UpdateEntityFromRequest(UpdateBasketRequest request, Basket entity);
-  public partial BasketResponseDto EntityToResponse(Basket entity);
+  public partial BasketResponseDto EntityToResponseDto(Basket entity);
+  public partial List<BasketResponseDto> EntityToResponseDtoList(List<Basket> entities);
 
   public partial Review CreateToEntity(CreateReviewRequest request);
   public partial void UpdateEntityFromRequest(UpdateReviewRequest request, Review entity);
-  public partial ReviewResponseDto EntityToResponse(Review entity);
+  public partial ReviewResponseDto EntityToResponseDto(Review entity);
+  public partial List<ReviewResponseDto> EntityToResponseDtoList(List<Review> entities);
 
   public partial Comment CreateToEntity(CreateCommentRequest request);
   public partial void UpdateEntityFromRequest(UpdateCommentRequest request, Comment entity);
-  public partial CommentResponseDto EntityToResponse(Comment entity);
+  public partial CommentResponseDto EntityToResponseDto(Comment entity);
+  public partial List<CommentResponseDto> EntityToResponseDtoList(List<Comment> entities);
 
-  public partial UserResponseDto EntityToResponse(User entity);
+  [MapperIgnoreSource(nameof(RegisterUserRequest.Password))]
+  [MapperIgnoreTarget(nameof(User.PasswordHash))]
+  [MapperIgnoreTarget(nameof(User.PasswordKey))]
+  public partial User CreateToEntity(RegisterUserRequest request);
   public partial void UpdateEntityFromRequest(UpdateUserRequest request, User entity);
+  public partial UserResponseDto EntityToResponseDto(User entity);
+  public partial List<UserResponseDto> EntityToResponseDtoList(List<User> entities);
 }
