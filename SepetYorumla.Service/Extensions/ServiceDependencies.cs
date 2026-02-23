@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using SepetYorumla.Models.Mapping;
 using SepetYorumla.Service.Abstracts;
 using SepetYorumla.Service.BusinessRules;
 using SepetYorumla.Service.Concretes;
+using System.Reflection;
 
 namespace SepetYorumla.Service.Extensions;
 
@@ -18,6 +20,8 @@ public static class ServiceDependencies
 
     services.AddScoped<ICategoryService, CategoryService>();
     services.AddScoped<IProductService, ProductService>();
+
+    services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
     return services;
   }

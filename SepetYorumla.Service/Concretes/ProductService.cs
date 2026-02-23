@@ -1,4 +1,6 @@
-﻿using SepetYorumla.Core.Responses;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using SepetYorumla.Core.Responses;
 using SepetYorumla.DataAccess.Abstracts;
 using SepetYorumla.Models.Dtos.Products.Requests;
 using SepetYorumla.Models.Dtos.Products.Responses;
@@ -10,23 +12,25 @@ using System.Linq.Expressions;
 
 namespace SepetYorumla.Service.Concretes;
 
-public class ProductService(IProductRepository _productRepository, ProductBusinessRules _businessRules, GeneralMapper _mapper, IUnitOfWork _unitOfWork) : IProductService
+public class ProductService(
+  IProductRepository _productRepository,
+  ProductBusinessRules _businessRules,
+  GeneralMapper _mapper,
+  IUnitOfWork _unitOfWork,
+  IValidator<CreateProductRequest> _createValidator,
+  IValidator<UpdateProductRequest> _updateValidator) : IProductService
 {
   public async Task<ReturnModel<List<ProductResponseDto>>> GetAllAsync(
-        Expression<Func<Product, bool>>? filter = null,
-        Func<IQueryable<Product>, IQueryable<Product>>? include = null,
-        Func<IQueryable<Product>, IOrderedQueryable<Product>>? orderBy = null,
-        bool enableTracking = false,
-        bool withDeleted = false,
-        CancellationToken cancellationToken = default)
+    Expression<Func<Product, bool>>? filter = null,
+    Func<IQueryable<Product>, IQueryable<Product>>? include = null,
+    Func<IQueryable<Product>, IOrderedQueryable<Product>>? orderBy = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
   {
     List<Product> products = await _productRepository.GetAllAsync(
-        filter,
-        include,
-        orderBy,
-        enableTracking,
-        withDeleted,
-        cancellationToken);
+      include: p => p.Include(p => p.Category),
+      cancellationToken: cancellationToken);
 
     List<ProductResponseDto> response = _mapper.EntityToResponseDtoList(products);
 
@@ -45,7 +49,11 @@ public class ProductService(IProductRepository _productRepository, ProductBusine
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
   {
-    Product product = await _businessRules.GetProductIfExistAsync(id, include, enableTracking, cancellationToken);
+    Product product = await _businessRules.GetProductIfExistAsync(
+      id,
+      include: p => p.Include(p => p.Category),
+      enableTracking: false,
+      cancellationToken: cancellationToken);
 
     ProductResponseDto response = _mapper.EntityToResponseDto(product);
 
@@ -60,7 +68,14 @@ public class ProductService(IProductRepository _productRepository, ProductBusine
 
   public async Task<ReturnModel<ProductResponseDto>> AddAsync(CreateProductRequest request, CancellationToken cancellationToken = default)
   {
-    await _businessRules.NameMustBeUniqueAsync(request.Name, cancellationToken);
+    var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
+    await _businessRules.ProductNameMustBeUniqueAsync(request.Name, cancellationToken: cancellationToken);
     await _businessRules.CategoryMustExistAsync(request.CategoryId, cancellationToken);
 
     Product createdProduct = _mapper.CreateToEntity(request);
@@ -96,6 +111,13 @@ public class ProductService(IProductRepository _productRepository, ProductBusine
 
   public async Task<ReturnModel<NoData>> UpdateAsync(UpdateProductRequest request, CancellationToken cancellationToken = default)
   {
+    var validationResult = await _updateValidator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
     Product existingProduct = await _businessRules.GetProductIfExistAsync(
       request.Id,
       enableTracking: true,
@@ -108,7 +130,7 @@ public class ProductService(IProductRepository _productRepository, ProductBusine
 
     if (existingProduct.Name != request.Name)
     {
-      await _businessRules.NameMustBeUniqueAsync(request.Name, cancellationToken);
+      await _businessRules.ProductNameMustBeUniqueAsync(request.Name, request.Id, cancellationToken);
     }
 
     _mapper.UpdateEntityFromRequest(request, existingProduct);

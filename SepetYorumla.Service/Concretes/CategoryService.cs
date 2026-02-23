@@ -1,4 +1,5 @@
-﻿using SepetYorumla.Core.Responses;
+﻿using FluentValidation;
+using SepetYorumla.Core.Responses;
 using SepetYorumla.DataAccess.Abstracts;
 using SepetYorumla.Models.Dtos.Categories.Requests;
 using SepetYorumla.Models.Dtos.Categories.Responses;
@@ -10,7 +11,13 @@ using System.Linq.Expressions;
 
 namespace SepetYorumla.Service.Concretes;
 
-public class CategoryService(ICategoryRepository _categoryRepository, CategoryBusinessRules _businessRules, GeneralMapper _mapper, IUnitOfWork _unitOfWork) : ICategoryService
+public class CategoryService(
+  ICategoryRepository _categoryRepository,
+  CategoryBusinessRules _businessRules,
+  GeneralMapper _mapper,
+  IUnitOfWork _unitOfWork,
+  IValidator<CreateCategoryRequest> _createValidator,
+  IValidator<UpdateCategoryRequest> _updateValidator) : ICategoryService
 {
   public async Task<ReturnModel<List<CategoryResponseDto>>> GetAllAsync(
     Expression<Func<Category, bool>>? filter = null,
@@ -60,6 +67,13 @@ public class CategoryService(ICategoryRepository _categoryRepository, CategoryBu
 
   public async Task<ReturnModel<CategoryResponseDto>> AddAsync(CreateCategoryRequest request, CancellationToken cancellationToken = default)
   {
+    var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
     await _businessRules.NameMustBeUniqueAsync(request.Name, cancellationToken);
 
     Category createdCategory = _mapper.CreateToEntity(request);
@@ -95,6 +109,13 @@ public class CategoryService(ICategoryRepository _categoryRepository, CategoryBu
 
   public async Task<ReturnModel<NoData>> UpdateAsync(UpdateCategoryRequest request, CancellationToken cancellationToken = default)
   {
+    var validationResult = await _updateValidator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
     Category existingCategory = await _businessRules.GetCategoryIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
 
     _mapper.UpdateEntityFromRequest(request, existingCategory);

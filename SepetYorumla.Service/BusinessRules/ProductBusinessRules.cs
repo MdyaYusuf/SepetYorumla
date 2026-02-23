@@ -22,9 +22,9 @@ public class ProductBusinessRules(IProductRepository _productRepository, ICatego
     return product;
   }
 
-  public async Task NameMustBeUniqueAsync(string name, CancellationToken cancellationToken = default)
+  public async Task ProductNameMustBeUniqueAsync(string name, Guid? id = null, CancellationToken cancellationToken = default)
   {
-    var exists = await _productRepository.AnyAsync(x => x.Name == name, cancellationToken);
+    var exists = await _productRepository.AnyAsync(p => p.Name == name && (id == null || p.Id != id), cancellationToken);
 
     if (exists)
     {

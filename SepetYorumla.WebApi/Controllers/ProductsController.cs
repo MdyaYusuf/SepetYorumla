@@ -1,0 +1,48 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using SepetYorumla.Models.Dtos.Products.Requests;
+using SepetYorumla.Service.Abstracts;
+
+namespace SepetYorumla.WebApi.Controllers;
+
+public class ProductsController(IProductService _productService) : CustomBaseController
+{
+  [HttpGet]
+  public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+  {
+    var result = await _productService.GetAllAsync(cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("{id:guid}")]
+  public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
+  {
+    var result = await _productService.GetByIdAsync(id, cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpPost]
+  public async Task<IActionResult> Add(CreateProductRequest request, CancellationToken cancellationToken)
+  {
+    var result = await _productService.AddAsync(request, cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpPut]
+  public async Task<IActionResult> Update(UpdateProductRequest request, CancellationToken cancellationToken)
+  {
+    var result = await _productService.UpdateAsync(request, cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpDelete("{id:guid}")]
+  public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+  {
+    var result = await _productService.RemoveAsync(id, cancellationToken);
+
+    return CreateActionResult(result);
+  }
+}

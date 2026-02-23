@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
 using SepetYorumla.Core.Exceptions;
 using SepetYorumla.Core.Responses;
 using System.Text.Json;
@@ -9,51 +10,32 @@ public class GlobalExceptionHandler : IExceptionHandler
 {
   public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
   {
-    ReturnModel<List<string>> Errors = new ReturnModel<List<string>>();
+    var statusCode = exception switch
+    {
+      NotFoundException => StatusCodes.Status404NotFound,
+      AuthorizationException => StatusCodes.Status401Unauthorized,
+      BusinessException => StatusCodes.Status400BadRequest,
+      ValidationException => StatusCodes.Status400BadRequest,
+      _ => StatusCodes.Status500InternalServerError
+    };
+
+    var response = new ReturnModel<NoData>
+    {
+      Success = false,
+      Message = statusCode == 500 ? "Sistem kaynaklı bir hata oluştu." : exception.Message,
+      StatusCode = statusCode
+    };
+
+    if (exception is ValidationException validationException)
+    {
+      response.Message = "Validasyon hataları oluştu.";
+      response.Errors = validationException.Errors.Select(x => x.ErrorMessage).ToList();
+    }
+
     httpContext.Response.ContentType = "application/json";
+    httpContext.Response.StatusCode = statusCode;
 
-    if (exception.GetType() == typeof(NotFoundException))
-    {
-      httpContext.Response.StatusCode = 404;
-      Errors.Success = false;
-      Errors.Message = exception.Message;
-      Errors.StatusCode = 404;
-
-      await httpContext.Response.WriteAsync(JsonSerializer.Serialize(Errors));
-
-      return true;
-    }
-
-    if (exception.GetType() == typeof(AuthorizationException))
-    {
-      httpContext.Response.StatusCode = 401;
-      Errors.Success = false;
-      Errors.Message = exception.Message;
-      Errors.StatusCode = 401;
-
-      await httpContext.Response.WriteAsync(JsonSerializer.Serialize(Errors));
-
-      return true;
-    }
-
-    if (exception.GetType() == typeof(BusinessException))
-    {
-      httpContext.Response.StatusCode = 400;
-      Errors.Success = false;
-      Errors.Message = exception.Message;
-      Errors.StatusCode = 400;
-
-      await httpContext.Response.WriteAsync(JsonSerializer.Serialize(Errors));
-
-      return true;
-    }
-
-    httpContext.Response.StatusCode = 500;
-    Errors.Success = false;
-    Errors.Message = exception.Message;
-    Errors.StatusCode = 500;
-
-    await httpContext.Response.WriteAsync(JsonSerializer.Serialize(Errors));
+    await httpContext.Response.WriteAsync(JsonSerializer.Serialize(response), cancellationToken);
 
     return true;
   }

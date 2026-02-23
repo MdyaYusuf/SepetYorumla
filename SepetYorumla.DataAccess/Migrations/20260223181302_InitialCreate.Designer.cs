@@ -12,7 +12,7 @@ using SepetYorumla.DataAccess.Contexts;
 namespace SepetYorumla.DataAccess.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20260220111540_InitialCreate")]
+    [Migration("20260223181302_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -159,6 +159,10 @@ namespace SepetYorumla.DataAccess.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("CreatedDate");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(500)

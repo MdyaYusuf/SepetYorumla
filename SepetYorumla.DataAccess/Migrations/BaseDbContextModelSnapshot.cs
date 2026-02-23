@@ -157,6 +157,10 @@ namespace SepetYorumla.DataAccess.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("CreatedDate");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
