@@ -1,9 +1,16 @@
 ﻿using SepetYorumla.Core.Entities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SepetYorumla.Models.Entities;
 
 public class Product : Entity<Guid>
 {
+  [SetsRequiredMembers]
+  public Product()
+  {
+    Name = default!;
+  }
+
   public required string Name { get; set; }
   public decimal Price { get; set; }
   public string? StoreName { get; set; }

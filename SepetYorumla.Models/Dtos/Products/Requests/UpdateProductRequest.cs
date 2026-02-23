@@ -6,4 +6,6 @@ public sealed record UpdateProductRequest(
   decimal Price,
   string? StoreName,
   string? Brand,
-  string? Model);
+  string? Model,
+  bool IsActive,
+  int CategoryId);

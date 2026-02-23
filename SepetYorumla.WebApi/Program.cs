@@ -1,5 +1,5 @@
 using SepetYorumla.DataAccess.Extensions;
-using SepetYorumla.Models.Mapping;
+using SepetYorumla.Service.Extensions;
 using SepetYorumla.WebApi.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +9,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddDataAccessDependencies(builder.Configuration);
+builder.Services.AddServiceDependencies();
 
 var app = builder.Build();
 

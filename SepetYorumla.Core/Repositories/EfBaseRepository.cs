@@ -16,7 +16,13 @@ public class EfBaseRepository<TContext, TEntity, TId> : IRepository<TEntity, TId
     _context = context;
   }
 
-  public async Task<List<TEntity>> GetAllAsync(bool enableTracking = false, bool withDeleted = false, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null, Expression<Func<TEntity, bool>>? filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, CancellationToken cancellationToken = default)
+  public async Task<List<TEntity>> GetAllAsync(
+    Expression<Func<TEntity, bool>>? filter = null,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
   {
     IQueryable<TEntity> query = _context.Set<TEntity>();
 
@@ -48,15 +54,40 @@ public class EfBaseRepository<TContext, TEntity, TId> : IRepository<TEntity, TId
     return await query.ToListAsync(cancellationToken);
   }
 
-  public async Task<TEntity?> GetByIdAsync(TId id)
+  public async Task<TEntity?> GetByIdAsync(
+    TId id,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+    bool enableTracking = false,
+    CancellationToken cancellationToken = default)
   {
-    return await _context.Set<TEntity>().FindAsync(id);
+    IQueryable<TEntity> query = _context.Set<TEntity>();
+
+    if (!enableTracking)
+    {
+      query = query.AsNoTracking();
+    }
+
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    return await query.FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
   }
 
-  public async Task<TEntity> AddAsync(TEntity entity)
+  public async Task<bool> AnyAsync(
+    Expression<Func<TEntity, bool>> predicate,
+    CancellationToken cancellationToken = default)
+  {
+    return await _context.Set<TEntity>().AnyAsync(predicate, cancellationToken);
+  }
+
+  public async Task<TEntity> AddAsync(
+    TEntity entity,
+    CancellationToken cancellationToken)
   {
     entity.CreatedDate = DateTime.Now;
-    await _context.Set<TEntity>().AddAsync(entity);
+    await _context.Set<TEntity>().AddAsync(entity, cancellationToken);
 
     return entity;
   }

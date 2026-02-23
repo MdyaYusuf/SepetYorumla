@@ -8,9 +8,13 @@ public class Category : Entity<int>
   [SetsRequiredMembers]
   public Category()
   {
+    Products = new HashSet<Product>();
+
     Name = default!;
   }
 
   public required string Name { get; set; }
-  public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+
+  // Navigation properties
+  public virtual ICollection<Product> Products { get; set; }
 }

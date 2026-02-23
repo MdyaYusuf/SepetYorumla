@@ -1,9 +1,16 @@
 ﻿using SepetYorumla.Core.Entities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SepetYorumla.Models.Entities;
 
 public class Comment : Entity<int>
 {
+  [SetsRequiredMembers]
+  public Comment()
+  {
+    Text = default!;
+  }
+
   public required string Text { get; set; }
   public bool IsActive { get; set; } = true;
 

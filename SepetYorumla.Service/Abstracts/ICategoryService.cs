@@ -1,5 +1,4 @@
-﻿using SepetYorumla.Core.Entities;
-using SepetYorumla.Core.Responses;
+﻿using SepetYorumla.Core.Responses;
 using SepetYorumla.Models.Dtos.Categories.Requests;
 using SepetYorumla.Models.Dtos.Categories.Responses;
 using SepetYorumla.Models.Entities;
@@ -10,15 +9,28 @@ namespace SepetYorumla.Service.Abstracts;
 public interface ICategoryService
 {
   Task<ReturnModel<List<CategoryResponseDto>>> GetAllAsync(
+    Expression<Func<Category, bool>>? filter = null,
+    Func<IQueryable<Category>, IQueryable<Category>>? include = null,
+    Func<IQueryable<Category>, IOrderedQueryable<Category>>? orderBy = null,
     bool enableTracking = false,
     bool withDeleted = false,
-    Func<IQueryable<Category>, IQueryable<Category>>? include = null,
-    Expression<Func<Category, bool>>? filter = null,
-    Func<IQueryable<Category>, IOrderedQueryable<Category>>? orderBy = null,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<CategoryResponseDto>> GetByIdAsync(int id);
-  Task<ReturnModel<CategoryResponseDto>> AddAsync(CreateCategoryRequest request);
-  Task<ReturnModel<NoData>> RemoveAsync(int id);
-  Task<ReturnModel<NoData>> UpdateAsync(UpdateCategoryRequest request);
+  Task<ReturnModel<CategoryResponseDto>> GetByIdAsync(
+    int id,
+    Func<IQueryable<Category>, IQueryable<Category>>? include = null,
+    bool enableTracking = false,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<CategoryResponseDto>> AddAsync(
+    CreateCategoryRequest request,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<NoData>> RemoveAsync(
+    int id,
+    CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<NoData>> UpdateAsync(
+    UpdateCategoryRequest request,
+    CancellationToken cancellationToken = default);
 }

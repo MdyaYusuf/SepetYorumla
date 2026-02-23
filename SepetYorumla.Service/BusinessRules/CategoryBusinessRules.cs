@@ -6,9 +6,13 @@ namespace SepetYorumla.Service.BusinessRules;
 
 public class CategoryBusinessRules(ICategoryRepository _categoryRepository)
 {
-  public async Task<Category> GetCategoryIfExistAsync(int id)
+  public async Task<Category> GetCategoryIfExistAsync(
+    int id,
+    Func<IQueryable<Category>, IQueryable<Category>>? include = null,
+    bool enableTracking = false,
+    CancellationToken cancellationToken = default)
   {
-    var category = await _categoryRepository.GetByIdAsync(id);
+    var category = await _categoryRepository.GetByIdAsync(id, include, enableTracking, cancellationToken);
 
     if (category == null)
     {
@@ -18,11 +22,11 @@ public class CategoryBusinessRules(ICategoryRepository _categoryRepository)
     return category;
   }
 
-  public async Task IsNameUniqueAsync(string name)
+  public async Task NameMustBeUniqueAsync(string name, CancellationToken cancellationToken = default)
   {
-    var category = await _categoryRepository.GetByNameAsync(name);
+    var exists = await _categoryRepository.AnyAsync(x => x.Name == name, cancellationToken);
 
-    if (category != null)
+    if (exists)
     {
       throw new BusinessException("Kategori için benzersiz bir isim kullanılmalıdır.");
     }

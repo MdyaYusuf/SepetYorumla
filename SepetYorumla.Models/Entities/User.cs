@@ -1,9 +1,23 @@
 ﻿using SepetYorumla.Core.Entities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SepetYorumla.Models.Entities;
 
 public class User : Entity<Guid>
 {
+  [SetsRequiredMembers]
+  public User()
+  {
+    Baskets = new HashSet<Basket>();
+    Reviews = new HashSet<Review>();
+    Comments = new HashSet<Comment>();
+
+    Username = default!;
+    Email = default!;
+    PasswordHash = default!;
+    PasswordKey = default!;
+  }
+
   public required string Username { get; set; }
   public required string Email { get; set; }
   public required string PasswordHash { get; set; }
@@ -13,7 +27,7 @@ public class User : Entity<Guid>
   public bool IsActive { get; set; } = true;
 
   // Navigation properties
-  public virtual ICollection<Basket> Baskets { get; set; } = new List<Basket>();
-  public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
-  public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+  public virtual ICollection<Basket> Baskets { get; set; }
+  public virtual ICollection<Review> Reviews { get; set; }
+  public virtual ICollection<Comment> Comments { get; set; }
 }

@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SepetYorumla.DataAccess\SepetYorumla.DataAccess.csproj" />
+    <ProjectReference Include="..\SepetYorumla.Service\SepetYorumla.Service.csproj" />
   </ItemGroup>
 
 </Project>

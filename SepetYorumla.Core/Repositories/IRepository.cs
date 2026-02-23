@@ -8,15 +8,27 @@ public interface IRepository<TEntity, TId>
   where TId : notnull
 {
   Task<List<TEntity>> GetAllAsync(
+    Expression<Func<TEntity, bool>>? filter = null,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
     bool enableTracking = false,
     bool withDeleted = false,
-    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
-    Expression<Func<TEntity, bool>>? filter = null,
-    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
     CancellationToken cancellationToken = default);
 
-  Task<TEntity?> GetByIdAsync(TId id);
-  Task<TEntity> AddAsync(TEntity entity);
+  Task<TEntity?> GetByIdAsync(
+    TId id,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+    bool enableTracking = false,
+    CancellationToken cancellationToken = default);
+
+  Task<bool> AnyAsync(
+    Expression<Func<TEntity,bool>> predicate,
+    CancellationToken cancellationToken = default);
+
+  Task<TEntity> AddAsync(
+    TEntity entity,
+    CancellationToken cancellationToken = default);
+
   void Delete(TEntity entity);
   void Update(TEntity entity);
 }
