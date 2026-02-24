@@ -16,6 +16,10 @@ public static class DataAccessDependencies
     services.AddScoped<IUnitOfWork, UnitOfWork>();
     services.AddScoped<ICategoryRepository, EfCategoryRepository>();
     services.AddScoped<IProductRepository, EfProductRepository>();
+    services.AddScoped<IBasketRepository, EfBasketRepository>();
+    services.AddScoped<ICommentRepository, EfCommentRepository>();
+    services.AddScoped<IReviewRepository, EfReviewRepository>();
+    services.AddScoped<IUserRepository, EfUserRepository>();
 
     return services;
   }

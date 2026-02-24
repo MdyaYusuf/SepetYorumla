@@ -12,9 +12,4 @@ public class EfProductRepository : EfBaseRepository<BaseDbContext, Product, Guid
   {
     
   }
-
-  public async Task<Product?> GetByNameAsync(string name)
-  {
-    return await _context.Products.FirstOrDefaultAsync(p => p.Name == name);
-  }
 }

@@ -46,6 +46,36 @@ public class CategoryService(
     };
   }
 
+  public async Task<ReturnModel<CategoryResponseDto>> GetAsync(
+    Expression<Func<Category, bool>> predicate,
+    Func<IQueryable<Category>, IQueryable<Category>>? include = null,
+    bool enableTracking = false,
+    CancellationToken cancellationToken = default)
+  {
+    var category = await _categoryRepository.GetAsync(predicate, include, enableTracking, cancellationToken);
+
+    if (category == null)
+    {
+      return new ReturnModel<CategoryResponseDto>
+      {
+        Success = true,
+        Message = "Eşleşen kategori bulunamadı.",
+        Data = null,
+        StatusCode = 200
+      };
+    }
+
+    var response = _mapper.EntityToResponseDto(category);
+
+    return new ReturnModel<CategoryResponseDto>
+    {
+      Success = true,
+      Message = "Kategori başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<CategoryResponseDto>> GetByIdAsync(
     int id,
     Func<IQueryable<Category>, IQueryable<Category>>? include = null,

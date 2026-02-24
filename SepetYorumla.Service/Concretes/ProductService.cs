@@ -43,6 +43,40 @@ public class ProductService(
     };
   }
 
+  public async Task<ReturnModel<ProductResponseDto>> GetAsync(
+    Expression<Func<Product, bool>> predicate,
+    Func<IQueryable<Product>, IQueryable<Product>>? include = null,
+    bool enableTracking = false,
+    CancellationToken cancellationToken = default)
+  {
+    var product = await _productRepository.GetAsync(
+        predicate,
+        include ?? (p => p.Include(x => x.Category)),
+        enableTracking,
+        cancellationToken);
+
+    if (product == null)
+    {
+      return new ReturnModel<ProductResponseDto>
+      {
+        Success = true,
+        Message = "Eşleşen ürün bulunamadı.",
+        Data = null,
+        StatusCode = 200
+      };
+    }
+
+    var response = _mapper.EntityToResponseDto(product);
+
+    return new ReturnModel<ProductResponseDto>
+    {
+      Success = true,
+      Message = "Ürün başarılı bir şekilde getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<ProductResponseDto>> GetByIdAsync(
     Guid id,
     Func<IQueryable<Product>, IQueryable<Product>>? include = null,

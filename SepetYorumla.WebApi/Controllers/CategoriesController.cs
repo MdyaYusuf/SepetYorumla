@@ -24,6 +24,16 @@ public class CategoriesController(ICategoryService _categoryService) : CustomBas
     return CreateActionResult(result);
   }
 
+  [HttpGet("getbyname")]
+  public async Task<IActionResult> GetByName([FromQuery] string name, CancellationToken cancellationToken)
+  {
+    var result = await _categoryService.GetAsync(
+      predicate: c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpPost]
   public async Task<IActionResult> Add([FromBody] CreateCategoryRequest request, CancellationToken cancellationToken)
   {

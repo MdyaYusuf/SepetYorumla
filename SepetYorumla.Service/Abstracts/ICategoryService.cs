@@ -16,6 +16,12 @@ public interface ICategoryService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<CategoryResponseDto>> GetAsync(
+    Expression<Func<Category, bool>> predicate,
+    Func<IQueryable<Category>, IQueryable<Category>>? include = null,
+    bool enableTracking = false,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<CategoryResponseDto>> GetByIdAsync(
     int id,
     Func<IQueryable<Category>, IQueryable<Category>>? include = null,

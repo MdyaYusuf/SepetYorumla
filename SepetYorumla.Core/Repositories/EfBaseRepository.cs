@@ -54,6 +54,27 @@ public class EfBaseRepository<TContext, TEntity, TId> : IRepository<TEntity, TId
     return await query.ToListAsync(cancellationToken);
   }
 
+  public async Task<TEntity?> GetAsync(
+    Expression<Func<TEntity, bool>> predicate,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+    bool enableTracking = false,
+    CancellationToken cancellationToken = default)
+  {
+    IQueryable<TEntity> query = _context.Set<TEntity>();
+
+    if (!enableTracking)
+    {
+      query = query.AsNoTracking();
+    }
+
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    return await query.FirstOrDefaultAsync(predicate, cancellationToken);
+  }
+
   public async Task<TEntity?> GetByIdAsync(
     TId id,
     Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,

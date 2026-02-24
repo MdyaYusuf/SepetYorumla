@@ -12,7 +12,7 @@ using SepetYorumla.DataAccess.Contexts;
 namespace SepetYorumla.DataAccess.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20260223181302_InitialCreate")]
+    [Migration("20260224182312_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -199,6 +199,9 @@ namespace SepetYorumla.DataAccess.Migrations
                     b.HasIndex("BasketId");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Products", (string)null);
                 });

@@ -16,6 +16,12 @@ public interface IProductService
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<ProductResponseDto>> GetAsync(
+    Expression<Func<Product, bool>> predicate,
+    Func<IQueryable<Product>, IQueryable<Product>>? include = null,
+    bool enableTracking = false,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<ProductResponseDto>> GetByIdAsync(
     Guid id,
     Func<IQueryable<Product>, IQueryable<Product>>? include = null,

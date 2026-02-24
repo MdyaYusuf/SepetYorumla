@@ -197,6 +197,9 @@ namespace SepetYorumla.DataAccess.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Products", (string)null);
                 });
 

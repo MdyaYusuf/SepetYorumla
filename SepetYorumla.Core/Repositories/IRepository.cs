@@ -15,6 +15,12 @@ public interface IRepository<TEntity, TId>
     bool withDeleted = false,
     CancellationToken cancellationToken = default);
 
+  Task<TEntity?> GetAsync(
+    Expression<Func<TEntity, bool>> predicate,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+    bool enableTracking = false,
+    CancellationToken cancellationToken = default);
+
   Task<TEntity?> GetByIdAsync(
     TId id,
     Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,

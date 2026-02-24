@@ -199,6 +199,12 @@ namespace SepetYorumla.DataAccess.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Products_Name",
+                table: "Products",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reviews_BasketId",
                 table: "Reviews",
                 column: "BasketId");

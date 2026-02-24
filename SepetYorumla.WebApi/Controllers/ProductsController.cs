@@ -22,6 +22,16 @@ public class ProductsController(IProductService _productService) : CustomBaseCon
     return CreateActionResult(result);
   }
 
+  [HttpGet("getbyname")]
+  public async Task<IActionResult> GetByName([FromQuery] string name, CancellationToken cancellationToken)
+  {
+    var result = await _productService.GetAsync(
+      predicate: p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpPost]
   public async Task<IActionResult> Add(CreateProductRequest request, CancellationToken cancellationToken)
   {

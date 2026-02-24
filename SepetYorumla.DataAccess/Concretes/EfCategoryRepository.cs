@@ -12,9 +12,4 @@ public class EfCategoryRepository : EfBaseRepository<BaseDbContext, Category, in
   {
     
   }
-
-  public async Task<Category?> GetByNameAsync(string name)
-  {
-    return await _context.Categories.FirstOrDefaultAsync(c => c.Name == name);
-  }
 }

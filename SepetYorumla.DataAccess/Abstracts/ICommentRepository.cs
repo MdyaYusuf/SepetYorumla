@@ -3,7 +3,7 @@ using SepetYorumla.Models.Entities;
 
 namespace SepetYorumla.DataAccess.Abstracts;
 
-public interface IProductRepository : IRepository<Product, Guid>
+public interface ICommentRepository : IRepository<Comment, int>
 {
 
 }
