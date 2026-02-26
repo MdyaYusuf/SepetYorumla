@@ -31,16 +31,21 @@ public partial class GeneralMapper
 
   public partial Basket CreateToEntity(CreateBasketRequest request);
   public partial void UpdateEntityFromRequest(UpdateBasketRequest request, Basket entity);
+  [MapProperty("User.Username", nameof(BasketResponseDto.Username))]
   public partial BasketResponseDto EntityToResponseDto(Basket entity);
   public partial List<BasketResponseDto> EntityToResponseDtoList(List<Basket> entities);
 
   public partial Review CreateToEntity(CreateReviewRequest request);
   public partial void UpdateEntityFromRequest(UpdateReviewRequest request, Review entity);
+  [MapProperty("User.Username", nameof(ReviewResponseDto.Username))]
+  [MapProperty("Basket.Title", nameof(ReviewResponseDto.BasketTitle))]
   public partial ReviewResponseDto EntityToResponseDto(Review entity);
   public partial List<ReviewResponseDto> EntityToResponseDtoList(List<Review> entities);
 
   public partial Comment CreateToEntity(CreateCommentRequest request);
   public partial void UpdateEntityFromRequest(UpdateCommentRequest request, Comment entity);
+  [MapProperty("User.Username", nameof(CommentResponseDto.Username))]
+  [MapProperty("Basket.Title", nameof(CommentResponseDto.BasketTitle))]
   public partial CommentResponseDto EntityToResponseDto(Comment entity);
   public partial List<CommentResponseDto> EntityToResponseDtoList(List<Comment> entities);
 

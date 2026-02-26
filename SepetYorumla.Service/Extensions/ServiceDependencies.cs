@@ -17,9 +17,17 @@ public static class ServiceDependencies
 
     services.AddScoped<CategoryBusinessRules>();
     services.AddScoped<ProductBusinessRules>();
+    services.AddScoped<BasketBusinessRules>();
+    services.AddScoped<CommentBusinessRules>();
+    services.AddScoped<ReviewBusinessRules>();
+    services.AddScoped<UserBusinessRules>();
 
     services.AddScoped<ICategoryService, CategoryService>();
     services.AddScoped<IProductService, ProductService>();
+    services.AddScoped<IBasketService, BasketService>();
+    services.AddScoped<ICommentService, CommentService>();
+    services.AddScoped<IReviewService, ReviewService>();
+    services.AddScoped<IUserService, UserService>();
 
     services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 

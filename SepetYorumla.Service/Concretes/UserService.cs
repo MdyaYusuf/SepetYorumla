@@ -1,0 +1,158 @@
+﻿using FluentValidation;
+using SepetYorumla.Core.Responses;
+using SepetYorumla.DataAccess.Abstracts;
+using SepetYorumla.Models.Dtos.Users.Requests;
+using SepetYorumla.Models.Dtos.Users.Responses;
+using SepetYorumla.Models.Entities;
+using SepetYorumla.Models.Mapping;
+using SepetYorumla.Service.Abstracts;
+using SepetYorumla.Service.BusinessRules;
+using System.Linq.Expressions;
+
+namespace SepetYorumla.Service.Concretes;
+
+public class UserService(
+    IUserRepository _userRepository,
+    UserBusinessRules _businessRules,
+    GeneralMapper _mapper,
+    IUnitOfWork _unitOfWork,
+    IValidator<RegisterUserRequest> _registerValidator,
+    IValidator<UpdateUserRequest> _updateValidator) : IUserService
+{
+  public async Task<ReturnModel<List<UserResponseDto>>> GetAllAsync(
+    Expression<Func<User, bool>>? filter = null,
+    Func<IQueryable<User>, IQueryable<User>>? include = null,
+    Func<IQueryable<User>, IOrderedQueryable<User>>? orderBy = null,
+    bool enableTracking = false,
+    bool withDeleted = false,
+    CancellationToken cancellationToken = default)
+  {
+    List<User> users = await _userRepository.GetAllAsync(filter, include, orderBy, enableTracking, withDeleted, cancellationToken);
+    List<UserResponseDto> response = _mapper.EntityToResponseDtoList(users);
+
+    return new ReturnModel<List<UserResponseDto>>()
+    {
+      Success = true,
+      Message = "Kullanıcı listesi başarıyla getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<UserResponseDto>> GetAsync(
+      Expression<Func<User, bool>> predicate,
+      Func<IQueryable<User>, IQueryable<User>>? include = null,
+      bool enableTracking = false,
+      CancellationToken cancellationToken = default)
+  {
+    var user = await _userRepository.GetAsync(predicate, include, enableTracking, cancellationToken);
+
+    if (user == null)
+    {
+      return new ReturnModel<UserResponseDto>()
+      {
+        Success = true,
+        Message = "Eşleşen kullanıcı bulunamadı.",
+        Data = null,
+        StatusCode = 200
+      };
+    }
+
+    return new ReturnModel<UserResponseDto>()
+    {
+      Success = true,
+      Message = "Kullanıcı başarıyla getirildi.",
+      Data = _mapper.EntityToResponseDto(user),
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<UserResponseDto>> GetByIdAsync(
+    Guid id,
+    Func<IQueryable<User>, IQueryable<User>>? include = null,
+    bool enableTracking = false,
+    CancellationToken cancellationToken = default)
+  {
+    User user = await _businessRules.GetUserIfExistAsync(id, include, enableTracking, cancellationToken);
+
+    return new ReturnModel<UserResponseDto>()
+    {
+      Success = true,
+      Message = $"{id} numaralı kullanıcı başarıyla getirildi.",
+      Data = _mapper.EntityToResponseDto(user),
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<UserResponseDto>> RegisterAsync(RegisterUserRequest request, CancellationToken cancellationToken = default)
+  {
+    var validationResult = await _registerValidator.ValidateAsync(request, cancellationToken);
+    if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+
+    await _businessRules.EmailMustBeUniqueAsync(request.Email, cancellationToken: cancellationToken);
+    await _businessRules.UsernameMustBeUniqueAsync(request.Username, cancellationToken: cancellationToken);
+
+    User createdUser = _mapper.CreateToEntity(request);
+
+    // Note: Password hashing will happen here later!
+
+    await _userRepository.AddAsync(createdUser, cancellationToken);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    return new ReturnModel<UserResponseDto>()
+    {
+      Success = true,
+      Message = "Kullanıcı başarıyla kaydedildi.",
+      Data = _mapper.EntityToResponseDto(createdUser),
+      StatusCode = 201
+    };
+  }
+
+  public async Task<ReturnModel<NoData>> RemoveAsync(Guid id, CancellationToken cancellationToken = default)
+  {
+    User user = await _businessRules.GetUserIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
+
+    _userRepository.Delete(user);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    return new ReturnModel<NoData>()
+    {
+      Success = true,
+      Message = "Kullanıcı başarıyla silindi.",
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateUserRequest request, CancellationToken cancellationToken = default)
+  {
+    var validationResult = await _updateValidator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
+    User existingUser = await _businessRules.GetUserIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
+
+    if (existingUser.Email != request.Email)
+    {
+      await _businessRules.EmailMustBeUniqueAsync(request.Email, request.Id, cancellationToken);
+    }
+
+    if (existingUser.Username != request.Username)
+    {
+      await _businessRules.UsernameMustBeUniqueAsync(request.Username, request.Id, cancellationToken);
+    }
+
+    _mapper.UpdateEntityFromRequest(request, existingUser);
+    _userRepository.Update(existingUser);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    return new ReturnModel<NoData>()
+    {
+      Success = true,
+      Message = "Kullanıcı başarıyla güncellendi.",
+      StatusCode = 200
+    };
+  }
+}
