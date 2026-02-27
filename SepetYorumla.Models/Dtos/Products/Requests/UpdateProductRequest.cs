@@ -9,4 +9,5 @@ public sealed record UpdateProductRequest(
   string? Brand,
   string? Model,
   bool IsActive,
+  Guid BasketId,
   int CategoryId);

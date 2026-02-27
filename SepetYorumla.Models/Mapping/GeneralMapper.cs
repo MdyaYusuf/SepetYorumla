@@ -25,6 +25,8 @@ public partial class GeneralMapper
 
   public partial Product CreateToEntity(CreateProductRequest request);
   public partial void UpdateEntityFromRequest(UpdateProductRequest request, Product entity);
+  public partial Product ProductDtoToEntity(CreateProductInBasketDto dto);
+  [MapProperty("Basket.Title", nameof(ProductResponseDto.BasketTitle))]
   [MapProperty("Category.Name", nameof(ProductResponseDto.CategoryName))]
   public partial ProductResponseDto EntityToResponseDto(Product entity);
   public partial List<ProductResponseDto> EntityToResponseDtoList(List<Product> entities);

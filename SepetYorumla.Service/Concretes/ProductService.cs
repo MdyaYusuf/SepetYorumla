@@ -29,7 +29,7 @@ public class ProductService(
     CancellationToken cancellationToken = default)
   {
     List<Product> products = await _productRepository.GetAllAsync(
-      include: p => p.Include(p => p.Category),
+      include: p => p.Include(p => p.Category).Include(p => p.Basket),
       cancellationToken: cancellationToken);
 
     List<ProductResponseDto> response = _mapper.EntityToResponseDtoList(products);
@@ -51,7 +51,7 @@ public class ProductService(
   {
     var product = await _productRepository.GetAsync(
         predicate,
-        include ?? (p => p.Include(x => x.Category)),
+        include ?? (p => p.Include(x => x.Category).Include(p => p.Basket)),
         enableTracking,
         cancellationToken);
 
@@ -85,7 +85,7 @@ public class ProductService(
   {
     Product product = await _businessRules.GetProductIfExistAsync(
       id,
-      include: p => p.Include(p => p.Category),
+      include: p => p.Include(p => p.Category).Include(p => p.Basket),
       enableTracking: false,
       cancellationToken: cancellationToken);
 
@@ -109,8 +109,9 @@ public class ProductService(
       throw new ValidationException(validationResult.Errors);
     }
 
-    await _businessRules.ProductNameMustBeUniqueAsync(request.Name, cancellationToken: cancellationToken);
+    await _businessRules.BasketMustExistAsync(request.BasketId, cancellationToken);
     await _businessRules.CategoryMustExistAsync(request.CategoryId, cancellationToken);
+    await _businessRules.ProductNameMustBeUniqueAsync(request.Name, cancellationToken: cancellationToken);
 
     Product createdProduct = _mapper.CreateToEntity(request);
 
@@ -156,6 +157,11 @@ public class ProductService(
       request.Id,
       enableTracking: true,
       cancellationToken: cancellationToken);
+
+    if (existingProduct.BasketId != request.BasketId)
+    {
+      await _businessRules.BasketMustExistAsync(request.BasketId, cancellationToken);
+    }
 
     if (existingProduct.CategoryId != request.CategoryId)
     {

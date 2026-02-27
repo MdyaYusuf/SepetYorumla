@@ -24,4 +24,8 @@
     <ProjectReference Include="..\SepetYorumla.Service\SepetYorumla.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>

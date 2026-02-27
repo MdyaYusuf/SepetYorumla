@@ -4,7 +4,10 @@ using SepetYorumla.Models.Entities;
 
 namespace SepetYorumla.Service.BusinessRules;
 
-public class ProductBusinessRules(IProductRepository _productRepository, ICategoryRepository _categoryRepository)
+public class ProductBusinessRules(
+  IProductRepository _productRepository,
+  ICategoryRepository _categoryRepository,
+  IBasketRepository _basketRepository)
 {
   public async Task<Product> GetProductIfExistAsync(
     Guid id,
@@ -39,6 +42,16 @@ public class ProductBusinessRules(IProductRepository _productRepository, ICatego
     if (!exists)
     {
       throw new NotFoundException($"{categoryId} numaralı kategori bulunamadı.");
+    }
+  }
+
+  public async Task BasketMustExistAsync(Guid basketId, CancellationToken cancellationToken = default)
+  {
+    var exists = await _basketRepository.AnyAsync(x => x.Id == basketId, cancellationToken);
+
+    if (!exists)
+    {
+      throw new NotFoundException($"{basketId} numaralı sepet bulunamadı.");
     }
   }
 }

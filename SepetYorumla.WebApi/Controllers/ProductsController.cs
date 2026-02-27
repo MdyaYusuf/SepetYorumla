@@ -4,6 +4,8 @@ using SepetYorumla.Service.Abstracts;
 
 namespace SepetYorumla.WebApi.Controllers;
 
+[Route("api/[controller]")]
+[ApiController]
 public class ProductsController(IProductService _productService) : CustomBaseController
 {
   [HttpGet]

@@ -9,5 +9,7 @@ public sealed record ProductResponseDto(
   string? ImageUrl,
   string? Brand,
   string? Model,
+  Guid BasketId,
+  string BasketTitle,
   int CategoryId,
   string CategoryName);
