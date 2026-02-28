@@ -1,0 +1,8 @@
+@import './styles/variables.css';
+
+body {
+  margin: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-white);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
