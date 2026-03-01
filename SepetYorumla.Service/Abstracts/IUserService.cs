@@ -28,10 +28,6 @@ public interface IUserService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<UserResponseDto>> RegisterAsync(
-    RegisterUserRequest request,
-    CancellationToken cancellationToken = default);
-
   Task<ReturnModel<NoData>> RemoveAsync(
     Guid id,
     CancellationToken cancellationToken = default);

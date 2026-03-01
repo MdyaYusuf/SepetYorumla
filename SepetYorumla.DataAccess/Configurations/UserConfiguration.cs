@@ -38,6 +38,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     builder.Property(u => u.PasswordKey)
       .IsRequired();
 
+    builder.Property(u => u.RefreshToken)
+      .HasMaxLength(500)
+      .IsRequired(false);
+
+    builder.Property(u => u.RefreshTokenExpiration)
+      .IsRequired(false);
+
     builder.Property(u => u.ProfileImageUrl)
       .HasMaxLength(500)
       .IsRequired(false);

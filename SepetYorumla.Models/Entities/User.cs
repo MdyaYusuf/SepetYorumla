@@ -22,6 +22,8 @@ public class User : Entity<Guid>
   public required string Email { get; set; }
   public required string PasswordHash { get; set; }
   public required string PasswordKey { get; set; }
+  public string? RefreshToken { get; set; }
+  public DateTime? RefreshTokenExpiration { get; set; }
   public string? ProfileImageUrl { get; set; }
   public string? Bio {  get; set; }
   public bool IsActive { get; set; } = true;

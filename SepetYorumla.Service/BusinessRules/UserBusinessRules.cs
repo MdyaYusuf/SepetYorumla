@@ -28,7 +28,7 @@ public class UserBusinessRules(IUserRepository _userRepository)
 
     if (exists)
     {
-      throw new BusinessException("Bu e-posta adresi zaten kullanımda.");
+      throw new BusinessException("Bu eposta adresi zaten kullanımda.");
     }
   }
 

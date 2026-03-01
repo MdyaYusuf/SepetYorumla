@@ -16,7 +16,6 @@ public class UserService(
     UserBusinessRules _businessRules,
     GeneralMapper _mapper,
     IUnitOfWork _unitOfWork,
-    IValidator<RegisterUserRequest> _registerValidator,
     IValidator<UpdateUserRequest> _updateValidator) : IUserService
 {
   public async Task<ReturnModel<List<UserResponseDto>>> GetAllAsync(
@@ -81,30 +80,6 @@ public class UserService(
       Message = $"{id} numaralı kullanıcı başarıyla getirildi.",
       Data = _mapper.EntityToResponseDto(user),
       StatusCode = 200
-    };
-  }
-
-  public async Task<ReturnModel<UserResponseDto>> RegisterAsync(RegisterUserRequest request, CancellationToken cancellationToken = default)
-  {
-    var validationResult = await _registerValidator.ValidateAsync(request, cancellationToken);
-    if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
-
-    await _businessRules.EmailMustBeUniqueAsync(request.Email, cancellationToken: cancellationToken);
-    await _businessRules.UsernameMustBeUniqueAsync(request.Username, cancellationToken: cancellationToken);
-
-    User createdUser = _mapper.CreateToEntity(request);
-
-    // Note: Password hashing will happen here later!
-
-    await _userRepository.AddAsync(createdUser, cancellationToken);
-    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-    return new ReturnModel<UserResponseDto>()
-    {
-      Success = true,
-      Message = "Kullanıcı başarıyla kaydedildi.",
-      Data = _mapper.EntityToResponseDto(createdUser),
-      StatusCode = 201
     };
   }
 

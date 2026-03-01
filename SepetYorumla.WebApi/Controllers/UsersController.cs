@@ -24,14 +24,6 @@ public class UsersController(IUserService _userService) : CustomBaseController
     return CreateActionResult(result);
   }
 
-  [HttpPost("register")]
-  public async Task<IActionResult> Register(RegisterUserRequest request, CancellationToken cancellationToken)
-  {
-    var result = await _userService.RegisterAsync(request, cancellationToken);
-
-    return CreateActionResult(result);
-  }
-
   [HttpPut]
   public async Task<IActionResult> Update(UpdateUserRequest request, CancellationToken cancellationToken)
   {
