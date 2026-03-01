@@ -2,6 +2,7 @@ import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Container, IconButton } from '@mui/material';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import MenuIcon from '@mui/icons-material/Menu';
+import { Link as RouterLink } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
   return (
@@ -17,14 +18,28 @@ const Navbar: React.FC = () => {
       <Container maxWidth="lg">
         <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 0 } }}>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }}>
+          <Box
+            component={RouterLink}
+            to="/"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              cursor: 'pointer',
+              textDecoration: 'none',
+              '&:active': { color: 'var(--primary)', opacity: 1 },
+              '&:visited': { color: 'var(--primary)' }
+            }}
+          >
             <Box
               sx={{
                 bgcolor: 'rgba(13, 166, 242, 0.15)',
                 p: 0.8,
                 borderRadius: '10px',
                 display: 'flex',
-                border: '1px solid rgba(13, 166, 242, 0.3)'
+                border: '1px solid rgba(13, 166, 242, 0.3)',
+                transition: 'all 0.3s ease',
+                '&:hover': { boxShadow: '0 0 15px rgba(13, 166, 242, 0.4)' }
               }}
             >
               <ShoppingBasketIcon sx={{ color: 'var(--primary)', fontSize: 28 }} />
@@ -33,9 +48,16 @@ const Navbar: React.FC = () => {
               variant="h6"
               sx={{
                 fontWeight: 800,
-                color: 'var(--text-white)',
+                color: 'var(--primary)',
+                opacity: 0.85,
                 letterSpacing: '-0.5px',
-                fontFamily: "'Plus Jakarta Sans', sans-serif"
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                  opacity: 1,
+                  color: 'var(--primary)',
+                  textShadow: '0 0 12px rgba(13, 166, 242, 0.6), 0 0 20px rgba(13, 166, 242, 0.2)'
+                }
               }}
             >
               SepetYorumla
@@ -50,6 +72,31 @@ const Navbar: React.FC = () => {
             <Box sx={{ width: '1px', height: '20px', bgcolor: 'var(--border-dark)', mx: 2 }} />
 
             <Button
+              component={RouterLink}
+              to="/register"
+              variant="outlined"
+              sx={{
+                color: 'var(--text-white)',
+                borderColor: 'var(--border-dark)',
+                borderRadius: '24px',
+                px: 3,
+                py: 0.8,
+                textTransform: 'none',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                mr: 1,
+                '&:hover': {
+                  borderColor: 'var(--text-muted)',
+                  bgcolor: 'rgba(255, 255, 255, 0.05)'
+                }
+              }}
+            >
+              Kayıt Ol
+            </Button>
+
+            <Button
+              component={RouterLink}
+              to="/login"
               variant="contained"
               sx={{
                 bgcolor: 'var(--primary)',
