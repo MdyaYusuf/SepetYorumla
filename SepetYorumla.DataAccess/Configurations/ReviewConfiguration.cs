@@ -35,6 +35,12 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
       .HasDefaultValue(true)
       .IsRequired();
 
+    builder.Property(r => r.UserId)
+      .IsRequired();
+
+    builder.Property(r => r.BasketId)
+      .IsRequired();
+
     builder.HasOne(r => r.Basket)
       .WithMany(b => b.Reviews)
       .HasForeignKey(r => r.BasketId)

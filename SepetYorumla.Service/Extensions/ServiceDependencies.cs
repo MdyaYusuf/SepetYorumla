@@ -22,6 +22,7 @@ public static class ServiceDependencies
     services.AddScoped<ReviewBusinessRules>();
     services.AddScoped<UserBusinessRules>();
     services.AddScoped<AuthenticationBusinessRules>();
+    services.AddScoped<RoleBusinessRules>();
 
     services.AddScoped<ICategoryService, CategoryService>();
     services.AddScoped<IProductService, ProductService>();
@@ -30,6 +31,7 @@ public static class ServiceDependencies
     services.AddScoped<IReviewService, ReviewService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IAuthenticationService, AuthenticationService>();
+    services.AddScoped<IRoleService, RoleService>();
 
     services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 

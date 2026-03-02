@@ -56,6 +56,12 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
       .HasDefaultValue(true)
       .IsRequired();
 
+    builder.Property(p => p.BasketId)
+      .IsRequired();
+
+    builder.Property(p => p.CategoryId)
+      .IsRequired();
+
     builder.HasOne(p => p.Basket)
       .WithMany(b => b.Products)
       .HasForeignKey(p => p.BasketId)

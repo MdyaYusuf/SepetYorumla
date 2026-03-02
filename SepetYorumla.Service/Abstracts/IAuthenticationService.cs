@@ -7,8 +7,8 @@ namespace SepetYorumla.Service.Abstracts;
 
 public interface IAuthenticationService
 {
-  Task<ReturnModel<TokenResponseDto>> RefreshTokenAsync(string refreshToken, CancellationToken cancellationToken);
-  Task<ReturnModel<NoData>> RevokeRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken);
+  Task<ReturnModel<TokenResponseDto>> RefreshTokenAsync(CancellationToken cancellationToken, string? refreshToken = null);
+  Task<ReturnModel<NoData>> RevokeRefreshTokenAsync(CancellationToken cancellationToken, string? refreshToken = null);
   Task<ReturnModel<TokenResponseDto>> LoginAsync(LoginRequest request, CancellationToken cancellationToken);
 
   Task<ReturnModel<UserResponseDto>> RegisterAsync(

@@ -25,17 +25,17 @@ public class AuthenticationController(IAuthenticationService _authenticationServ
   }
 
   [HttpPost("refresh-token")]
-  public async Task<IActionResult> RefreshToken([FromBody] string refreshToken, CancellationToken cancellationToken)
+  public async Task<IActionResult> RefreshToken(CancellationToken cancellationToken)
   {
-    var result = await _authenticationService.RefreshTokenAsync(refreshToken, cancellationToken);
+    var result = await _authenticationService.RefreshTokenAsync(cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpPost("logout")]
-  public async Task<IActionResult> Logout([FromBody] string refreshToken, CancellationToken cancellationToken)
+  public async Task<IActionResult> Logout(CancellationToken cancellationToken)
   {
-    var result = await _authenticationService.RevokeRefreshTokenAsync(refreshToken, cancellationToken);
+    var result = await _authenticationService.RevokeRefreshTokenAsync(cancellationToken);
 
     return CreateActionResult(result);
   }

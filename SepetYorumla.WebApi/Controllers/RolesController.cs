@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SepetYorumla.Models.Dtos.Categories.Requests;
+using SepetYorumla.Models.Dtos.Roles.Requests;
 using SepetYorumla.Service.Abstracts;
 
 namespace SepetYorumla.WebApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CategoriesController(ICategoryService _categoryService) : CustomBaseController
+public class RolesController(IRoleService _roleService) : CustomBaseController
 {
   [HttpGet]
   public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
   {
-    var result = await _categoryService.GetAllAsync(cancellationToken: cancellationToken);
+    var result = await _roleService.GetAllAsync(cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }
@@ -19,7 +19,7 @@ public class CategoriesController(ICategoryService _categoryService) : CustomBas
   [HttpGet("{id:int}")]
   public async Task<IActionResult> GetById([FromRoute] int id, CancellationToken cancellationToken)
   {
-    var result = await _categoryService.GetByIdAsync(id, cancellationToken: cancellationToken);
+    var result = await _roleService.GetByIdAsync(id, cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }
@@ -27,17 +27,17 @@ public class CategoriesController(ICategoryService _categoryService) : CustomBas
   [HttpGet("getbyname")]
   public async Task<IActionResult> GetByName([FromQuery] string name, CancellationToken cancellationToken)
   {
-    var result = await _categoryService.GetAsync(
-      predicate: c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase),
+    var result = await _roleService.GetAsync(
+      predicate: r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase),
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpPost]
-  public async Task<IActionResult> Add([FromBody] CreateCategoryRequest request, CancellationToken cancellationToken)
+  public async Task<IActionResult> Add([FromBody] CreateRoleRequest request, CancellationToken cancellationToken)
   {
-    var result = await _categoryService.AddAsync(request, cancellationToken);
+    var result = await _roleService.AddAsync(request, cancellationToken);
 
     return CreateActionResult(result);
   }
@@ -45,15 +45,15 @@ public class CategoriesController(ICategoryService _categoryService) : CustomBas
   [HttpDelete("{id:int}")]
   public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
   {
-    var result = await _categoryService.RemoveAsync(id, cancellationToken);
+    var result = await _roleService.RemoveAsync(id, cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpPut]
-  public async Task<IActionResult> Update([FromBody] UpdateCategoryRequest request, CancellationToken cancellationToken)
+  public async Task<IActionResult> Update([FromBody] UpdateRoleRequest request, CancellationToken cancellationToken)
   {
-    var result = await _categoryService.UpdateAsync(request, cancellationToken);
+    var result = await _roleService.UpdateAsync(request, cancellationToken);
 
     return CreateActionResult(result);
   }

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SepetYorumla.Core.Responses;
@@ -31,11 +32,13 @@ public class AuthenticationService(
 {
   private readonly TokenOptions _options = _tokenOptions.Value;
 
-  public async Task<ReturnModel<TokenResponseDto>> RefreshTokenAsync(string? refreshToken, CancellationToken cancellationToken)
+  public async Task<ReturnModel<TokenResponseDto>> RefreshTokenAsync(CancellationToken cancellationToken, string? refreshToken = null)
   {
     var token = refreshToken ?? _httpContextAccessor.HttpContext?.Request.Cookies["refreshToken"];
 
-    var user = await _userRepository.GetAsync(u => u.RefreshToken == token);
+    var user = await _userRepository.GetAsync(
+      predicate: u => u.RefreshToken == token,
+      include: u => u.Include(u => u.Role));
 
     _authenticationBusinessRules.RefreshTokenMustBeValid(user);
 
@@ -56,7 +59,7 @@ public class AuthenticationService(
     };
   }
 
-  public async Task<ReturnModel<NoData>> RevokeRefreshTokenAsync(string? refreshToken, CancellationToken cancellationToken)
+  public async Task<ReturnModel<NoData>> RevokeRefreshTokenAsync(CancellationToken cancellationToken, string? refreshToken = null)
   {
     var token = refreshToken ?? _httpContextAccessor.HttpContext?.Request.Cookies["refreshToken"];
 
@@ -80,7 +83,9 @@ public class AuthenticationService(
 
   public async Task<ReturnModel<TokenResponseDto>> LoginAsync(LoginRequest request, CancellationToken cancellationToken)
   {
-    var user = await _userRepository.GetAsync(u => u.Email == request.Email);
+    var user = await _userRepository.GetAsync(
+      predicate: u => u.Email == request.Email,
+      include: u => u.Include(u => u.Role));
 
     _authenticationBusinessRules.UserCredentialsMustMatch(user, request.Password);
 
@@ -115,6 +120,7 @@ public class AuthenticationService(
     await _businessRules.UsernameMustBeUniqueAsync(request.Username, cancellationToken: cancellationToken);
 
     User createdUser = _mapper.CreateToEntity(request);
+    createdUser.RoleId = 2;
 
     HashingHelper.CreatePasswordHash(request.Password, out string hash, out string key);
     createdUser.PasswordHash = hash;
@@ -123,11 +129,13 @@ public class AuthenticationService(
     await _userRepository.AddAsync(createdUser, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+    UserResponseDto response = _mapper.EntityToResponseDto(createdUser);
+
     return new ReturnModel<UserResponseDto>()
     {
       Success = true,
       Message = "Kullanıcı başarıyla kaydedildi.",
-      Data = _mapper.EntityToResponseDto(createdUser),
+      Data = response,
       StatusCode = 201
     };
   }
@@ -161,7 +169,8 @@ public class AuthenticationService(
     {
       new(ClaimTypes.NameIdentifier, user.Id.ToString()),
       new(ClaimTypes.Email, user.Email),
-      new(ClaimTypes.Name, user.Username)
+      new(ClaimTypes.Name, user.Username),
+      new(ClaimTypes.Role, user.Role.Name)
     };
 
     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecurityKey));

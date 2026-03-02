@@ -28,7 +28,7 @@ public class ProductsController(IProductService _productService) : CustomBaseCon
   public async Task<IActionResult> GetByName([FromQuery] string name, CancellationToken cancellationToken)
   {
     var result = await _productService.GetAsync(
-      predicate: p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase),
+      predicate: p => p.Name == name,
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);

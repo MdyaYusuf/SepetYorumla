@@ -57,6 +57,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
       .HasDefaultValue(true)
       .IsRequired();
 
+    builder.Property(u => u.RoleId)
+      .IsRequired();
+
+    builder.HasOne(u => u.Role)
+      .WithMany(r => r.Users)
+      .HasForeignKey(u => u.RoleId)
+      .OnDelete(DeleteBehavior.Restrict);
+
     builder.HasIndex(u => u.Username)
       .IsUnique();
 

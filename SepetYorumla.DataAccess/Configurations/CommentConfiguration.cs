@@ -32,6 +32,12 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
       .HasDefaultValue(true)
       .IsRequired();
 
+    builder.Property(c => c.UserId)
+      .IsRequired();
+
+    builder.Property(c => c.BasketId)
+      .IsRequired();
+
     // To fix the "Multiple Cascade Path error" we share responsibilities between EF Core and SQL Server
     builder.HasOne(c => c.User)
       .WithMany(u => u.Comments)

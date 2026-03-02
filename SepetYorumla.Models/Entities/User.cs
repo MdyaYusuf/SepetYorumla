@@ -29,6 +29,8 @@ public class User : Entity<Guid>
   public bool IsActive { get; set; } = true;
 
   // Navigation properties
+  public int RoleId { get; set; }
+  public virtual Role Role { get; set; } = default!;
   public virtual ICollection<Basket> Baskets { get; set; }
   public virtual ICollection<Review> Reviews { get; set; }
   public virtual ICollection<Comment> Comments { get; set; }

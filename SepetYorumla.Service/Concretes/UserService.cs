@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using SepetYorumla.Core.Responses;
 using SepetYorumla.DataAccess.Abstracts;
 using SepetYorumla.Models.Dtos.Users.Requests;
@@ -26,7 +27,10 @@ public class UserService(
     bool withDeleted = false,
     CancellationToken cancellationToken = default)
   {
-    List<User> users = await _userRepository.GetAllAsync(filter, include, orderBy, enableTracking, withDeleted, cancellationToken);
+    List<User> users = await _userRepository.GetAllAsync(
+      include: u => u.Include(u => u.Role),
+      cancellationToken: cancellationToken);
+
     List<UserResponseDto> response = _mapper.EntityToResponseDtoList(users);
 
     return new ReturnModel<List<UserResponseDto>>()
@@ -44,7 +48,11 @@ public class UserService(
       bool enableTracking = false,
       CancellationToken cancellationToken = default)
   {
-    var user = await _userRepository.GetAsync(predicate, include, enableTracking, cancellationToken);
+    var user = await _userRepository.GetAsync(
+      predicate: predicate,
+      include: u => u.Include(u => u.Role),
+      enableTracking: enableTracking,
+      cancellationToken: cancellationToken);
 
     if (user == null)
     {
@@ -72,7 +80,11 @@ public class UserService(
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
   {
-    User user = await _businessRules.GetUserIfExistAsync(id, include, enableTracking, cancellationToken);
+    User user = await _businessRules.GetUserIfExistAsync(
+      id: id,
+      include: u => u.Include(u => u.Role),
+      enableTracking: enableTracking,
+      cancellationToken: cancellationToken);
 
     return new ReturnModel<UserResponseDto>()
     {

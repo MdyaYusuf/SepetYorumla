@@ -36,6 +36,9 @@ public class BasketConfiguration : IEntityTypeConfiguration<Basket>
       .HasDefaultValue(true)
       .IsRequired();
 
+    builder.Property(b => b.UserId)
+      .IsRequired();
+
     builder.HasIndex(b => b.Title);
 
     builder.HasOne(b => b.User)

@@ -20,6 +20,7 @@ public static class DataAccessDependencies
     services.AddScoped<ICommentRepository, EfCommentRepository>();
     services.AddScoped<IReviewRepository, EfReviewRepository>();
     services.AddScoped<IUserRepository, EfUserRepository>();
+    services.AddScoped<IRoleRepository, EfRoleRepository>();
 
     return services;
   }
