@@ -28,15 +28,19 @@ public interface IProductService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<ProductResponseDto>> AddAsync(
+  Task<ReturnModel<CreatedProductResponseDto>> AddAsync(
     CreateProductRequest request,
+    Guid userId,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<NoData>> RemoveAsync(
     Guid id,
+    Guid userId,
+    string userRole,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<NoData>> UpdateAsync(
     UpdateProductRequest request,
+    Guid userId,
     CancellationToken cancellationToken = default);
 }

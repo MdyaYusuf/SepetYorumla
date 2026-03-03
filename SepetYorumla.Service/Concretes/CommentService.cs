@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using SepetYorumla.Core.Responses;
 using SepetYorumla.DataAccess.Abstracts;
@@ -104,7 +105,7 @@ public class CommentService(
     };
   }
 
-  public async Task<ReturnModel<CommentResponseDto>> AddAsync(CreateCommentRequest request, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<CreatedCommentResponseDto>> AddAsync(CreateCommentRequest request, Guid userId, CancellationToken cancellationToken = default)
   {
     var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
 
@@ -113,17 +114,17 @@ public class CommentService(
       throw new ValidationException(validationResult.Errors);
     }
 
-    await _businessRules.UserMustExistAsync(request.UserId, cancellationToken);
     await _businessRules.BasketMustExistAsync(request.BasketId, cancellationToken);
 
     Comment createdComment = _mapper.CreateToEntity(request);
+    createdComment.UserId = userId;
 
     await _commentRepository.AddAsync(createdComment, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    CommentResponseDto response = _mapper.EntityToResponseDto(createdComment);
+    CreatedCommentResponseDto response = _mapper.EntityToCreatedResponseDto(createdComment);
 
-    return new ReturnModel<CommentResponseDto>()
+    return new ReturnModel<CreatedCommentResponseDto>()
     {
       Success = true,
       Message = "Yorum başarılı bir şekilde eklendi.",
@@ -132,9 +133,11 @@ public class CommentService(
     };
   }
 
-  public async Task<ReturnModel<NoData>> RemoveAsync(int id, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<NoData>> RemoveAsync(int id, Guid userId, string userRole, CancellationToken cancellationToken = default)
   {
     Comment comment = await _businessRules.GetCommentIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
+
+    _businessRules.UserMustOwnCommentOrBeAdmin(comment, userId, userRole);
 
     _commentRepository.Delete(comment);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -147,7 +150,7 @@ public class CommentService(
     };
   }
 
-  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateCommentRequest request, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateCommentRequest request, Guid userId, CancellationToken cancellationToken = default)
   {
     var validationResult = await _updateValidator.ValidateAsync(request, cancellationToken);
 
@@ -157,6 +160,8 @@ public class CommentService(
     }
 
     Comment existingComment = await _businessRules.GetCommentIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
+
+    _businessRules.OnlyUserCanEditComment(existingComment, userId);
 
     _mapper.UpdateEntityFromRequest(request, existingComment);
 

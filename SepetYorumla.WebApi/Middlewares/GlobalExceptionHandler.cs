@@ -14,6 +14,7 @@ public class GlobalExceptionHandler : IExceptionHandler
     {
       NotFoundException => StatusCodes.Status404NotFound,
       AuthorizationException => StatusCodes.Status401Unauthorized,
+      ForbiddenException => StatusCodes.Status403Forbidden,
       BusinessException => StatusCodes.Status400BadRequest,
       ValidationException => StatusCodes.Status400BadRequest,
       _ => StatusCodes.Status500InternalServerError

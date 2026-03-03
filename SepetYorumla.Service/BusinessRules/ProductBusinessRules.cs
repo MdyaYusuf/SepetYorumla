@@ -54,4 +54,30 @@ public class ProductBusinessRules(
       throw new NotFoundException($"{basketId} numaralı sepet bulunamadı.");
     }
   }
+
+  public async Task UserMustOwnBasketAsync(Guid basketId, Guid userId, CancellationToken cancellationToken = default)
+  {
+    var isOwner = await _basketRepository.AnyAsync(b => b.Id == basketId && b.UserId == userId, cancellationToken);
+
+    if (!isOwner)
+    {
+      throw new ForbiddenException("Bu sepete ürün ekleme yetkiniz bulunmamaktadır.");
+    }
+  }
+
+  public void UserMustOwnProductBasket(Product product, Guid userId, string userRole)
+  {
+    if (product.Basket.UserId != userId && userRole != "Admin")
+    {
+      throw new ForbiddenException("Bu ürün üzerinde işlem yapma yetkiniz bulunmamaktadır.");
+    }
+  }
+
+  public void OnlyUserCanEditProduct(Product product, Guid userId)
+  {
+    if (product.Basket.UserId != userId)
+    {
+      throw new ForbiddenException("Bu ürünü sadece sepet sahibi düzenleyebilir.");
+    }
+  }
 }

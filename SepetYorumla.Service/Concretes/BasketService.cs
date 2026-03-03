@@ -38,7 +38,7 @@ public class BasketService(
 
     var response = _mapper.EntityToResponseDtoList(baskets);
 
-    return new ReturnModel<List<BasketResponseDto>>
+    return new ReturnModel<List<BasketResponseDto>>()
     {
       Success = true,
       Message = "Sepet listesi başarıyla getirildi.",
@@ -61,7 +61,7 @@ public class BasketService(
 
     if (basket == null)
     {
-      return new ReturnModel<BasketResponseDto>
+      return new ReturnModel<BasketResponseDto>()
       {
         Success = true,
         Message = "Eşleşen sepet bulunamadı.",
@@ -72,7 +72,7 @@ public class BasketService(
 
     var response = _mapper.EntityToResponseDto(basket);
 
-    return new ReturnModel<BasketResponseDto>
+    return new ReturnModel<BasketResponseDto>()
     {
       Success = true,
       Message = "Sepet başarıyla getirildi.",
@@ -95,7 +95,7 @@ public class BasketService(
 
     var response = _mapper.EntityToResponseDto(basket);
 
-    return new ReturnModel<BasketResponseDto>
+    return new ReturnModel<BasketResponseDto>()
     {
       Success = true,
       Message = $"{id} numaralı sepet başarıyla getirildi.",
@@ -104,21 +104,24 @@ public class BasketService(
     };
   }
 
-  public async Task<ReturnModel<BasketResponseDto>> AddAsync(CreateBasketRequest request, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<CreatedBasketResponseDto>> AddAsync(CreateBasketRequest request, Guid userId, CancellationToken cancellationToken = default)
   {
     var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
-    if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-    await _businessRules.UserMustExistAsync(request.UserId, cancellationToken);
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
 
     var createdBasket = _mapper.CreateToEntity(request);
+    createdBasket.UserId = userId;
 
     await _basketRepository.AddAsync(createdBasket, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    var response = _mapper.EntityToResponseDto(createdBasket);
+    var response = _mapper.EntityToCreatedResponseDto(createdBasket);
 
-    return new ReturnModel<BasketResponseDto>
+    return new ReturnModel<CreatedBasketResponseDto>()
     {
       Success = true,
       Message = "Sepet başarıyla oluşturuldu.",
@@ -127,14 +130,16 @@ public class BasketService(
     };
   }
 
-  public async Task<ReturnModel<NoData>> RemoveAsync(Guid id, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<NoData>> RemoveAsync(Guid id, Guid userId, string userRole, CancellationToken cancellationToken = default)
   {
     var basket = await _businessRules.GetBasketIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
+
+    _businessRules.UserMustOwnBasketOrBeAdmin(basket, userId, userRole);
 
     _basketRepository.Delete(basket);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    return new ReturnModel<NoData>
+    return new ReturnModel<NoData>()
     {
       Success = true,
       Message = "Sepet başarıyla silindi.",
@@ -142,19 +147,25 @@ public class BasketService(
     };
   }
 
-  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateBasketRequest request, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateBasketRequest request, Guid userId, CancellationToken cancellationToken = default)
   {
     var validationResult = await _updateValidator.ValidateAsync(request, cancellationToken);
-    if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
 
     var existingBasket = await _businessRules.GetBasketIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
+
+    _businessRules.OnlyUserCanEditBasket(existingBasket, userId);
 
     _mapper.UpdateEntityFromRequest(request, existingBasket);
 
     _basketRepository.Update(existingBasket);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    return new ReturnModel<NoData>
+    return new ReturnModel<NoData>()
     {
       Success = true,
       Message = "Sepet başarıyla güncellendi.",

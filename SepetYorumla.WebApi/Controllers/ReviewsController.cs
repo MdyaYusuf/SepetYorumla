@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SepetYorumla.Models.Dtos.Reviews.Requests;
 using SepetYorumla.Service.Abstracts;
 
@@ -25,25 +26,35 @@ public class ReviewsController(IReviewService _reviewService) : CustomBaseContro
   }
 
   [HttpPost]
+  [Authorize]
   public async Task<IActionResult> Add(CreateReviewRequest request, CancellationToken cancellationToken)
   {
-    var result = await _reviewService.AddAsync(request, cancellationToken);
+    var userId = GetUserId();
+
+    var result = await _reviewService.AddAsync(request, userId, cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpPut]
+  [Authorize]
   public async Task<IActionResult> Update(UpdateReviewRequest request, CancellationToken cancellationToken)
   {
-    var result = await _reviewService.UpdateAsync(request, cancellationToken);
+    var userId = GetUserId();
+
+    var result = await _reviewService.UpdateAsync(request, userId, cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpDelete("{id:guid}")]
+  [Authorize]
   public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
   {
-    var result = await _reviewService.RemoveAsync(id, cancellationToken);
+    var userId = GetUserId();
+    var userRole = GetUserRole();
+
+    var result = await _reviewService.RemoveAsync(id, userId, userRole, cancellationToken);
 
     return CreateActionResult(result);
   }

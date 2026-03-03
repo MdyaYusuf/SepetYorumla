@@ -11,7 +11,7 @@ public interface IAuthenticationService
   Task<ReturnModel<NoData>> RevokeRefreshTokenAsync(CancellationToken cancellationToken, string? refreshToken = null);
   Task<ReturnModel<TokenResponseDto>> LoginAsync(LoginRequest request, CancellationToken cancellationToken);
 
-  Task<ReturnModel<UserResponseDto>> RegisterAsync(
+  Task<ReturnModel<CreatedUserResponseDto>> RegisterAsync(
     RegisterUserRequest request,
     CancellationToken cancellationToken = default);
 }

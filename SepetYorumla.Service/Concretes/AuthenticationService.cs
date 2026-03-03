@@ -107,7 +107,7 @@ public class AuthenticationService(
     };
   }
 
-  public async Task<ReturnModel<UserResponseDto>> RegisterAsync(RegisterUserRequest request, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<CreatedUserResponseDto>> RegisterAsync(RegisterUserRequest request, CancellationToken cancellationToken = default)
   {
     var validationResult = await _registerValidator.ValidateAsync(request, cancellationToken);
 
@@ -129,9 +129,9 @@ public class AuthenticationService(
     await _userRepository.AddAsync(createdUser, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    UserResponseDto response = _mapper.EntityToResponseDto(createdUser);
+    CreatedUserResponseDto response = _mapper.EntityToCreatedResponseDto(createdUser);
 
-    return new ReturnModel<UserResponseDto>()
+    return new ReturnModel<CreatedUserResponseDto>()
     {
       Success = true,
       Message = "Kullanıcı başarıyla kaydedildi.",

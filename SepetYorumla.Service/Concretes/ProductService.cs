@@ -34,7 +34,7 @@ public class ProductService(
 
     List<ProductResponseDto> response = _mapper.EntityToResponseDtoList(products);
 
-    return new ReturnModel<List<ProductResponseDto>>
+    return new ReturnModel<List<ProductResponseDto>>()
     {
       Success = true,
       Message = "Ürün listesi başarılı bir şekilde getirildi.",
@@ -57,7 +57,7 @@ public class ProductService(
 
     if (product == null)
     {
-      return new ReturnModel<ProductResponseDto>
+      return new ReturnModel<ProductResponseDto>()
       {
         Success = true,
         Message = "Eşleşen ürün bulunamadı.",
@@ -68,7 +68,7 @@ public class ProductService(
 
     var response = _mapper.EntityToResponseDto(product);
 
-    return new ReturnModel<ProductResponseDto>
+    return new ReturnModel<ProductResponseDto>()
     {
       Success = true,
       Message = "Ürün başarılı bir şekilde getirildi.",
@@ -91,7 +91,7 @@ public class ProductService(
 
     ProductResponseDto response = _mapper.EntityToResponseDto(product);
 
-    return new ReturnModel<ProductResponseDto>
+    return new ReturnModel<ProductResponseDto>()
     {
       Success = true,
       Message = $"{id} numaralı ürün başarılı bir şekilde getirildi.",
@@ -100,7 +100,7 @@ public class ProductService(
     };
   }
 
-  public async Task<ReturnModel<ProductResponseDto>> AddAsync(CreateProductRequest request, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<CreatedProductResponseDto>> AddAsync(CreateProductRequest request, Guid userId, CancellationToken cancellationToken = default)
   {
     var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
 
@@ -112,15 +112,16 @@ public class ProductService(
     await _businessRules.BasketMustExistAsync(request.BasketId, cancellationToken);
     await _businessRules.CategoryMustExistAsync(request.CategoryId, cancellationToken);
     await _businessRules.ProductNameMustBeUniqueAsync(request.Name, cancellationToken: cancellationToken);
+    await _businessRules.UserMustOwnBasketAsync(request.BasketId, userId, cancellationToken);
 
     Product createdProduct = _mapper.CreateToEntity(request);
 
     await _productRepository.AddAsync(createdProduct, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    ProductResponseDto response = _mapper.EntityToResponseDto(createdProduct);
+    CreatedProductResponseDto response = _mapper.EntityToCreatedResponseDto(createdProduct);
 
-    return new ReturnModel<ProductResponseDto>
+    return new ReturnModel<CreatedProductResponseDto>()
     {
       Success = true,
       Message = "Ürün başarılı bir şekilde eklendi.",
@@ -129,14 +130,20 @@ public class ProductService(
     };
   }
 
-  public async Task<ReturnModel<NoData>> RemoveAsync(Guid id, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<NoData>> RemoveAsync(Guid id, Guid userId, string userRole, CancellationToken cancellationToken = default)
   {
-    Product product = await _businessRules.GetProductIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
+    Product product = await _businessRules.GetProductIfExistAsync(
+      id,
+      include: q => q.Include(p => p.Basket),
+      enableTracking: true,
+      cancellationToken: cancellationToken);
+
+    _businessRules.UserMustOwnProductBasket(product, userId, userRole);
 
     _productRepository.Delete(product);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    return new ReturnModel<NoData>
+    return new ReturnModel<NoData>()
     {
       Success = true,
       Message = "Ürün başarılı bir şekilde silindi.",
@@ -144,7 +151,7 @@ public class ProductService(
     };
   }
 
-  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateProductRequest request, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateProductRequest request, Guid userId, CancellationToken cancellationToken = default)
   {
     var validationResult = await _updateValidator.ValidateAsync(request, cancellationToken);
 
@@ -155,12 +162,16 @@ public class ProductService(
 
     Product existingProduct = await _businessRules.GetProductIfExistAsync(
       request.Id,
+      include: q => q.Include(p => p.Basket),
       enableTracking: true,
       cancellationToken: cancellationToken);
+
+    _businessRules.OnlyUserCanEditProduct(existingProduct, userId);
 
     if (existingProduct.BasketId != request.BasketId)
     {
       await _businessRules.BasketMustExistAsync(request.BasketId, cancellationToken);
+      await _businessRules.UserMustOwnBasketAsync(request.BasketId, userId, cancellationToken);
     }
 
     if (existingProduct.CategoryId != request.CategoryId)
@@ -178,7 +189,7 @@ public class ProductService(
     _productRepository.Update(existingProduct);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    return new ReturnModel<NoData>
+    return new ReturnModel<NoData>()
     {
       Success = true,
       Message = "Ürün başarılı bir şekilde güncellendi.",

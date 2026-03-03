@@ -6,8 +6,7 @@ namespace SepetYorumla.Service.BusinessRules;
 
 public class CommentBusinessRules(
   ICommentRepository _commentRepository,
-  IBasketRepository _basketRepository,
-  IUserRepository _userRepository)
+  IBasketRepository _basketRepository)
 {
   public async Task<Comment> GetCommentIfExistAsync(
     int id,
@@ -25,16 +24,6 @@ public class CommentBusinessRules(
     return comment;
   }
 
-  public async Task UserMustExistAsync(Guid userId, CancellationToken cancellationToken = default)
-  {
-    var exists = await _userRepository.AnyAsync(u => u.Id == userId, cancellationToken);
-
-    if (!exists)
-    {
-      throw new NotFoundException("Kullanıcı bulunamadı.");
-    }
-  }
-
   public async Task BasketMustExistAsync(Guid basketId, CancellationToken cancellationToken = default)
   {
     var exists = await _basketRepository.AnyAsync(b => b.Id == basketId, cancellationToken);
@@ -42,6 +31,22 @@ public class CommentBusinessRules(
     if (!exists)
     {
       throw new NotFoundException("Sepet bulunamadı.");
+    }
+  }
+
+  public void UserMustOwnCommentOrBeAdmin(Comment comment, Guid userId, string userRole)
+  {
+    if (comment.UserId != userId && userRole != "Admin")
+    {
+      throw new ForbiddenException("Bu işlem için yetkiniz bulunmamaktadır.");
+    }
+  }
+
+  public void OnlyUserCanEditComment(Comment comment, Guid userId)
+  {
+    if (comment.UserId != userId)
+    {
+      throw new ForbiddenException("Yorumu sadece sahibi düzenleyebilir.");
     }
   }
 }

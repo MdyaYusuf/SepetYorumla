@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SepetYorumla.Models.Dtos.Users.Requests;
 using SepetYorumla.Service.Abstracts;
 
@@ -9,6 +10,7 @@ namespace SepetYorumla.WebApi.Controllers;
 public class UsersController(IUserService _userService) : CustomBaseController
 {
   [HttpGet]
+  [Authorize(Roles = "Admin")]
   public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
   {
     var result = await _userService.GetAllAsync(cancellationToken: cancellationToken);
@@ -17,6 +19,7 @@ public class UsersController(IUserService _userService) : CustomBaseController
   }
 
   [HttpGet("{id:guid}")]
+  [Authorize]
   public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
   {
     var result = await _userService.GetByIdAsync(id, cancellationToken: cancellationToken);
@@ -25,17 +28,25 @@ public class UsersController(IUserService _userService) : CustomBaseController
   }
 
   [HttpPut]
+  [Authorize]
   public async Task<IActionResult> Update(UpdateUserRequest request, CancellationToken cancellationToken)
   {
-    var result = await _userService.UpdateAsync(request, cancellationToken);
+    var userId = GetUserId();
+    var userRole = GetUserRole();
+
+    var result = await _userService.UpdateAsync(request, userId, userRole, cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpDelete("{id:guid}")]
+  [Authorize]
   public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
   {
-    var result = await _userService.RemoveAsync(id, cancellationToken);
+    var userId = GetUserId();
+    var userRole = GetUserRole();
+
+    var result = await _userService.RemoveAsync(id, userId, userRole, cancellationToken);
 
     return CreateActionResult(result);
   }

@@ -39,13 +39,16 @@ public partial class GeneralMapper
   [MapProperty("Basket.Title", nameof(ProductResponseDto.BasketTitle))]
   [MapProperty("Category.Name", nameof(ProductResponseDto.CategoryName))]
   public partial ProductResponseDto EntityToResponseDto(Product entity);
+  public partial CreatedProductResponseDto EntityToCreatedResponseDto(Product entity);
   public partial List<ProductResponseDto> EntityToResponseDtoList(List<Product> entities);
 
   // Basket
   public partial Basket CreateToEntity(CreateBasketRequest request);
   public partial void UpdateEntityFromRequest(UpdateBasketRequest request, Basket entity);
   [MapProperty("User.Username", nameof(BasketResponseDto.Username))]
+  [MapProperty("User.ProfileImageUrl", nameof(BasketResponseDto.UserProfileImageUrl))]
   public partial BasketResponseDto EntityToResponseDto(Basket entity);
+  public partial CreatedBasketResponseDto EntityToCreatedResponseDto(Basket entity);
   public partial List<BasketResponseDto> EntityToResponseDtoList(List<Basket> entities);
 
   // Review
@@ -54,6 +57,7 @@ public partial class GeneralMapper
   [MapProperty("User.Username", nameof(ReviewResponseDto.Username))]
   [MapProperty("Basket.Title", nameof(ReviewResponseDto.BasketTitle))]
   public partial ReviewResponseDto EntityToResponseDto(Review entity);
+  public partial CreatedReviewResponseDto EntityToCreatedResponseDto(Review entity);
   public partial List<ReviewResponseDto> EntityToResponseDtoList(List<Review> entities);
 
   // Comment
@@ -62,6 +66,7 @@ public partial class GeneralMapper
   [MapProperty("User.Username", nameof(CommentResponseDto.Username))]
   [MapProperty("Basket.Title", nameof(CommentResponseDto.BasketTitle))]
   public partial CommentResponseDto EntityToResponseDto(Comment entity);
+  public partial CreatedCommentResponseDto EntityToCreatedResponseDto(Comment entity);
   public partial List<CommentResponseDto> EntityToResponseDtoList(List<Comment> entities);
 
   // User
@@ -72,5 +77,6 @@ public partial class GeneralMapper
   public partial void UpdateEntityFromRequest(UpdateUserRequest request, User entity);
   [MapProperty("Role.Name", nameof(UserResponseDto.RoleName))]
   public partial UserResponseDto EntityToResponseDto(User entity);
+  public partial CreatedUserResponseDto EntityToCreatedResponseDto(User entity);
   public partial List<UserResponseDto> EntityToResponseDtoList(List<User> entities);
 }

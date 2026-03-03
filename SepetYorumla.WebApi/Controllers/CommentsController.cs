@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SepetYorumla.Models.Dtos.Comments.Requests;
 using SepetYorumla.Service.Abstracts;
 
@@ -25,25 +26,35 @@ public class CommentsController(ICommentService _commentService) : CustomBaseCon
   }
 
   [HttpPost]
+  [Authorize]
   public async Task<IActionResult> Add(CreateCommentRequest request, CancellationToken cancellationToken)
   {
-    var result = await _commentService.AddAsync(request, cancellationToken);
+    var userId = GetUserId();
+
+    var result = await _commentService.AddAsync(request, userId, cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpPut]
+  [Authorize]
   public async Task<IActionResult> Update(UpdateCommentRequest request, CancellationToken cancellationToken)
   {
-    var result = await _commentService.UpdateAsync(request, cancellationToken);
+    var userId = GetUserId();
+
+    var result = await _commentService.UpdateAsync(request, userId, cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpDelete("{id:int}")]
+  [Authorize]
   public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
   {
-    var result = await _commentService.RemoveAsync(id, cancellationToken);
+    var userId = GetUserId();
+    var userRole = GetUserRole();
+
+    var result = await _commentService.RemoveAsync(id, userId, userRole, cancellationToken);
 
     return CreateActionResult(result);
   }

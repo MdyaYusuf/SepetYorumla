@@ -28,15 +28,19 @@ public interface IReviewService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<ReviewResponseDto>> AddAsync(
+  Task<ReturnModel<CreatedReviewResponseDto>> AddAsync(
     CreateReviewRequest request,
+    Guid userId,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<NoData>> RemoveAsync(
     Guid id,
+    Guid userId,
+    string userRole,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<NoData>> UpdateAsync(
     UpdateReviewRequest request,
+    Guid userId,
     CancellationToken cancellationToken = default);
 }

@@ -6,8 +6,7 @@ namespace SepetYorumla.Service.BusinessRules;
 
 public class ReviewBusinessRules(
   IReviewRepository _reviewRepository,
-  IBasketRepository _basketRepository,
-  IUserRepository _userRepository)
+  IBasketRepository _basketRepository)
 {
   public async Task<Review> GetReviewIfExistAsync(
     Guid id,
@@ -25,16 +24,6 @@ public class ReviewBusinessRules(
     return review;
   }
 
-  public async Task UserMustExistAsync(Guid userId, CancellationToken cancellationToken = default)
-  {
-    var exists = await _userRepository.AnyAsync(u => u.Id == userId, cancellationToken);
-
-    if (!exists)
-    {
-      throw new NotFoundException("Kullanıcı bulunamadı.");
-    }
-  }
-
   public async Task BasketMustExistAsync(Guid basketId, CancellationToken cancellationToken = default)
   {
     var exists = await _basketRepository.AnyAsync(b => b.Id == basketId, cancellationToken);
@@ -42,6 +31,22 @@ public class ReviewBusinessRules(
     if (!exists)
     {
       throw new NotFoundException("Sepet bulunamadı.");
+    }
+  }
+
+  public void UserMustOwnReviewOrBeAdmin(Review review, Guid userId, string userRole)
+  {
+    if (review.UserId != userId && userRole != "Admin")
+    {
+      throw new ForbiddenException("Bu incelemeyi silme yetkiniz bulunmamaktadır.");
+    }
+  }
+
+  public void OnlyUserCanEditReview(Review review, Guid userId)
+  {
+    if (review.UserId != userId)
+    {
+      throw new ForbiddenException("İncelemeyi sadece sahibi düzenleyebilir.");
     }
   }
 }

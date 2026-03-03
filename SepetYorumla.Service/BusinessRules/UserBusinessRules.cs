@@ -41,4 +41,12 @@ public class UserBusinessRules(IUserRepository _userRepository)
       throw new BusinessException("Bu kullanıcı adı zaten alınmış.");
     }
   }
+
+  public void UserMustBeOwnerOrAdmin(Guid requestTargetId, Guid currentUserId, string userRole)
+  {
+    if (requestTargetId != currentUserId && userRole != "Admin")
+    {
+      throw new ForbiddenException("Bu işlem için yetkiniz bulunmamaktadır.");
+    }
+  }
 }

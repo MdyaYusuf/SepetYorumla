@@ -95,8 +95,10 @@ public class UserService(
     };
   }
 
-  public async Task<ReturnModel<NoData>> RemoveAsync(Guid id, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<NoData>> RemoveAsync(Guid id, Guid currentUserId, string userRole, CancellationToken cancellationToken = default)
   {
+    _businessRules.UserMustBeOwnerOrAdmin(id, currentUserId, userRole);
+
     User user = await _businessRules.GetUserIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
 
     _userRepository.Delete(user);
@@ -110,8 +112,10 @@ public class UserService(
     };
   }
 
-  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateUserRequest request, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateUserRequest request, Guid currentUserId, string userRole, CancellationToken cancellationToken = default)
   {
+    _businessRules.UserMustBeOwnerOrAdmin(request.Id, currentUserId, userRole);
+
     var validationResult = await _updateValidator.ValidateAsync(request, cancellationToken);
 
     if (!validationResult.IsValid)

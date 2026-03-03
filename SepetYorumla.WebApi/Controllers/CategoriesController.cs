@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SepetYorumla.Models.Dtos.Categories.Requests;
 using SepetYorumla.Service.Abstracts;
 
@@ -35,6 +36,7 @@ public class CategoriesController(ICategoryService _categoryService) : CustomBas
   }
 
   [HttpPost]
+  [Authorize(Roles = "Admin")]
   public async Task<IActionResult> Add([FromBody] CreateCategoryRequest request, CancellationToken cancellationToken)
   {
     var result = await _categoryService.AddAsync(request, cancellationToken);
@@ -43,6 +45,7 @@ public class CategoriesController(ICategoryService _categoryService) : CustomBas
   }
 
   [HttpDelete("{id:int}")]
+  [Authorize(Roles = "Admin")]
   public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
   {
     var result = await _categoryService.RemoveAsync(id, cancellationToken);
@@ -51,6 +54,7 @@ public class CategoriesController(ICategoryService _categoryService) : CustomBas
   }
 
   [HttpPut]
+  [Authorize(Roles = "Admin")]
   public async Task<IActionResult> Update([FromBody] UpdateCategoryRequest request, CancellationToken cancellationToken)
   {
     var result = await _categoryService.UpdateAsync(request, cancellationToken);

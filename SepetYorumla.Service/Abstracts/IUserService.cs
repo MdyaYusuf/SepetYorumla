@@ -30,9 +30,13 @@ public interface IUserService
 
   Task<ReturnModel<NoData>> RemoveAsync(
     Guid id,
+    Guid currentUserId,
+    string userRole,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<NoData>> UpdateAsync(
     UpdateUserRequest request,
+    Guid currentUserId,
+    string userRole,
     CancellationToken cancellationToken = default);
 }

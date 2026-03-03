@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SepetYorumla.Models.Dtos.Baskets.Requests;
+using SepetYorumla.Models.Entities;
 using SepetYorumla.Service.Abstracts;
 
 namespace SepetYorumla.WebApi.Controllers;
@@ -25,25 +27,35 @@ public class BasketsController(IBasketService _basketService) : CustomBaseContro
   }
 
   [HttpPost]
+  [Authorize]
   public async Task<IActionResult> Add(CreateBasketRequest request, CancellationToken cancellationToken)
   {
-    var result = await _basketService.AddAsync(request, cancellationToken);
+    var userId = GetUserId();
+
+    var result = await _basketService.AddAsync(request, userId, cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpPut]
+  [Authorize]
   public async Task<IActionResult> Update(UpdateBasketRequest request, CancellationToken cancellationToken)
   {
-    var result = await _basketService.UpdateAsync(request, cancellationToken);
+    var userId = GetUserId();
+
+    var result = await _basketService.UpdateAsync(request, userId, cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpDelete("{id:guid}")]
+  [Authorize]
   public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
   {
-    var result = await _basketService.RemoveAsync(id, cancellationToken);
+    var userId = GetUserId();
+    var userRole = GetUserRole();
+
+    var result = await _basketService.RemoveAsync(id, userId, userRole, cancellationToken);
 
     return CreateActionResult(result);
   }

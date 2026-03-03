@@ -38,7 +38,7 @@ public class ReviewService(
 
     var response = _mapper.EntityToResponseDtoList(reviews);
 
-    return new ReturnModel<List<ReviewResponseDto>>
+    return new ReturnModel<List<ReviewResponseDto>>()
     {
       Success = true,
       Message = "İncelemeler başarıyla listelendi.",
@@ -61,7 +61,7 @@ public class ReviewService(
 
     if (review == null)
     {
-      return new ReturnModel<ReviewResponseDto>
+      return new ReturnModel<ReviewResponseDto>()
       {
         Success = true,
         Message = "Eşleşen inceleme bulunamadı.",
@@ -72,7 +72,7 @@ public class ReviewService(
 
     var response = _mapper.EntityToResponseDto(review);
 
-    return new ReturnModel<ReviewResponseDto>
+    return new ReturnModel<ReviewResponseDto>()
     {
       Success = true,
       Message = "İnceleme başarıyla getirildi.",
@@ -95,7 +95,7 @@ public class ReviewService(
 
     var response = _mapper.EntityToResponseDto(review);
 
-    return new ReturnModel<ReviewResponseDto>
+    return new ReturnModel<ReviewResponseDto>()
     {
       Success = true,
       Message = $"{id} numaralı inceleme başarıyla getirildi.",
@@ -104,7 +104,7 @@ public class ReviewService(
     };
   }
 
-  public async Task<ReturnModel<ReviewResponseDto>> AddAsync(CreateReviewRequest request, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<CreatedReviewResponseDto>> AddAsync(CreateReviewRequest request, Guid userId, CancellationToken cancellationToken = default)
   {
     var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
 
@@ -113,17 +113,17 @@ public class ReviewService(
       throw new ValidationException(validationResult.Errors);
     }
 
-    await _businessRules.UserMustExistAsync(request.UserId, cancellationToken);
     await _businessRules.BasketMustExistAsync(request.BasketId, cancellationToken);
 
     Review createdReview = _mapper.CreateToEntity(request);
+    createdReview.UserId = userId;
 
     await _reviewRepository.AddAsync(createdReview, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    ReviewResponseDto response = _mapper.EntityToResponseDto(createdReview);
+    CreatedReviewResponseDto response = _mapper.EntityToCreatedResponseDto(createdReview);
 
-    return new ReturnModel<ReviewResponseDto>()
+    return new ReturnModel<CreatedReviewResponseDto>()
     {
       Success = true,
       Message = "İnceleme başarılı bir şekilde eklendi.",
@@ -132,14 +132,16 @@ public class ReviewService(
     };
   }
 
-  public async Task<ReturnModel<NoData>> RemoveAsync(Guid id, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<NoData>> RemoveAsync(Guid id, Guid userId, string userRole, CancellationToken cancellationToken = default)
   {
     var review = await _businessRules.GetReviewIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
+
+    _businessRules.UserMustOwnReviewOrBeAdmin(review, userId, userRole);
 
     _reviewRepository.Delete(review);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    return new ReturnModel<NoData>
+    return new ReturnModel<NoData>()
     {
       Success = true,
       Message = "İnceleme başarıyla silindi.",
@@ -147,7 +149,7 @@ public class ReviewService(
     };
   }
 
-  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateReviewRequest request, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateReviewRequest request, Guid userId, CancellationToken cancellationToken = default)
   {
     var validationResult = await _updateValidator.ValidateAsync(request, cancellationToken);
 
@@ -158,12 +160,14 @@ public class ReviewService(
 
     var existingReview = await _businessRules.GetReviewIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
 
+    _businessRules.OnlyUserCanEditReview(existingReview, userId);
+
     _mapper.UpdateEntityFromRequest(request, existingReview);
 
     _reviewRepository.Update(existingReview);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    return new ReturnModel<NoData>
+    return new ReturnModel<NoData>()
     {
       Success = true,
       Message = "İnceleme başarıyla güncellendi.",

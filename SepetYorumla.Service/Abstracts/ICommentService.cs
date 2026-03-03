@@ -28,15 +28,19 @@ public interface ICommentService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<CommentResponseDto>> AddAsync(
+  Task<ReturnModel<CreatedCommentResponseDto>> AddAsync(
     CreateCommentRequest request,
+    Guid userId,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<NoData>> RemoveAsync(
     int id,
+    Guid userId,
+    string userRole,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<NoData>> UpdateAsync(
     UpdateCommentRequest request,
+    Guid userId,
     CancellationToken cancellationToken = default);
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SepetYorumla.Models.Dtos.Users.Requests;
 using SepetYorumla.Service.Abstracts;
 
@@ -33,6 +34,7 @@ public class AuthenticationController(IAuthenticationService _authenticationServ
   }
 
   [HttpPost("logout")]
+  [Authorize]
   public async Task<IActionResult> Logout(CancellationToken cancellationToken)
   {
     var result = await _authenticationService.RevokeRefreshTokenAsync(cancellationToken);

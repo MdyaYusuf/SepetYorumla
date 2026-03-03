@@ -4,7 +4,7 @@ using SepetYorumla.Models.Entities;
 
 namespace SepetYorumla.Service.BusinessRules;
 
-public class BasketBusinessRules(IBasketRepository _basketRepository, IUserRepository _userRepository)
+public class BasketBusinessRules(IBasketRepository _basketRepository)
 {
   public async Task<Basket> GetBasketIfExistAsync(
     Guid id,
@@ -22,13 +22,19 @@ public class BasketBusinessRules(IBasketRepository _basketRepository, IUserRepos
     return basket;
   }
 
-  public async Task UserMustExistAsync(Guid userId, CancellationToken cancellationToken = default)
+  public void UserMustOwnBasketOrBeAdmin(Basket basket, Guid userId, string userRole)
   {
-    var exists = await _userRepository.AnyAsync(u => u.Id == userId, cancellationToken);
-
-    if (!exists)
+    if (basket.UserId != userId && userRole != "Admin")
     {
-      throw new NotFoundException($"{userId} numaralı kullanıcı bulunamadı.");
+      throw new ForbiddenException("Bu sepeti silme yetkiniz bulunmamaktadır.");
+    }
+  }
+
+  public void OnlyUserCanEditBasket(Basket basket, Guid userId)
+  {
+    if (basket.UserId != userId)
+    {
+      throw new ForbiddenException("Sepeti sadece sahibi düzenleyebilir.");
     }
   }
 }

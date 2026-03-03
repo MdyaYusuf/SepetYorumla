@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SepetYorumla.Models.Dtos.Products.Requests;
 using SepetYorumla.Service.Abstracts;
 
@@ -35,25 +36,35 @@ public class ProductsController(IProductService _productService) : CustomBaseCon
   }
 
   [HttpPost]
+  [Authorize]
   public async Task<IActionResult> Add(CreateProductRequest request, CancellationToken cancellationToken)
   {
-    var result = await _productService.AddAsync(request, cancellationToken);
+    var userId = GetUserId();
+
+    var result = await _productService.AddAsync(request, userId, cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpPut]
+  [Authorize]
   public async Task<IActionResult> Update(UpdateProductRequest request, CancellationToken cancellationToken)
   {
-    var result = await _productService.UpdateAsync(request, cancellationToken);
+    var userId = GetUserId();
+
+    var result = await _productService.UpdateAsync(request, userId, cancellationToken);
 
     return CreateActionResult(result);
   }
 
   [HttpDelete("{id:guid}")]
+  [Authorize]
   public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
   {
-    var result = await _productService.RemoveAsync(id, cancellationToken);
+    var userId = GetUserId();
+    var userRole = GetUserRole();
+
+    var result = await _productService.RemoveAsync(id, userId, userRole, cancellationToken);
 
     return CreateActionResult(result);
   }
