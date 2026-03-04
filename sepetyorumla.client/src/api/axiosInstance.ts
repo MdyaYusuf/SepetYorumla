@@ -1,63 +1,81 @@
-import axios, { AxiosError, type AxiosResponse } from "axios";
+import axios from "axios";
+import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { toast } from "react-toastify";
-
-export interface ReturnModel<T> {
-  success: boolean;
-  message?: string;
-  data?: T;
-  statusCode: number;
-  errors?: string[];
-}
+import { store } from "../store/store";
+import { setCredentials, logout } from "../features/authentication/authSlice";
+import type { ApiResponse } from "../models/ApiResponse";
+import type { TokenResponseDto } from "../models/Token";
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:5222/api/",
   withCredentials: true,
 });
 
+axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  const token = store.getState().auth.token;
+
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response,
-  (error: AxiosError) => {
-    if (!error.response) {
-      toast.error("Sunucuya bağlanılamıyor. Lütfen internetinizi veya sunucu durumunu kontrol edin.");
+  async (error: AxiosError) => {
+    const originalRequest = error.config as any;
 
-      return Promise.reject(error);
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const response = await axios.post<ApiResponse<TokenResponseDto>>(
+          "http://localhost:5222/api/Authentication/refresh-token",
+          {},
+          { withCredentials: true }
+        );
+
+        const tokenData = response.data.data;
+
+        store.dispatch(setCredentials(tokenData));
+
+        originalRequest.headers.Authorization = `Bearer ${tokenData.token}`;
+
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        store.dispatch(logout());
+
+        return Promise.reject(refreshError);
+      }
     }
 
-    const result = error.response.data as ReturnModel<unknown>;
-    const status = error.response.status;
+    const result = error.response?.data as any;
 
-    const errorMessage = result?.message || "Bir hata oluştu.";
-
-    switch (status) {
-      case 400:
-        if (result.errors && result.errors.length > 0) {
-          result.errors.forEach(err => toast.error(err));
-        } else {
-          toast.error(errorMessage);
-        }
-        break;
-      case 401:
-        toast.error("Oturum süreniz dolmuş veya yetkiniz yok.");
-        break;
-      case 404:
-        console.warn("Aradığınız kaynak bulunamadı.");
-        break;
-      case 500:
-        toast.error("Sunucu taraflı bir hata oluştu.");
-        break;
-      default:
-        toast.error("Bir şeyler ters gitti.");
-        break;
+    if (result?.errors?.length > 0) {
+      toast.error(result.errors[0]);
+    } else if (result?.message) {
+      toast.error(result.message);
+    } else {
+      toast.error("Bir hata oluştu.");
     }
+
     return Promise.reject(error);
   }
 );
 
 export const requests = {
-  get: <T>(url: string) => axiosInstance.get<ReturnModel<T>>(url).then(response => response.data),
-  post: <T>(url: string, body: object) => axiosInstance.post<ReturnModel<T>>(url, body).then(response => response.data),
-  put: <T>(url: string, body: object) => axiosInstance.put<ReturnModel<T>>(url, body).then(response => response.data),
-  delete: <T>(url: string) => axiosInstance.delete<ReturnModel<T>>(url).then(response => response.data),
+  get: <T>(url: string): Promise<ApiResponse<T>> =>
+    axiosInstance.get<ApiResponse<T>>(url).then((res) => res.data),
+
+  post: <T>(url: string, body: object): Promise<ApiResponse<T>> =>
+    axiosInstance.post<ApiResponse<T>>(url, body).then((res) => res.data),
+
+  put: <T>(url: string, body: object): Promise<ApiResponse<T>> =>
+    axiosInstance.put<ApiResponse<T>>(url, body).then((res) => res.data),
+
+  delete: <T>(url: string): Promise<ApiResponse<T>> =>
+    axiosInstance.delete<ApiResponse<T>>(url).then((res) => res.data),
 };
 
 export default axiosInstance;

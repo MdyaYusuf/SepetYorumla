@@ -2,38 +2,45 @@ import React from 'react';
 import { Box, Container, Typography, Grid, Button } from '@mui/material';
 import BasketCard from '../shared/BasketCard';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import type { Basket } from '../../models/Basket';
 
 const FeaturedBaskets: React.FC = () => {
-  const sampleBaskets = [
+  const sampleBaskets: Basket[] = [
     {
-      id: 1,
+      id: "1",
       title: "Gece Rutini: Lüks Cilt Bakım Sepetim",
-      user: "SelinGlow",
-      price: "4.250 TL",
-      commentCount: 28,
-      rating: 4.9,
-      image: "/night-care.webp",
-      tags: ["Kozmetik"]
+      userId: "selin-1",
+      username: "SelinGlow",
+      userProfileImageUrl: "https://i.pravatar.cc/150?u=selin",
+      createdDate: new Date().toISOString(),
+      products: [
+        { id: "p1", name: "Gece Kremi", price: 1250, categoryName: "Kozmetik" },
+        { id: "p2", name: "Serum", price: 3000, categoryName: "Kozmetik" }
+      ]
     },
     {
-      id: 2,
+      id: "2",
       title: "Ultimate 4K Gaming & Yayıncı Kurulumu",
-      user: "TechMaster",
-      price: "112.000 TL",
-      commentCount: 156,
-      rating: 4.8,
-      image: "/gaming-setup.webp",
-      tags: ["Elektronik Eşyalar"]
+      userId: "tech-1",
+      username: "TechMaster",
+      userProfileImageUrl: "https://i.pravatar.cc/150?u=tech",
+      createdDate: new Date().toISOString(),
+      products: [
+        { id: "p3", name: "RTX 4090", price: 82000, categoryName: "Elektronik" },
+        { id: "p4", name: "4K Monitor", price: 30000, categoryName: "Elektronik" }
+      ]
     },
     {
-      id: 3,
+      id: "3",
       title: "Sokak Stili: 2026 Kış Koleksiyonu",
-      user: "ModaIkonu",
-      price: "8.900 TL",
-      commentCount: 42,
-      rating: 4.5,
-      image: "/winter-collection.jpg",
-      tags: ["Moda"]
+      userId: "moda-1",
+      username: "ModaIkonu",
+      userProfileImageUrl: "https://i.pravatar.cc/150?u=moda",
+      createdDate: new Date().toISOString(),
+      products: [
+        { id: "p5", name: "Kışlık Parka", price: 5400, categoryName: "Moda" },
+        { id: "p6", name: "Bot", price: 3500, categoryName: "Moda" }
+      ]
     },
   ];
 
@@ -60,7 +67,7 @@ const FeaturedBaskets: React.FC = () => {
         <Grid container spacing={4}>
           {sampleBaskets.map((basket) => (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={basket.id}>
-              <BasketCard {...basket} />
+              <BasketCard basket={basket} />
             </Grid>
           ))}
         </Grid>

@@ -2,6 +2,8 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { createTheme, ThemeProvider, CssBaseline, Box } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useSelector } from 'react-redux';
+import type { RootState } from './store/store';
 
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
@@ -17,6 +19,8 @@ const darkTheme = createTheme({
 });
 
 function App() {
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -28,13 +32,14 @@ function App() {
           flexDirection: 'column'
         }}>
           <ToastContainer position="bottom-right" theme="dark" />
-          <Navbar />
+
+          {!isAuthenticated && <Navbar />}
 
           <Box component="main" sx={{ flexGrow: 1 }}>
             <AppRoutes />
           </Box>
 
-          <Footer />
+          {!isAuthenticated && <Footer />}
         </Box>
       </Router>
     </ThemeProvider>

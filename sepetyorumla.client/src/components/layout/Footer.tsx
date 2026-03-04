@@ -1,21 +1,16 @@
 import React from 'react';
-import { Box, Container, Typography, Grid, Link, Divider } from '@mui/material';
-import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import { Box, Typography, Grid, Link, Divider, Container } from '@mui/material';
 
 const Footer: React.FC = () => {
   return (
-    <Box sx={{ bgcolor: 'var(--bg-dark)', pt: 10, pb: 4, borderTop: '1px solid var(--border-dark)' }}>
-      <Container maxWidth="lg">
-        <Grid container spacing={4} sx={{ mb: 8 }}>
-
+    <Box sx={{ bgcolor: 'var(--bg-dark)', pt: 8, pb: 4, borderTop: '1px solid var(--border-dark)' }}>
+      <Container maxWidth="xl">
+        <Grid container spacing={4} sx={{ mb: 6 }}>
           <Grid size={{ xs: 12, md: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <ShoppingBasketIcon sx={{ color: 'var(--primary)', fontSize: 28 }} />
-              <Typography variant="h6" sx={{ fontWeight: 800, color: 'var(--text-white)', letterSpacing: '-0.5px' }}>
-                SepetYorumla
-              </Typography>
-            </Box>
-            <Typography variant="body2" sx={{ color: 'var(--text-muted)', lineHeight: 1.8, maxWidth: '300px' }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: 'var(--text-white)', mb: 2 }}>
+              SepetYorumla
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'var(--text-muted)', lineHeight: 1.8, maxWidth: '350px' }}>
               Alışveriş sepetlerini paylaşan ve yorumlayan en büyük topluluk.
               Birlikte daha bilinçli ve tasarruflu kararlar veriyoruz.
             </Typography>
@@ -27,7 +22,6 @@ const Footer: React.FC = () => {
             </Typography>
             <FooterLink>Keşfet</FooterLink>
             <FooterLink>Topluluk</FooterLink>
-            <FooterLink>Nasıl Çalışır?</FooterLink>
             <FooterLink>Trendler</FooterLink>
           </Grid>
 
@@ -36,8 +30,6 @@ const Footer: React.FC = () => {
               Kurumsal
             </Typography>
             <FooterLink>Hakkımızda</FooterLink>
-            <FooterLink>Gizlilik Politikası</FooterLink>
-            <FooterLink>Kullanım Şartları</FooterLink>
             <FooterLink>İletişim</FooterLink>
           </Grid>
         </Grid>

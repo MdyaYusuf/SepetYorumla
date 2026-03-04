@@ -8,6 +8,11 @@ namespace SepetYorumla.WebApi.Middlewares;
 
 public class GlobalExceptionHandler : IExceptionHandler
 {
+  private static readonly JsonSerializerOptions _jsonOptions = new()
+  {
+    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+  };
+
   public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
   {
     var statusCode = exception switch
@@ -36,7 +41,7 @@ public class GlobalExceptionHandler : IExceptionHandler
     httpContext.Response.ContentType = "application/json";
     httpContext.Response.StatusCode = statusCode;
 
-    await httpContext.Response.WriteAsync(JsonSerializer.Serialize(response), cancellationToken);
+    await httpContext.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions), cancellationToken);
 
     return true;
   }

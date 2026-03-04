@@ -1,5 +1,8 @@
-﻿namespace SepetYorumla.Models.Dtos.Tokens.Responses;
+﻿using SepetYorumla.Models.Dtos.Users.Responses;
+
+namespace SepetYorumla.Models.Dtos.Tokens.Responses;
 
 public record TokenResponseDto(
   string AccessToken,
-  DateTime AccessTokenExpiration);
+  DateTime AccessTokenExpiration,
+  UserResponseDto User);

@@ -27,6 +27,7 @@ public class AuthenticationService(
   GeneralMapper _mapper,
   IUnitOfWork _unitOfWork,
   IValidator<RegisterUserRequest> _registerValidator,
+  IValidator<LoginRequest> _loginValidator,
   IOptions<TokenOptions> _tokenOptions,
   IHttpContextAccessor _httpContextAccessor) : IAuthenticationService
 {
@@ -83,6 +84,13 @@ public class AuthenticationService(
 
   public async Task<ReturnModel<TokenResponseDto>> LoginAsync(LoginRequest request, CancellationToken cancellationToken)
   {
+    var validationResult = await _loginValidator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
     var user = await _userRepository.GetAsync(
       predicate: u => u.Email == request.Email,
       include: u => u.Include(u => u.Role));
@@ -187,7 +195,8 @@ public class AuthenticationService(
 
     return new TokenResponseDto(
       new JwtSecurityTokenHandler().WriteToken(token),
-      expiration
+      expiration,
+      _mapper.EntityToResponseDto(user)
     );
   }
 }
