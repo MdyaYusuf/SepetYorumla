@@ -18,8 +18,8 @@ public class CreateBasketRequestValidator : AbstractValidator<CreateBasketReques
       .NotEmpty().WithMessage("Kullanıcı ID boş olamaz.");
 
     RuleFor(b => b.Products)
-            .NotEmpty().WithMessage("Bir sepet oluşturmak için en az bir ürün eklemelisiniz.")
-            .Must(p => p != null && p.Count > 0).WithMessage("Sepet içeriği boş olamaz.");
+      .NotEmpty().WithMessage("Bir sepet oluşturmak için ürün eklemelisiniz.")
+      .Must(p => p != null && p.Count >= 2).WithMessage("Bir sepet oluşturmak için en az iki ürün eklenmelidir.");
 
     RuleForEach(b => b.Products).ChildRules(product =>
     {
@@ -34,6 +34,10 @@ public class CreateBasketRequestValidator : AbstractValidator<CreateBasketReques
       product.RuleFor(p => p.CategoryId)
         .NotEmpty().WithMessage("Bir kategori seçilmelidir.")
         .GreaterThan(0).WithMessage("Geçersiz kategori seçimi.");
+
+      product.RuleFor(p => p.ImageFile)
+        .NotNull().WithMessage("Her ürün için bir görsel yüklenmelidir.")
+        .Must(f => f != null && f.Length > 0).WithMessage("Ürün görseli boş olamaz.");
 
       product.RuleFor(p => p.Description)
         .MaximumLength(1000).WithMessage("Açıklama 1000 karakterden fazla olamaz.");

@@ -3,4 +3,5 @@
 public sealed record ProductPreviewDto(
   string Name,
   string? ImageUrl,
-  decimal Price);
+  decimal Price,
+  string CategoryName);

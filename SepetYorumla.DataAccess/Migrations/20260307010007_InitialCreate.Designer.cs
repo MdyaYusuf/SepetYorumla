@@ -12,8 +12,8 @@ using SepetYorumla.DataAccess.Contexts;
 namespace SepetYorumla.DataAccess.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20260302153500_AddRoleAndRefactorConfigs")]
-    partial class AddRoleAndRefactorConfigs
+    [Migration("20260307010007_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

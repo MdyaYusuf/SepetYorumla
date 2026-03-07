@@ -1,12 +1,11 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { createTheme, ThemeProvider, CssBaseline, Box } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useSelector } from 'react-redux';
-import type { RootState } from './store/store';
-
-import Navbar from './components/layout/Navbar';
-import Footer from './components/layout/Footer';
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from './store/store';
+import { initializeAuth } from './features/authentication/authSlice';
 import AppRoutes from './routes/AppRoutes';
 
 const darkTheme = createTheme({
@@ -19,7 +18,11 @@ const darkTheme = createTheme({
 });
 
 function App() {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(initializeAuth());
+  }, [dispatch]);
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -33,13 +36,9 @@ function App() {
         }}>
           <ToastContainer position="bottom-right" theme="dark" />
 
-          {!isAuthenticated && <Navbar />}
-
-          <Box component="main" sx={{ flexGrow: 1 }}>
+          <Box component="main" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
             <AppRoutes />
           </Box>
-
-          {!isAuthenticated && <Footer />}
         </Box>
       </Router>
     </ThemeProvider>

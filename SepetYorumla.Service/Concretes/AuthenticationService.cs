@@ -156,9 +156,9 @@ public class AuthenticationService(
     {
       HttpOnly = true,
       Secure = !isDevelopment,
-      SameSite = SameSiteMode.Strict,
+      SameSite = SameSiteMode.Lax,
       Expires = expires,
-      Path = "/api/Authentication"
+      Path = "/"
     };
 
     _httpContextAccessor.HttpContext?.Response.Cookies.Append("refreshToken", token, cookieOptions);

@@ -8,6 +8,7 @@ using SepetYorumla.Models.Entities;
 using SepetYorumla.Models.Mapping;
 using SepetYorumla.Service.Abstracts;
 using SepetYorumla.Service.BusinessRules;
+using SepetYorumla.Service.Helpers;
 using System.Linq.Expressions;
 
 namespace SepetYorumla.Service.Concretes;
@@ -30,7 +31,7 @@ public class BasketService(
   {
     var baskets = await _basketRepository.GetAllAsync(
       filter,
-      include ?? (query => query.Include(b => b.User).Include(b => b.Products)),
+      include ?? (query => query.Include(b => b.User).Include(b => b.Products).ThenInclude(p => p.Category)),
       orderBy,
       enableTracking,
       withDeleted,
@@ -55,7 +56,7 @@ public class BasketService(
   {
     var basket = await _basketRepository.GetAsync(
       predicate,
-      include: query => query.Include(b => b.User).Include(b => b.Products),
+      include: query => query.Include(b => b.User).Include(b => b.Products).ThenInclude(p => p.Category),
       enableTracking,
       cancellationToken);
 
@@ -89,7 +90,7 @@ public class BasketService(
   {
     var basket = await _businessRules.GetBasketIfExistAsync(
       id,
-      include: query => query.Include(b => b.User).Include(b => b.Products),
+      include: query => query.Include(b => b.User).Include(b => b.Products).ThenInclude(p => p.Category),
       enableTracking,
       cancellationToken);
 
@@ -113,8 +114,26 @@ public class BasketService(
       throw new ValidationException(validationResult.Errors);
     }
 
-    var createdBasket = _mapper.CreateToEntity(request);
-    createdBasket.UserId = userId;
+    var createdBasket = new Basket()
+    {
+      Title = request.Title,
+      Description = request.Description,
+      UserId = userId
+    };
+
+    foreach (var productDto in request.Products)
+    {
+      var productEntity = _mapper.ProductDtoToEntity(productDto);
+
+      if (productDto.ImageFile != null && productDto.ImageFile.Length > 0)
+      {
+        _businessRules.ValidateProductImage(productDto.ImageFile);
+
+        productEntity.ImageUrl = await FileHelper.SaveImageToDisk(productDto.ImageFile, "products", productDto.Name, cancellationToken);
+      }
+
+      createdBasket.Products.Add(productEntity);
+    }
 
     await _basketRepository.AddAsync(createdBasket, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);

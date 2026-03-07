@@ -1,4 +1,6 @@
-﻿namespace SepetYorumla.Models.Dtos.Baskets.Requests;
+﻿using Microsoft.AspNetCore.Http;
+
+namespace SepetYorumla.Models.Dtos.Baskets.Requests;
 
 public sealed record CreateProductInBasketDto(
   string Name,
@@ -8,4 +10,5 @@ public sealed record CreateProductInBasketDto(
   string? ImageUrl,
   string? Brand,
   string? Model,
-  int CategoryId);
+  int CategoryId,
+  IFormFile? ImageFile);

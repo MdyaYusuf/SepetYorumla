@@ -44,6 +44,8 @@ public partial class GeneralMapper
 
   // Basket
   public partial Basket CreateToEntity(CreateBasketRequest request);
+  [MapProperty("Category.Name", nameof(ProductPreviewDto.CategoryName))]
+  public partial ProductPreviewDto ProductToPreviewDto(Product entity);
   public partial void UpdateEntityFromRequest(UpdateBasketRequest request, Basket entity);
   [MapProperty("User.Username", nameof(BasketResponseDto.Username))]
   [MapProperty("User.ProfileImageUrl", nameof(BasketResponseDto.UserProfileImageUrl))]

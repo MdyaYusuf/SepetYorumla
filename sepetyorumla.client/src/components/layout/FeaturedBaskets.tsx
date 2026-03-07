@@ -1,48 +1,28 @@
-import React from 'react';
-import { Box, Container, Typography, Grid, Button } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Container, Typography, Grid, Button, CircularProgress } from '@mui/material';
 import BasketCard from '../shared/BasketCard';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import type { Basket } from '../../models/Basket';
+import type { BasketResponseDto } from '../../models/Basket';
+import { BasketService } from '../../api/basketService';
 
 const FeaturedBaskets: React.FC = () => {
-  const sampleBaskets: Basket[] = [
-    {
-      id: "1",
-      title: "Gece Rutini: Lüks Cilt Bakım Sepetim",
-      userId: "selin-1",
-      username: "SelinGlow",
-      userProfileImageUrl: "https://i.pravatar.cc/150?u=selin",
-      createdDate: new Date().toISOString(),
-      products: [
-        { id: "p1", name: "Gece Kremi", price: 1250, categoryName: "Kozmetik" },
-        { id: "p2", name: "Serum", price: 3000, categoryName: "Kozmetik" }
-      ]
-    },
-    {
-      id: "2",
-      title: "Ultimate 4K Gaming & Yayıncı Kurulumu",
-      userId: "tech-1",
-      username: "TechMaster",
-      userProfileImageUrl: "https://i.pravatar.cc/150?u=tech",
-      createdDate: new Date().toISOString(),
-      products: [
-        { id: "p3", name: "RTX 4090", price: 82000, categoryName: "Elektronik" },
-        { id: "p4", name: "4K Monitor", price: 30000, categoryName: "Elektronik" }
-      ]
-    },
-    {
-      id: "3",
-      title: "Sokak Stili: 2026 Kış Koleksiyonu",
-      userId: "moda-1",
-      username: "ModaIkonu",
-      userProfileImageUrl: "https://i.pravatar.cc/150?u=moda",
-      createdDate: new Date().toISOString(),
-      products: [
-        { id: "p5", name: "Kışlık Parka", price: 5400, categoryName: "Moda" },
-        { id: "p6", name: "Bot", price: 3500, categoryName: "Moda" }
-      ]
-    },
-  ];
+  const [baskets, setBaskets] = useState<BasketResponseDto[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBaskets = async () => {
+      try {
+        const response = await BasketService.getAll();
+        setBaskets(response.data.slice(0, 3));
+      } catch (error) {
+        // The axios interceptor already handles the toast notification
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBaskets();
+  }, []);
 
   return (
     <Box sx={{ py: 10, bgcolor: 'var(--bg-dark)' }}>
@@ -64,13 +44,24 @@ const FeaturedBaskets: React.FC = () => {
           </Button>
         </Box>
 
-        <Grid container spacing={4}>
-          {sampleBaskets.map((basket) => (
-            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={basket.id}>
-              <BasketCard basket={basket} />
-            </Grid>
-          ))}
-        </Grid>
+        {isLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
+            <CircularProgress color="primary" />
+          </Box>
+        ) : (
+          <Grid container spacing={4}>
+            {baskets.map((basket) => (
+              <Grid key={basket.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                <BasketCard basket={basket} />
+              </Grid>
+            ))}
+            {baskets.length === 0 && (
+              <Typography sx={{ color: 'var(--text-muted)', textAlign: 'center', width: '100%', py: 5 }}>
+                Henüz paylaşılmış bir sepet bulunamadı.
+              </Typography>
+            )}
+          </Grid>
+        )}
       </Container>
     </Box>
   );

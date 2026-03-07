@@ -1,17 +1,17 @@
-export interface Basket {
+export interface BasketResponseDto {
   id: string;
   title: string;
   description?: string;
   userId: string;
   username: string;
-  userProfileImageUrl?: string; 
+  userProfileImageUrl?: string;
   products: ProductPreviewDto[];
   createdDate: string;
 }
 
 export interface ProductPreviewDto {
-  id: string;
   name: string;
+  imageUrl: string;
   price: number;
   categoryName: string;
 }

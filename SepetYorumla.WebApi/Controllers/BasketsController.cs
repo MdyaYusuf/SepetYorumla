@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SepetYorumla.Models.Dtos.Baskets.Requests;
-using SepetYorumla.Models.Entities;
 using SepetYorumla.Service.Abstracts;
 
 namespace SepetYorumla.WebApi.Controllers;
@@ -28,7 +27,7 @@ public class BasketsController(IBasketService _basketService) : CustomBaseContro
 
   [HttpPost]
   [Authorize]
-  public async Task<IActionResult> Add(CreateBasketRequest request, CancellationToken cancellationToken)
+  public async Task<IActionResult> Add([FromForm] CreateBasketRequest request, CancellationToken cancellationToken)
   {
     var userId = GetUserId();
 

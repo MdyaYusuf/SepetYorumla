@@ -1,7 +1,7 @@
 import type { User } from "./User";
 
 export interface TokenResponseDto {
-  token: string;
-  expiration: string;
+  accessToken: string;
+  accessTokenExpiration: string;
   user: User;
 }

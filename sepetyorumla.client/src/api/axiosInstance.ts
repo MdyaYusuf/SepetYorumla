@@ -6,6 +6,10 @@ import { setCredentials, logout } from "../features/authentication/authSlice";
 import type { ApiResponse } from "../models/ApiResponse";
 import type { TokenResponseDto } from "../models/Token";
 
+interface RetryableRequest extends InternalAxiosRequestConfig {
+  retry?: boolean;
+}
+
 const axiosInstance = axios.create({
   baseURL: "http://localhost:5222/api/",
   withCredentials: true,
@@ -24,10 +28,16 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as any;
+    const originalRequest = error.config as RetryableRequest;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    if (originalRequest?.url?.includes("refresh-token")) {
+      store.dispatch(logout());
+
+      return Promise.reject(error);
+    }
+
+    if (error.response?.status === 401 && !originalRequest.retry) {
+      originalRequest.retry = true;
 
       try {
         const response = await axios.post<ApiResponse<TokenResponseDto>>(
@@ -37,26 +47,30 @@ axiosInstance.interceptors.response.use(
         );
 
         const tokenData = response.data.data;
-
         store.dispatch(setCredentials(tokenData));
 
-        originalRequest.headers.Authorization = `Bearer ${tokenData.token}`;
+        originalRequest.headers.Authorization = `Bearer ${tokenData.accessToken}`;
+
+        if (originalRequest.data instanceof FormData) {
+          delete originalRequest.headers['Content-Type'];
+        }
 
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         store.dispatch(logout());
+        toast.error("Oturum süreniz doldu, lütfen tekrar giriş yapın.");
 
         return Promise.reject(refreshError);
       }
     }
 
-    const result = error.response?.data as any;
+    const result = error.response?.data as ApiResponse<null>;
 
-    if (result?.errors?.length > 0) {
+    if (result?.errors && result.errors.length > 0) {
       toast.error(result.errors[0]);
     } else if (result?.message) {
       toast.error(result.message);
-    } else {
+    } else if (error.response?.status !== 401) {
       toast.error("Bir hata oluştu.");
     }
 
@@ -65,17 +79,10 @@ axiosInstance.interceptors.response.use(
 );
 
 export const requests = {
-  get: <T>(url: string): Promise<ApiResponse<T>> =>
-    axiosInstance.get<ApiResponse<T>>(url).then((res) => res.data),
-
-  post: <T>(url: string, body: object): Promise<ApiResponse<T>> =>
-    axiosInstance.post<ApiResponse<T>>(url, body).then((res) => res.data),
-
-  put: <T>(url: string, body: object): Promise<ApiResponse<T>> =>
-    axiosInstance.put<ApiResponse<T>>(url, body).then((res) => res.data),
-
-  delete: <T>(url: string): Promise<ApiResponse<T>> =>
-    axiosInstance.delete<ApiResponse<T>>(url).then((res) => res.data),
+  get: <T>(url: string): Promise<ApiResponse<T>> => axiosInstance.get<ApiResponse<T>>(url).then((res) => res.data),
+  post: <T>(url: string, body: object | FormData): Promise<ApiResponse<T>> => axiosInstance.post<ApiResponse<T>>(url, body).then((res) => res.data),
+  put: <T>(url: string, body: object | FormData): Promise<ApiResponse<T>> => axiosInstance.put<ApiResponse<T>>(url, body).then((res) => res.data),
+  delete: <T>(url: string): Promise<ApiResponse<T>> => axiosInstance.delete<ApiResponse<T>>(url).then((res) => res.data),
 };
 
 export default axiosInstance;
