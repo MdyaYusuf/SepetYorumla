@@ -1,7 +1,7 @@
 export interface ReviewResponseDto {
   id: string;
-  starRating: number;
-  isThumbsUp: boolean;
+  starRating: number | null;
+  isThumbsUp: boolean | null;
   userId: string;
   username: string;
   basketId: string;

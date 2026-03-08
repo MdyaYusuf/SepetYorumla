@@ -2,8 +2,8 @@
 
 public sealed record ReviewResponseDto(
   Guid Id,
-  decimal StarRating,
-  bool IsThumbsUp,
+  decimal? StarRating,
+  bool? IsThumbsUp,
   Guid UserId,
   string Username,
   Guid BasketId,

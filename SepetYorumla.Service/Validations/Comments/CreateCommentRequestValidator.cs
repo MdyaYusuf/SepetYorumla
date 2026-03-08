@@ -12,9 +12,6 @@ public class CreateCommentRequestValidator : AbstractValidator<CreateCommentRequ
       .MinimumLength(2).WithMessage("Yorum en az 2 karakter olmalıdır.")
       .MaximumLength(1000).WithMessage("Yorum en fazla 1000 karakter olabilir.");
 
-    RuleFor(c => c.UserId)
-      .NotEmpty().WithMessage("Kullanıcı bilgisi eksik.");
-
     RuleFor(c => c.BasketId)
       .NotEmpty().WithMessage("Sepet bilgisi eksik.");
   }

@@ -46,7 +46,19 @@ const BasketCard: React.FC<BasketCardProps> = ({ basket }) => {
               {basket.username}
             </Typography>
           </Stack>
-          <Rating value={basket.averageRating} precision={0.5} size="small" readOnly sx={{ color: '#ffc107' }} />
+
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography variant="caption" sx={{ fontWeight: 800, color: '#ffc107', fontSize: '0.75rem' }}>
+              {(Number(basket.averageRating) || 0).toFixed(1)}
+            </Typography>
+            <Rating
+              value={Number(basket.averageRating) || 0}
+              precision={0.5}
+              size="small"
+              readOnly
+              sx={{ color: '#ffc107', fontSize: '1rem' }}
+            />
+          </Stack>
         </Box>
 
         <Box sx={{ flexGrow: 1, mb: 1 }}>
