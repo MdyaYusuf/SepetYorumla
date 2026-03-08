@@ -22,6 +22,7 @@ public class BasketService(
   IValidator<UpdateBasketRequest> _updateValidator) : IBasketService
 {
   public async Task<ReturnModel<List<BasketResponseDto>>> GetAllAsync(
+    Guid? userId = null,
     Expression<Func<Basket, bool>>? filter = null,
     Func<IQueryable<Basket>, IQueryable<Basket>>? include = null,
     Func<IQueryable<Basket>, IOrderedQueryable<Basket>>? orderBy = null,
@@ -31,13 +32,29 @@ public class BasketService(
   {
     var baskets = await _basketRepository.GetAllAsync(
       filter,
-      include ?? (query => query.Include(b => b.User).Include(b => b.Products).ThenInclude(p => p.Category)),
+      include ?? (query => query
+        .Include(b => b.User)
+        .Include(b => b.Products).ThenInclude(p => p.Category)
+        .Include(b => b.Reviews)
+        .Include(b => b.Comments)),
       orderBy,
       enableTracking,
       withDeleted,
       cancellationToken);
 
     var response = _mapper.EntityToResponseDtoList(baskets);
+
+    for (int i = 0; i < baskets.Count; i++)
+    {
+      BasketMappingHelper.PopulateSummaryFields(baskets[i], response[i]);
+
+      if (userId.HasValue)
+      {
+        var userReview = baskets[i].Reviews?.FirstOrDefault(r => r.UserId == userId.Value);
+        response[i].UserThumbsUp = userReview?.IsThumbsUp;
+        response[i].UserStarRating = userReview?.StarRating;
+      }
+    }
 
     return new ReturnModel<List<BasketResponseDto>>()
     {
@@ -50,13 +67,18 @@ public class BasketService(
 
   public async Task<ReturnModel<BasketResponseDto>> GetAsync(
     Expression<Func<Basket, bool>> predicate,
+    Guid? userId = null,
     Func<IQueryable<Basket>, IQueryable<Basket>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
   {
     var basket = await _basketRepository.GetAsync(
       predicate,
-      include: query => query.Include(b => b.User).Include(b => b.Products).ThenInclude(p => p.Category),
+      include: query => query
+        .Include(b => b.User)
+        .Include(b => b.Products).ThenInclude(p => p.Category)
+        .Include(b => b.Reviews)
+        .Include(b => b.Comments),
       enableTracking,
       cancellationToken);
 
@@ -73,6 +95,15 @@ public class BasketService(
 
     var response = _mapper.EntityToResponseDto(basket);
 
+    BasketMappingHelper.PopulateSummaryFields(basket, response);
+
+    if (userId.HasValue)
+    {
+      var userReview = basket.Reviews?.FirstOrDefault(r => r.UserId == userId.Value);
+      response.UserThumbsUp = userReview?.IsThumbsUp;
+      response.UserStarRating = userReview?.StarRating;
+    }
+
     return new ReturnModel<BasketResponseDto>()
     {
       Success = true,
@@ -84,17 +115,31 @@ public class BasketService(
 
   public async Task<ReturnModel<BasketResponseDto>> GetByIdAsync(
     Guid id,
+    Guid? userId = null,
     Func<IQueryable<Basket>, IQueryable<Basket>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default)
   {
     var basket = await _businessRules.GetBasketIfExistAsync(
       id,
-      include: query => query.Include(b => b.User).Include(b => b.Products).ThenInclude(p => p.Category),
+      include: query => query
+        .Include(b => b.User)
+        .Include(b => b.Products).ThenInclude(p => p.Category)
+        .Include(b => b.Reviews)
+        .Include(b => b.Comments),
       enableTracking,
       cancellationToken);
 
     var response = _mapper.EntityToResponseDto(basket);
+
+    BasketMappingHelper.PopulateSummaryFields(basket, response);
+
+    if (userId.HasValue)
+    {
+      var userReview = basket.Reviews?.FirstOrDefault(r => r.UserId == userId.Value);
+      response.UserThumbsUp = userReview?.IsThumbsUp;
+      response.UserStarRating = userReview?.StarRating;
+    }
 
     return new ReturnModel<BasketResponseDto>()
     {

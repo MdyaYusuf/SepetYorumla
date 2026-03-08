@@ -12,7 +12,9 @@ public class BasketsController(IBasketService _basketService) : CustomBaseContro
   [HttpGet]
   public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
   {
-    var result = await _basketService.GetAllAsync(cancellationToken: cancellationToken);
+    var result = await _basketService.GetAllAsync(
+      userId: TryGetUserId(),
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }
@@ -20,7 +22,10 @@ public class BasketsController(IBasketService _basketService) : CustomBaseContro
   [HttpGet("{id:guid}")]
   public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
   {
-    var result = await _basketService.GetByIdAsync(id, cancellationToken: cancellationToken);
+    var result = await _basketService.GetByIdAsync(
+      id,
+      userId: TryGetUserId(),
+      cancellationToken: cancellationToken);
 
     return CreateActionResult(result);
   }
@@ -63,6 +68,7 @@ public class BasketsController(IBasketService _basketService) : CustomBaseContro
   public async Task<IActionResult> GetByUserId(Guid userId, CancellationToken cancellationToken)
   {
     var result = await _basketService.GetAllAsync(
+      userId: TryGetUserId(),
       filter: x => x.UserId == userId,
       cancellationToken: cancellationToken);
 

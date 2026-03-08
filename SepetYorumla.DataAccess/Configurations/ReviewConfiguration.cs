@@ -26,10 +26,10 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
 
     builder.Property(r => r.StarRating)
       .HasPrecision(3, 1)
-      .IsRequired();
+      .IsRequired(false);
 
     builder.Property(r => r.IsThumbsUp)
-      .IsRequired();
+      .IsRequired(false);
 
     builder.Property(r => r.IsActive)
       .HasDefaultValue(true)

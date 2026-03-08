@@ -25,24 +25,13 @@ public class ReviewsController(IReviewService _reviewService) : CustomBaseContro
     return CreateActionResult(result);
   }
 
-  [HttpPost]
+  [HttpPost("upsert")]
   [Authorize]
-  public async Task<IActionResult> Add(CreateReviewRequest request, CancellationToken cancellationToken)
+  public async Task<IActionResult> Upsert(UpsertReviewRequest request, CancellationToken cancellationToken)
   {
     var userId = GetUserId();
 
-    var result = await _reviewService.AddAsync(request, userId, cancellationToken);
-
-    return CreateActionResult(result);
-  }
-
-  [HttpPut]
-  [Authorize]
-  public async Task<IActionResult> Update(UpdateReviewRequest request, CancellationToken cancellationToken)
-  {
-    var userId = GetUserId();
-
-    var result = await _reviewService.UpdateAsync(request, userId, cancellationToken);
+    var result = await _reviewService.UpsertAsync(request, userId, cancellationToken);
 
     return CreateActionResult(result);
   }

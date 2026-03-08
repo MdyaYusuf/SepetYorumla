@@ -9,6 +9,7 @@ namespace SepetYorumla.Service.Abstracts;
 public interface IBasketService
 {
   Task<ReturnModel<List<BasketResponseDto>>> GetAllAsync(
+    Guid? userId = null,
     Expression<Func<Basket, bool>>? filter = null,
     Func<IQueryable<Basket>, IQueryable<Basket>>? include = null,
     Func<IQueryable<Basket>, IOrderedQueryable<Basket>>? orderBy = null,
@@ -18,12 +19,14 @@ public interface IBasketService
 
   Task<ReturnModel<BasketResponseDto>> GetAsync(
     Expression<Func<Basket, bool>> predicate,
+    Guid? userId = null,
     Func<IQueryable<Basket>, IQueryable<Basket>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<BasketResponseDto>> GetByIdAsync(
     Guid id,
+    Guid? userId = null,
     Func<IQueryable<Basket>, IQueryable<Basket>>? include = null,
     bool enableTracking = false,
     CancellationToken cancellationToken = default);

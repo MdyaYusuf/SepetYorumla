@@ -7,6 +7,13 @@ export interface BasketResponseDto {
   userProfileImageUrl?: string;
   products: ProductPreviewDto[];
   createdDate: string;
+  averageRating: number;
+  totalThumbsUp: number;
+  totalThumbsDown: number;
+  totalComments: number;
+  totalRatingsCount: number;
+  userThumbsUp: boolean | null;
+  userStarRating: number | null;
 }
 
 export interface ProductPreviewDto {

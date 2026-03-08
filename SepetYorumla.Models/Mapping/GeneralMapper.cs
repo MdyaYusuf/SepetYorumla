@@ -54,12 +54,11 @@ public partial class GeneralMapper
   public partial List<BasketResponseDto> EntityToResponseDtoList(List<Basket> entities);
 
   // Review
-  public partial Review CreateToEntity(CreateReviewRequest request);
-  public partial void UpdateEntityFromRequest(UpdateReviewRequest request, Review entity);
+  public partial Review UpsertToEntity(UpsertReviewRequest request);
   [MapProperty("User.Username", nameof(ReviewResponseDto.Username))]
   [MapProperty("Basket.Title", nameof(ReviewResponseDto.BasketTitle))]
   public partial ReviewResponseDto EntityToResponseDto(Review entity);
-  public partial CreatedReviewResponseDto EntityToCreatedResponseDto(Review entity);
+  public partial UpsertedReviewResponseDto EntityToUpsertedResponseDto(Review entity);
   public partial List<ReviewResponseDto> EntityToResponseDtoList(List<Review> entities);
 
   // Comment

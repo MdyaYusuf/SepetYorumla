@@ -162,8 +162,8 @@ namespace SepetYorumla.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StarRating = table.Column<decimal>(type: "decimal(3,1)", precision: 3, scale: 1, nullable: false),
-                    IsThumbsUp = table.Column<bool>(type: "bit", nullable: false),
+                    StarRating = table.Column<decimal>(type: "decimal(3,1)", precision: 3, scale: 1, nullable: true),
+                    IsThumbsUp = table.Column<bool>(type: "bit", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     BasketId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),

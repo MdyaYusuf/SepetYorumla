@@ -7,7 +7,6 @@ namespace SepetYorumla.WebApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
 public class RolesController(IRoleService _roleService) : CustomBaseController
 {
   [HttpGet]

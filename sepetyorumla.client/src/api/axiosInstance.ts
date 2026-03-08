@@ -26,7 +26,15 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 });
 
 axiosInstance.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response: AxiosResponse) => {
+    const result = response.data as ApiResponse<unknown>;
+
+    if (result?.success && result?.message && response.config.method !== 'get') {
+      toast.success(result.message);
+    }
+
+    return response;
+  },
   async (error: AxiosError) => {
     const originalRequest = error.config as RetryableRequest;
 

@@ -17,8 +17,7 @@ public class ReviewService(
   ReviewBusinessRules _businessRules,
   GeneralMapper _mapper,
   IUnitOfWork _unitOfWork,
-  IValidator<CreateReviewRequest> _createValidator,
-  IValidator<UpdateReviewRequest> _updateValidator) : IReviewService
+  IValidator<UpsertReviewRequest> _upsertValidator) : IReviewService
 {
   public async Task<ReturnModel<List<ReviewResponseDto>>> GetAllAsync(
     Expression<Func<Review, bool>>? filter = null,
@@ -104,9 +103,9 @@ public class ReviewService(
     };
   }
 
-  public async Task<ReturnModel<CreatedReviewResponseDto>> AddAsync(CreateReviewRequest request, Guid userId, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<UpsertedReviewResponseDto>> UpsertAsync(UpsertReviewRequest request, Guid userId, CancellationToken cancellationToken = default)
   {
-    var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
+    var validationResult = await _upsertValidator.ValidateAsync(request, cancellationToken);
 
     if (!validationResult.IsValid)
     {
@@ -115,19 +114,54 @@ public class ReviewService(
 
     await _businessRules.BasketMustExistAsync(request.BasketId, cancellationToken);
 
-    Review createdReview = _mapper.CreateToEntity(request);
+    var existingReview = await _reviewRepository.GetAsync(
+        r => r.UserId == userId && r.BasketId == request.BasketId,
+        enableTracking: true,
+        cancellationToken: cancellationToken
+    );
+
+    if (existingReview != null)
+    {
+      if (request.StarRating.HasValue)
+      {
+        existingReview.StarRating = request.StarRating;
+      }
+
+      if (request.IsThumbsUp.HasValue)
+      {
+        existingReview.IsThumbsUp = request.IsThumbsUp;
+      }
+
+      existingReview.UpdatedDate = DateTime.Now;
+
+      _reviewRepository.Update(existingReview);
+      await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+      UpsertedReviewResponseDto updatedResponse = _mapper.EntityToUpsertedResponseDto(existingReview);
+
+      return new ReturnModel<UpsertedReviewResponseDto>()
+      {
+        Success = true,
+        Message = "Değerlendirmeniz güncellendi.",
+        Data = updatedResponse,
+        StatusCode = 200
+      };
+    }
+
+    Review createdReview = _mapper.UpsertToEntity(request);
     createdReview.UserId = userId;
+    createdReview.StarRating = request.StarRating;
 
     await _reviewRepository.AddAsync(createdReview, cancellationToken);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    CreatedReviewResponseDto response = _mapper.EntityToCreatedResponseDto(createdReview);
+    UpsertedReviewResponseDto createdResponse = _mapper.EntityToUpsertedResponseDto(createdReview);
 
-    return new ReturnModel<CreatedReviewResponseDto>()
+    return new ReturnModel<UpsertedReviewResponseDto>()
     {
       Success = true,
-      Message = "İnceleme başarılı bir şekilde eklendi.",
-      Data = response,
+      Message = "Değerlendirmeniz alınmıştır.",
+      Data = createdResponse,
       StatusCode = 201
     };
   }
@@ -145,32 +179,6 @@ public class ReviewService(
     {
       Success = true,
       Message = "İnceleme başarıyla silindi.",
-      StatusCode = 200
-    };
-  }
-
-  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateReviewRequest request, Guid userId, CancellationToken cancellationToken = default)
-  {
-    var validationResult = await _updateValidator.ValidateAsync(request, cancellationToken);
-
-    if (!validationResult.IsValid)
-    {
-      throw new ValidationException(validationResult.Errors);
-    }
-
-    var existingReview = await _businessRules.GetReviewIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
-
-    _businessRules.OnlyUserCanEditReview(existingReview, userId);
-
-    _mapper.UpdateEntityFromRequest(request, existingReview);
-
-    _reviewRepository.Update(existingReview);
-    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-    return new ReturnModel<NoData>()
-    {
-      Success = true,
-      Message = "İnceleme başarıyla güncellendi.",
       StatusCode = 200
     };
   }

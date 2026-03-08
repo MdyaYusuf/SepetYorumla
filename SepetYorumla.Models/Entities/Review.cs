@@ -4,8 +4,8 @@ namespace SepetYorumla.Models.Entities;
 
 public class Review : Entity<Guid>
 {
-  public decimal StarRating { get; set; }
-  public bool IsThumbsUp { get; set; }
+  public decimal? StarRating { get; set; }
+  public bool? IsThumbsUp { get; set; }
   public bool IsActive { get; set; } = true;
 
   // Navigation properties

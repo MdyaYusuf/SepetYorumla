@@ -30,6 +30,14 @@ public class CustomBaseController : ControllerBase
   }
 
   [NonAction]
+  protected Guid? TryGetUserId()
+  {
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    return Guid.TryParse(userId, out var id) ? id : null;
+  }
+
+  [NonAction]
   protected string GetUserRole()
   {
     return User.FindFirst(ClaimTypes.Role)?.Value ?? string.Empty;

@@ -1,8 +1,9 @@
 import React from 'react';
-import { Card, CardContent, Typography, Box, Avatar, Chip, Divider, Stack, Grid } from '@mui/material';
+import { Card, CardContent, Typography, Box, Avatar, Chip, Divider, Stack, Grid, Rating } from '@mui/material';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import SellIcon from '@mui/icons-material/Sell';
-import StarIcon from '@mui/icons-material/Star';
+import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
+import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import type { BasketResponseDto } from '../../models/Basket';
 
 interface BasketCardProps {
@@ -17,9 +18,6 @@ const BasketCard: React.FC<BasketCardProps> = ({ basket }) => {
   const productImages = basket.products
     .map(p => p.imageUrl ? (p.imageUrl.startsWith('http') ? p.imageUrl : `${API_BASE_URL}${p.imageUrl}`) : null)
     .filter((url): url is string => !!url);
-
-  const rating = 4.8;
-  const commentCount = 5;
 
   return (
     <Card
@@ -48,10 +46,7 @@ const BasketCard: React.FC<BasketCardProps> = ({ basket }) => {
               {basket.username}
             </Typography>
           </Stack>
-          <Stack direction="row" spacing={0.5} alignItems="center">
-            <StarIcon sx={{ color: '#ffc107', fontSize: 16 }} />
-            <Typography variant="caption" sx={{ color: '#ffc107', fontWeight: 700 }}>{rating.toFixed(1)}</Typography>
-          </Stack>
+          <Rating value={basket.averageRating} precision={0.5} size="small" readOnly sx={{ color: '#ffc107' }} />
         </Box>
 
         <Box sx={{ flexGrow: 1, mb: 1 }}>
@@ -100,9 +95,19 @@ const BasketCard: React.FC<BasketCardProps> = ({ basket }) => {
         <Divider sx={{ borderColor: 'var(--border-dark)', mb: 2, mt: 'auto' }} />
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: 'var(--text-muted)' }}>
-            <ChatBubbleOutlineIcon sx={{ fontSize: 18 }} />
-            <Typography variant="caption" sx={{ fontWeight: 600 }}>{commentCount}</Typography>
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ color: 'var(--text-muted)' }}>
+            <Stack direction="row" spacing={0.5} alignItems="center">
+              <ThumbUpOffAltIcon sx={{ fontSize: 16 }} />
+              <Typography variant="caption" sx={{ fontWeight: 600 }}>{basket.totalThumbsUp}</Typography>
+            </Stack>
+            <Stack direction="row" spacing={0.5} alignItems="center">
+              <ThumbDownOffAltIcon sx={{ fontSize: 16 }} />
+              <Typography variant="caption" sx={{ fontWeight: 600 }}>{basket.totalThumbsDown}</Typography>
+            </Stack>
+            <Stack direction="row" spacing={0.5} alignItems="center">
+              <ChatBubbleOutlineIcon sx={{ fontSize: 16 }} />
+              <Typography variant="caption" sx={{ fontWeight: 600 }}>{basket.totalComments}</Typography>
+            </Stack>
           </Stack>
 
           <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: 'var(--primary)' }}>

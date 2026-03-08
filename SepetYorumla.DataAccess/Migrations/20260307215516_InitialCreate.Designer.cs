@@ -12,7 +12,7 @@ using SepetYorumla.DataAccess.Contexts;
 namespace SepetYorumla.DataAccess.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20260307010007_InitialCreate")]
+    [Migration("20260307215516_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -225,10 +225,10 @@ namespace SepetYorumla.DataAccess.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
-                    b.Property<bool>("IsThumbsUp")
+                    b.Property<bool?>("IsThumbsUp")
                         .HasColumnType("bit");
 
-                    b.Property<decimal>("StarRating")
+                    b.Property<decimal?>("StarRating")
                         .HasPrecision(3, 1)
                         .HasColumnType("decimal(3,1)");
 

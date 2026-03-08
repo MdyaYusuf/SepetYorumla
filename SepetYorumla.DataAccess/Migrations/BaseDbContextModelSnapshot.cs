@@ -222,10 +222,10 @@ namespace SepetYorumla.DataAccess.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
-                    b.Property<bool>("IsThumbsUp")
+                    b.Property<bool?>("IsThumbsUp")
                         .HasColumnType("bit");
 
-                    b.Property<decimal>("StarRating")
+                    b.Property<decimal?>("StarRating")
                         .HasPrecision(3, 1)
                         .HasColumnType("decimal(3,1)");
 
