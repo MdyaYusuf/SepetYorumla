@@ -11,4 +11,7 @@ export const BasketService = {
 
   getAll: () =>
     requests.get<BasketResponseDto[]>("Baskets"),
+
+  getById: (id: string) =>
+    requests.get<BasketResponseDto>(`Baskets/${id}`)
 };

@@ -103,7 +103,6 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
 
     try {
       await BasketService.create(formData);
-      toast.success("Sepet başarıyla paylaşıldı.");
       resetAndClose();
     } catch {
       // The axios interceptor already handles the toast notification
@@ -191,6 +190,7 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
                       <TextField fullWidth label="Model" variant="filled" size="small" value={curProduct.model} onChange={(e) => setCurProduct({ ...curProduct, model: e.target.value })} />
                     </Stack>
                     <TextField fullWidth label="Mağaza Adı" variant="filled" size="small" value={curProduct.storeName} onChange={(e) => setCurProduct({ ...curProduct, storeName: e.target.value })} />
+                    <TextField fullWidth multiline rows={2} label="Ürün Açıklaması" variant="filled" size="small" value={curProduct.description} onChange={(e) => setCurProduct({ ...curProduct, description: e.target.value })} />
                   </Stack>
                 </AccordionDetails>
               </Accordion>

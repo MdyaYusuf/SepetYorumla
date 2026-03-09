@@ -18,9 +18,13 @@ export interface BasketResponseDto {
 
 export interface ProductPreviewDto {
   name: string;
-  imageUrl: string;
+  imageUrl?: string;
   price: number;
   categoryName: string;
+  brand?: string;
+  model?: string;
+  storeName?: string;
+  description?: string;
 }
 
 export interface CreatedBasketResponseDto {

@@ -45,10 +45,16 @@ public class AuthenticationService(
 
     var tokenResponse = CreateToken(user!);
 
-    user!.RefreshToken = GenerateRefreshToken();
-    user.RefreshTokenExpiration = DateTime.Now.AddDays(_options.RefreshTokenExpiration);
-
-    SetRefreshTokenCookie(user.RefreshToken, user.RefreshTokenExpiration.Value);
+    if (user!.RefreshTokenExpiration <= DateTime.Now.AddDays(1))
+    {
+      user.RefreshToken = GenerateRefreshToken();
+      user.RefreshTokenExpiration = DateTime.Now.AddDays(_options.RefreshTokenExpiration);
+      SetRefreshTokenCookie(user.RefreshToken, user.RefreshTokenExpiration.Value);
+    }
+    else
+    {
+      SetRefreshTokenCookie(user.RefreshToken!, user.RefreshTokenExpiration!.Value);
+    }
 
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -156,7 +162,7 @@ public class AuthenticationService(
     {
       HttpOnly = true,
       Secure = !isDevelopment,
-      SameSite = SameSiteMode.Lax,
+      SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.Strict,
       Expires = expires,
       Path = "/"
     };

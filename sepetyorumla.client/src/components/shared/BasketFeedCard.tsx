@@ -1,27 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { Paper, Box, Avatar, Typography, IconButton, Grid, Chip, Divider, Stack, Tooltip, Rating, TextField, CircularProgress } from '@mui/material';
+import { Paper, Box, Avatar, Typography, IconButton, Grid, Chip, Divider, Stack, Tooltip, Rating, TextField, CircularProgress, Modal } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ShareIcon from '@mui/icons-material/Share';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import PaymentsIcon from '@mui/icons-material/Payments';
+import CloseIcon from '@mui/icons-material/Close';
 import type { BasketResponseDto } from '../../models/Basket';
 import { ReviewService } from '../../api/reviewService';
 import type { CommentResponseDto } from '../../models/Comment';
 import { CommentService } from '../../api/commentService';
 import { useAppSelector } from '../../store/store';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 interface BasketFeedCardProps {
   basket: BasketResponseDto;
+  isDetailView?: boolean;
 }
 
-const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket }) => {
+const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = false }) => {
   const API_BASE_URL = "http://localhost:5222";
   const totalPrice = basket.products.reduce((sum, p) => sum + p.price, 0);
   const tags = Array.from(new Set(basket.products.map(p => p.categoryName).filter(Boolean)));
@@ -41,12 +45,15 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket }) => {
   const [newCommentText, setNewCommentText] = useState('');
   const [isCommentsLoading, setIsCommentsLoading] = useState(false);
   const [showComments, setShowComments] = useState(true);
+  const [enlargedImageUrl, setEnlargedImageUrl] = useState<string | null>(null);
+  const hasUserCommented = comments.some(c => c.userId === user?.id);
 
   useEffect(() => {
     const fetchComments = async () => {
       setIsCommentsLoading(true);
       try {
         const response = await CommentService.getByBasketId(basket.id);
+
         if (response.data.success) {
           setComments(response.data.data);
         }
@@ -60,11 +67,21 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket }) => {
     fetchComments();
   }, [basket.id]);
 
+  useEffect(() => {
+    setUserStarRating(basket.userStarRating != null ? Number(basket.userStarRating) : null);
+    setIsThumbsUp(basket.userThumbsUp);
+    setLikesCount(Number(basket.totalThumbsUp) || 0);
+    setDislikesCount(Number(basket.totalThumbsDown) || 0);
+    setCommentsCount(Number(basket.totalComments) || 0);
+    setAvgRating(Number(basket.averageRating) || 0);
+  }, [basket.id, basket.userStarRating, basket.userThumbsUp, basket.totalThumbsUp, basket.totalThumbsDown]);
+
   const productImages = basket.products
     .map(p => p.imageUrl ? (p.imageUrl.startsWith('http') ? p.imageUrl : `${API_BASE_URL}${p.imageUrl}`) : null)
     .filter((url): url is string => !!url);
 
   const handleRatingChange = async (val: number | null) => {
+
     if (val === null) {
 
       return;
@@ -108,6 +125,7 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket }) => {
   };
 
   const handleVote = async (up: boolean) => {
+
     if (isThumbsUp === up) {
 
       return;
@@ -118,10 +136,16 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket }) => {
 
     if (up === true) {
       setLikesCount(prev => prev + 1);
-      if (oldVote === false) setDislikesCount(prev => Math.max(0, prev - 1));
+
+      if (oldVote === false) {
+        setDislikesCount(prev => Math.max(0, prev - 1));
+      }
     } else {
       setDislikesCount(prev => prev + 1);
-      if (oldVote === true) setLikesCount(prev => Math.max(0, prev - 1));
+
+      if (oldVote === true) {
+        setLikesCount(prev => Math.max(0, prev - 1));
+      }
     }
 
     try {
@@ -138,6 +162,7 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket }) => {
   };
 
   const handleAddComment = async () => {
+
     if (!newCommentText.trim()) {
 
       return;
@@ -163,6 +188,7 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket }) => {
   const handleDeleteComment = async (commentId: number) => {
     try {
       const response = await CommentService.delete(commentId);
+
       if (response.data.success) {
         setComments(prev => prev.filter(c => c.id !== commentId));
         setCommentsCount(prev => prev - 1);
@@ -172,23 +198,46 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket }) => {
     }
   };
 
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    const url = `${window.location.origin}/basket/${basket.id}`;
+
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success('Bağlantı kopyalandı!', {
+        position: "bottom-right",
+        autoClose: 2000,
+        theme: "dark",
+      });
+    });
+  };
+
+  const handleOpenImageModal = (imageUrl: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEnlargedImageUrl(imageUrl);
+  };
+
+  const handleCloseImageModal = () => {
+    setEnlargedImageUrl(null);
+  };
+
   const goToDetail = () => navigate(`/basket/${basket.id}`);
 
   return (
     <Paper
-      onClick={goToDetail}
+      onClick={!isDetailView ? goToDetail : undefined}
       sx={{
         p: 2.5,
         borderRadius: '24px',
         bgcolor: 'var(--surface-dark)',
         border: '1px solid var(--border-dark)',
         mb: 3,
-        cursor: 'pointer',
+        cursor: !isDetailView ? 'pointer' : 'default',
         transition: 'transform 0.2s ease, border-color 0.2s ease',
-        '&:hover': {
+        '&:hover': !isDetailView ? {
           transform: 'translateY(-2px)',
           borderColor: 'var(--primary)'
-        }
+        } : {}
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
@@ -206,23 +255,18 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket }) => {
           </Box>
         </Stack>
 
-        <Stack
-          direction="row"
-          spacing={1}
-          alignItems="center"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Typography variant="caption" sx={{ fontWeight: 800, color: '#ffc107' }}>
-            {avgRating.toFixed(1)}
-          </Typography>
-          <Rating
-            value={userStarRating}
-            precision={0.5}
-            size="small"
-            onChange={(_, val) => handleRatingChange(val)}
-            sx={{ color: '#ffc107' }}
-          />
-          <IconButton size="small"><MoreVertIcon sx={{ color: 'var(--text-muted)' }} /></IconButton>
+        <Stack direction="row" spacing={2} alignItems="center" onClick={(e) => e.stopPropagation()}>
+          <Stack alignItems="center">
+            <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontSize: '0.62rem', fontWeight: 700, mb: 0.5 }}>Ortalama</Typography>
+            <Typography variant="caption" sx={{ fontWeight: 800, color: '#ffc107' }}>{avgRating.toFixed(1)}</Typography>
+          </Stack>
+
+          <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 0.8 }} />
+
+          <Stack alignItems="center">
+            <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontSize: '0.62rem', fontWeight: 700, mb: 0.5 }}>Puanla</Typography>
+            <Rating value={userStarRating} precision={0.5} size="small" onChange={(_, val) => handleRatingChange(val)} sx={{ color: '#ffc107' }} />
+          </Stack>
         </Stack>
       </Box>
 
@@ -236,11 +280,25 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket }) => {
         İçerik: {basket.products.map(p => p.name).join(', ')}
       </Typography>
 
-      <Box sx={{ borderRadius: '16px', overflow: 'hidden', mb: 2, bgcolor: 'rgba(0,0,0,0.2)' }}>
+      <Box
+        sx={{ borderRadius: '16px', overflow: 'hidden', mb: 2, bgcolor: 'rgba(0,0,0,0.2)' }}
+        onClick={isDetailView ? (e) => e.stopPropagation() : undefined}
+      >
         <Grid container spacing={1}>
           {productImages.slice(0, 3).map((img, idx) => (
             <Grid key={idx} size={productImages.length === 1 ? 12 : productImages.length === 2 ? 6 : 4}>
-              <Box component="img" src={img} sx={{ width: '100%', height: 140, objectFit: 'cover', display: 'block' }} />
+              <Box
+                component="img"
+                src={img}
+                sx={{
+                  width: '100%',
+                  height: 140,
+                  objectFit: 'cover',
+                  display: 'block',
+                  cursor: isDetailView ? 'zoom-in' : 'pointer'
+                }}
+                onClick={(e) => isDetailView ? handleOpenImageModal(img, e) : undefined}
+              />
             </Grid>
           ))}
         </Grid>
@@ -267,32 +325,32 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket }) => {
                 </Typography>
               )}
 
-              {comments.length > 0 && (
-                <Box key={comments[comments.length - 1].id} sx={{ p: 1.2, borderRadius: '12px', bgcolor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', mb: 1 }}>
+              {(isDetailView ? comments : comments.slice(-1)).map((comment) => (
+                <Box key={comment.id} sx={{ p: 1.2, borderRadius: '12px', bgcolor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', mb: 1 }}>
                   <Stack direction="row" spacing={1} alignItems="flex-start" justifyContent="space-between">
                     <Stack direction="row" spacing={1} alignItems="flex-start">
                       <Avatar sx={{ width: 24, height: 24, fontSize: '0.7rem', bgcolor: 'var(--primary)' }}>
-                        {comments[comments.length - 1].username[0]}
+                        {comment.username[0]}
                       </Avatar>
                       <Box>
                         <Stack direction="row" spacing={1} alignItems="center">
                           <Typography variant="caption" sx={{ color: 'var(--text-white)', fontWeight: 700 }}>
-                            @{comments[comments.length - 1].username}
+                            @{comment.username}
                           </Typography>
                           <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontSize: '0.65rem' }}>
-                            {new Date(comments[comments.length - 1].createdDate).toLocaleDateString('tr-TR')}
+                            {new Date(comment.createdDate).toLocaleDateString('tr-TR')}
                           </Typography>
                         </Stack>
                         <Typography variant="caption" sx={{ color: 'var(--text-muted)', lineHeight: 1.2 }}>
-                          {comments[comments.length - 1].text}
+                          {comment.text}
                         </Typography>
                       </Box>
                     </Stack>
 
-                    {user?.id === comments[comments.length - 1].userId && (
+                    {user?.id === comment.userId && (
                       <IconButton
                         size="small"
-                        onClick={() => handleDeleteComment(comments[comments.length - 1].id)}
+                        onClick={() => handleDeleteComment(comment.id)}
                         sx={{ color: 'var(--text-muted)', '&:hover': { color: '#ff4b4b' } }}
                       >
                         <DeleteIcon sx={{ fontSize: '0.9rem' }} />
@@ -300,9 +358,9 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket }) => {
                     )}
                   </Stack>
                 </Box>
-              )}
+              ))}
 
-              {comments.length > 0 && (
+              {!isDetailView && comments.length > 0 && (
                 <Typography
                   variant="caption"
                   sx={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: 700, mb: 1, display: 'block', ml: 1, '&:hover': { textDecoration: 'underline' } }}
@@ -357,17 +415,86 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket }) => {
 
           <Box
             onClick={() => setShowComments(!showComments)}
-            sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: showComments ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', '&:hover': { color: 'var(--primary)' } }}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              color: hasUserCommented ? 'var(--primary)' : 'var(--text-muted)',
+              cursor: 'pointer',
+              '&:hover': { color: 'var(--primary)' }
+            }}
           >
-            <ChatBubbleOutlineIcon fontSize="small" />
+            {hasUserCommented ? <ChatBubbleIcon fontSize="small" /> : <ChatBubbleOutlineIcon fontSize="small" />}
             <Typography variant="caption" sx={{ fontWeight: 700 }}>{commentsCount}</Typography>
           </Box>
         </Stack>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--text-muted)', cursor: 'pointer' }}>
-          <BookmarkBorderIcon fontSize="small" />
-          <Typography variant="caption" sx={{ fontWeight: 700 }}>Kaydet</Typography>
-        </Box>
+
+        <Stack direction="row" spacing={2} alignItems="center">
+
+          <Box
+            onClick={handleShare}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              '&:hover': { color: 'var(--primary)' }
+            }}
+          >
+            <ShareIcon sx={{ fontSize: '1.1rem' }} />
+            <Typography variant="caption" sx={{ fontWeight: 700 }}>Paylaş</Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--text-muted)', cursor: 'pointer', '&:hover': { color: '#ffc107' } }}>
+            <BookmarkBorderIcon sx={{ fontSize: '1.1rem' }} />
+            <Typography variant="caption" sx={{ fontWeight: 700 }}>Kaydet</Typography>
+          </Box>
+        </Stack>
       </Box>
+
+      {isDetailView && (
+        <Modal
+          open={!!enlargedImageUrl}
+          onClose={handleCloseImageModal}
+          closeAfterTransition
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            '& .MuiBackdrop-root': {
+              backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            },
+          }}
+        >
+          <Box sx={{ position: 'relative', outline: 'none', maxWidth: '95vw', maxHeight: '95vh' }}>
+            <IconButton
+              onClick={handleCloseImageModal}
+              sx={{
+                position: 'absolute',
+                top: 8,
+                right: 8,
+                color: 'white',
+                bgcolor: 'rgba(0, 0, 0, 0.5)',
+                '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.1)' }
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+            <Box
+              component="img"
+              src={enlargedImageUrl || ''}
+              sx={{
+                maxWidth: '90vw',
+                maxHeight: '90vh',
+                objectFit: 'contain',
+                borderRadius: '8px',
+                border: '2px solid rgba(255, 255, 255, 0.05)',
+              }}
+            />
+          </Box>
+        </Modal>
+      )}
     </Paper>
   );
 };

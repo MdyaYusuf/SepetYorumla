@@ -20,4 +20,14 @@ public static class BasketMappingHelper
 
     dto.TotalComments = entity.Comments?.Count ?? 0;
   }
+
+  public static void PopulateUserInteraction(Basket basket, BasketResponseDto response, Guid? userId)
+  {
+    if (userId.HasValue && basket.Reviews != null)
+    {
+      var userReview = basket.Reviews.FirstOrDefault(r => r.UserId == userId.Value);
+      response.UserThumbsUp = userReview?.IsThumbsUp;
+      response.UserStarRating = userReview?.StarRating;
+    }
+  }
 }

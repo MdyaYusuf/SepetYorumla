@@ -47,13 +47,7 @@ public class BasketService(
     for (int i = 0; i < baskets.Count; i++)
     {
       BasketMappingHelper.PopulateSummaryFields(baskets[i], response[i]);
-
-      if (userId.HasValue)
-      {
-        var userReview = baskets[i].Reviews?.FirstOrDefault(r => r.UserId == userId.Value);
-        response[i].UserThumbsUp = userReview?.IsThumbsUp;
-        response[i].UserStarRating = userReview?.StarRating;
-      }
+      BasketMappingHelper.PopulateUserInteraction(baskets[i], response[i], userId);
     }
 
     return new ReturnModel<List<BasketResponseDto>>()
@@ -96,13 +90,7 @@ public class BasketService(
     var response = _mapper.EntityToResponseDto(basket);
 
     BasketMappingHelper.PopulateSummaryFields(basket, response);
-
-    if (userId.HasValue)
-    {
-      var userReview = basket.Reviews?.FirstOrDefault(r => r.UserId == userId.Value);
-      response.UserThumbsUp = userReview?.IsThumbsUp;
-      response.UserStarRating = userReview?.StarRating;
-    }
+    BasketMappingHelper.PopulateUserInteraction(basket, response, userId);
 
     return new ReturnModel<BasketResponseDto>()
     {
@@ -133,13 +121,7 @@ public class BasketService(
     var response = _mapper.EntityToResponseDto(basket);
 
     BasketMappingHelper.PopulateSummaryFields(basket, response);
-
-    if (userId.HasValue)
-    {
-      var userReview = basket.Reviews?.FirstOrDefault(r => r.UserId == userId.Value);
-      response.UserThumbsUp = userReview?.IsThumbsUp;
-      response.UserStarRating = userReview?.StarRating;
-    }
+    BasketMappingHelper.PopulateUserInteraction(basket, response, userId);
 
     return new ReturnModel<BasketResponseDto>()
     {
