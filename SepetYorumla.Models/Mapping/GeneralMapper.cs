@@ -34,6 +34,7 @@ public partial class GeneralMapper
 
   // Product
   public partial Product CreateToEntity(CreateProductRequest request);
+  [MapperIgnoreTarget(nameof(Product.ImageUrl))]
   public partial void UpdateEntityFromRequest(UpdateProductRequest request, Product entity);
   public partial Product ProductDtoToEntity(CreateProductInBasketDto dto);
   [MapProperty("Basket.Title", nameof(ProductResponseDto.BasketTitle))]
@@ -66,6 +67,7 @@ public partial class GeneralMapper
   public partial void UpdateEntityFromRequest(UpdateCommentRequest request, Comment entity);
   [MapProperty("User.Username", nameof(CommentResponseDto.Username))]
   [MapProperty("Basket.Title", nameof(CommentResponseDto.BasketTitle))]
+  [MapProperty("User.ProfileImageUrl", nameof(CommentResponseDto.UserProfileImageUrl))]
   public partial CommentResponseDto EntityToResponseDto(Comment entity);
   public partial CreatedCommentResponseDto EntityToCreatedResponseDto(Comment entity);
   public partial List<CommentResponseDto> EntityToResponseDtoList(List<Comment> entities);
@@ -75,6 +77,7 @@ public partial class GeneralMapper
   [MapperIgnoreTarget(nameof(User.PasswordHash))]
   [MapperIgnoreTarget(nameof(User.PasswordKey))]
   public partial User CreateToEntity(RegisterUserRequest request);
+  [MapperIgnoreTarget(nameof(User.ProfileImageUrl))]
   public partial void UpdateEntityFromRequest(UpdateUserRequest request, User entity);
   [MapProperty("Role.Name", nameof(UserResponseDto.RoleName))]
   public partial UserResponseDto EntityToResponseDto(User entity);

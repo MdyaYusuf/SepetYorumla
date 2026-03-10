@@ -5,6 +5,7 @@ public sealed record CommentResponseDto(
   string Text,
   Guid UserId,
   string Username,
+  string? UserProfileImageUrl,
   Guid BasketId,
   string BasketTitle,
   DateTime CreatedDate);

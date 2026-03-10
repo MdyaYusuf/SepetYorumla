@@ -1,4 +1,5 @@
 ﻿using SepetYorumla.Core.Exceptions;
+using SepetYorumla.Core.Security;
 using SepetYorumla.DataAccess.Abstracts;
 using SepetYorumla.Models.Entities;
 
@@ -47,6 +48,14 @@ public class UserBusinessRules(IUserRepository _userRepository)
     if (requestTargetId != currentUserId && userRole != "Admin")
     {
       throw new ForbiddenException("Bu işlem için yetkiniz bulunmamaktadır.");
+    }
+  }
+
+  public void PasswordMustMatch(string password, string storedHash, string storedKey)
+  {
+    if (!HashingHelper.VerifyPasswordHash(password, storedHash, storedKey))
+    {
+      throw new BusinessException("Mevcut şifreniz hatalı.");
     }
   }
 }

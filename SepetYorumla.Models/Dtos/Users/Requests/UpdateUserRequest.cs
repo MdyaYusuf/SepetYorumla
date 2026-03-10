@@ -1,8 +1,10 @@
-﻿namespace SepetYorumla.Models.Dtos.Users.Requests;
+﻿using Microsoft.AspNetCore.Http;
+
+namespace SepetYorumla.Models.Dtos.Users.Requests;
 
 public sealed record UpdateUserRequest(
   Guid Id,
   string Username,
   string Email,
-  string? ProfileImageUrl,
-  string? Bio);
+  string? Bio,
+  IFormFile? ImageFile);

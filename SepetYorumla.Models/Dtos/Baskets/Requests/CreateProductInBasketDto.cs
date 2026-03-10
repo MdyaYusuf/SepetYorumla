@@ -7,7 +7,6 @@ public sealed record CreateProductInBasketDto(
   string? Description,
   decimal Price,
   string? StoreName,
-  string? ImageUrl,
   string? Brand,
   string? Model,
   int CategoryId,

@@ -154,9 +154,13 @@ public class BasketService(
 
       if (productDto.ImageFile != null && productDto.ImageFile.Length > 0)
       {
-        _businessRules.ValidateProductImage(productDto.ImageFile);
+        FileHelper.ValidateImage(productDto.ImageFile);
 
-        productEntity.ImageUrl = await FileHelper.SaveImageToDisk(productDto.ImageFile, "products", productDto.Name, cancellationToken);
+        productEntity.ImageUrl = await FileHelper.SaveImageToDisk(
+          productDto.ImageFile,
+          "products",
+          productDto.Name,
+          cancellationToken);
       }
 
       createdBasket.Products.Add(productEntity);

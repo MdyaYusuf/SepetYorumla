@@ -1,11 +1,30 @@
 ﻿using Microsoft.AspNetCore.Http;
+using SepetYorumla.Core.Exceptions;
 using System.Text.RegularExpressions;
 
 namespace SepetYorumla.Service.Helpers;
 
 public static class FileHelper
 {
-  public static async Task<string> SaveImageToDisk(IFormFile file, string subFolder, string productName, CancellationToken cancellationToken)
+  private static readonly string[] _allowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+  private const long _maxFileSize = 5 * 1024 * 1024;
+
+  public static void ValidateImage(IFormFile file)
+  {
+    var extension = Path.GetExtension(file.FileName).ToLower();
+
+    if (!_allowedExtensions.Contains(extension))
+    {
+      throw new BusinessException($"Geçersiz dosya formatı. İzin verilenler: {string.Join(", ", _allowedExtensions)}");
+    }
+
+    if (file.Length > _maxFileSize)
+    {
+      throw new BusinessException("Dosya boyutu 5MB'dan büyük olamaz.");
+    }
+  }
+
+  public static async Task<string> SaveImageToDisk(IFormFile file, string subFolder, string name, CancellationToken cancellationToken)
   {
     string wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
     string targetPath = Path.Combine(wwwrootPath, "images", subFolder);
@@ -15,7 +34,7 @@ public static class FileHelper
       Directory.CreateDirectory(targetPath);
     }
 
-    string slug = GetSlug(productName);
+    string slug = GetSlug(name);
     string shortId = Guid.NewGuid().ToString().Substring(0, 8);
     string extension = Path.GetExtension(file.FileName).ToLower();
 
@@ -34,10 +53,11 @@ public static class FileHelper
   {
     if (string.IsNullOrWhiteSpace(name))
     {
-      return "product";
+      return "image";
     }
 
-    string slug = name.ToLowerInvariant();
+    var culture = new System.Globalization.CultureInfo("tr-TR");
+    string slug = name.ToLower(culture);
 
     slug = slug.Replace("ç", "c")
                .Replace("ğ", "g")

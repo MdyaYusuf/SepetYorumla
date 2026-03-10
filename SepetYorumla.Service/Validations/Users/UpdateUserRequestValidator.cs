@@ -18,6 +18,6 @@ public class UpdateUserRequestValidator : AbstractValidator<UpdateUserRequest>
       .EmailAddress().WithMessage("Geçerli bir e-posta adresi giriniz.");
 
     RuleFor(u => u.Bio)
-      .MaximumLength(500).WithMessage("Bio en fazla 500 karakter olabilir.");
+      .MaximumLength(1000).WithMessage("Bio en fazla 1000 karakter olabilir.");
   }
 }

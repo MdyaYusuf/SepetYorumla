@@ -15,8 +15,23 @@ const BasketCard: React.FC<BasketCardProps> = ({ basket }) => {
   const totalPrice = basket.products.reduce((sum: number, product) => sum + product.price, 0);
   const tags: string[] = Array.from(new Set(basket.products.map((p) => p.categoryName).filter(Boolean)));
 
+  const getFullUrl = (path: string | null | undefined) => {
+
+    if (!path) {
+
+      return undefined;
+    }
+
+    if (path.startsWith('http')) {
+
+      return path;
+    }
+
+    return `${API_BASE_URL}${path}`;
+  };
+
   const productImages = basket.products
-    .map(p => p.imageUrl ? (p.imageUrl.startsWith('http') ? p.imageUrl : `${API_BASE_URL}${p.imageUrl}`) : null)
+    .map(p => getFullUrl(p.imageUrl))
     .filter((url): url is string => !!url);
 
   return (
@@ -39,7 +54,10 @@ const BasketCard: React.FC<BasketCardProps> = ({ basket }) => {
       <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Stack direction="row" spacing={1} alignItems="center">
-            <Avatar src={basket.userProfileImageUrl} sx={{ width: 24, height: 24, border: '1px solid rgba(255,255,255,0.1)' }}>
+            <Avatar
+              src={getFullUrl(basket.userProfileImageUrl)}
+              sx={{ width: 24, height: 24, border: '1px solid rgba(255,255,255,0.1)' }}
+            >
               {basket.username[0]}
             </Avatar>
             <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontWeight: 600 }}>

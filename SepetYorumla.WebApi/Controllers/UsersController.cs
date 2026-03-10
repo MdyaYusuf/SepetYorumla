@@ -29,7 +29,7 @@ public class UsersController(IUserService _userService) : CustomBaseController
 
   [HttpPut]
   [Authorize]
-  public async Task<IActionResult> Update(UpdateUserRequest request, CancellationToken cancellationToken)
+  public async Task<IActionResult> Update([FromForm] UpdateUserRequest request, CancellationToken cancellationToken)
   {
     var userId = GetUserId();
     var userRole = GetUserRole();
@@ -47,6 +47,17 @@ public class UsersController(IUserService _userService) : CustomBaseController
     var userRole = GetUserRole();
 
     var result = await _userService.RemoveAsync(id, userId, userRole, cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpPost("change-password")]
+  [Authorize]
+  public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request, CancellationToken cancellationToken)
+  {
+    var userId = GetUserId();
+
+    var result = await _userService.ChangePasswordAsync(request, userId, cancellationToken);
 
     return CreateActionResult(result);
   }

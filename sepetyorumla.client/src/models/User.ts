@@ -23,3 +23,17 @@ export interface CreatedUserResponseDto {
   username: string;
   email: string;
 }
+
+export interface UpdateUserRequest {
+  id: string;
+  username: string;
+  email: string;
+  bio?: string;
+  imageFile?: File;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}

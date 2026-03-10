@@ -3,6 +3,7 @@ export interface CommentResponseDto {
   text: string;
   userId: string;
   username: string;
+  userProfileImageUrl?: string;
   basketId: string;
   basketTitle: string;
   createdDate: string;

@@ -76,8 +76,23 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
     setAvgRating(Number(basket.averageRating) || 0);
   }, [basket.id, basket.userStarRating, basket.userThumbsUp, basket.totalThumbsUp, basket.totalThumbsDown]);
 
+  const getFullUrl = (path: string | null | undefined) => {
+
+    if (!path) {
+
+      return undefined;
+    }
+
+    if (path.startsWith('http')) {
+
+      return path;
+    }
+
+    return `${API_BASE_URL}${path}`;
+  };
+
   const productImages = basket.products
-    .map(p => p.imageUrl ? (p.imageUrl.startsWith('http') ? p.imageUrl : `${API_BASE_URL}${p.imageUrl}`) : null)
+    .map(p => getFullUrl(p.imageUrl))
     .filter((url): url is string => !!url);
 
   const handleRatingChange = async (val: number | null) => {
@@ -242,8 +257,11 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Stack direction="row" spacing={1.5} alignItems="center">
-          <Avatar src={basket.userProfileImageUrl} sx={{ width: 40, height: 40, border: '1px solid rgba(255,255,255,0.1)' }}>
-            {basket.username[0]}
+          <Avatar
+            src={getFullUrl(basket.userProfileImageUrl)}
+            sx={{ width: 40, height: 40, border: '1px solid rgba(255,255,255,0.1)' }}
+          >
+            {basket.username[0].toUpperCase()}
           </Avatar>
           <Box>
             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--text-white)' }}>
@@ -329,8 +347,11 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
                 <Box key={comment.id} sx={{ p: 1.2, borderRadius: '12px', bgcolor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', mb: 1 }}>
                   <Stack direction="row" spacing={1} alignItems="flex-start" justifyContent="space-between">
                     <Stack direction="row" spacing={1} alignItems="flex-start">
-                      <Avatar sx={{ width: 24, height: 24, fontSize: '0.7rem', bgcolor: 'var(--primary)' }}>
-                        {comment.username[0]}
+                      <Avatar
+                        src={getFullUrl(comment.userProfileImageUrl)}
+                        sx={{ width: 24, height: 24, fontSize: '0.7rem', bgcolor: 'var(--primary)' }}
+                      >
+                        {comment.username[0].toUpperCase()}
                       </Avatar>
                       <Box>
                         <Stack direction="row" spacing={1} alignItems="center">

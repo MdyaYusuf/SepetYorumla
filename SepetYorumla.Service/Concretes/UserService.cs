@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using SepetYorumla.Core.Exceptions;
 using SepetYorumla.Core.Responses;
+using SepetYorumla.Core.Security;
 using SepetYorumla.DataAccess.Abstracts;
 using SepetYorumla.Models.Dtos.Users.Requests;
 using SepetYorumla.Models.Dtos.Users.Responses;
@@ -8,6 +10,7 @@ using SepetYorumla.Models.Entities;
 using SepetYorumla.Models.Mapping;
 using SepetYorumla.Service.Abstracts;
 using SepetYorumla.Service.BusinessRules;
+using SepetYorumla.Service.Helpers;
 using System.Linq.Expressions;
 
 namespace SepetYorumla.Service.Concretes;
@@ -17,7 +20,8 @@ public class UserService(
     UserBusinessRules _businessRules,
     GeneralMapper _mapper,
     IUnitOfWork _unitOfWork,
-    IValidator<UpdateUserRequest> _updateValidator) : IUserService
+    IValidator<UpdateUserRequest> _updateValidator,
+    IValidator<ChangePasswordRequest> _passwordValidator) : IUserService
 {
   public async Task<ReturnModel<List<UserResponseDto>>> GetAllAsync(
     Expression<Func<User, bool>>? filter = null,
@@ -136,13 +140,53 @@ public class UserService(
     }
 
     _mapper.UpdateEntityFromRequest(request, existingUser);
+
+    if (request.ImageFile != null && request.ImageFile.Length > 0)
+    {
+      FileHelper.ValidateImage(request.ImageFile);
+
+      existingUser.ProfileImageUrl = await FileHelper.SaveImageToDisk(
+        request.ImageFile,
+        "profiles",
+        existingUser.Username,
+        cancellationToken);
+    }
+
     _userRepository.Update(existingUser);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
     return new ReturnModel<NoData>()
     {
       Success = true,
-      Message = "Kullanıcı başarıyla güncellendi.",
+      Message = "Profil başarıyla güncellendi.",
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<NoData>> ChangePasswordAsync(ChangePasswordRequest request, Guid userId, CancellationToken cancellationToken = default)
+  {
+    var validationResult = await _passwordValidator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
+    User user = await _businessRules.GetUserIfExistAsync(userId, enableTracking: true, cancellationToken: cancellationToken);
+
+    _businessRules.PasswordMustMatch(request.CurrentPassword, user.PasswordHash, user.PasswordKey);
+
+    HashingHelper.CreatePasswordHash(request.NewPassword, out string newHash, out string newKey);
+    user.PasswordHash = newHash;
+    user.PasswordKey = newKey;
+
+    _userRepository.Update(user);
+    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    return new ReturnModel<NoData>()
+    {
+      Success = true,
+      Message = "Şifreniz başarıyla güncellendi.",
       StatusCode = 200
     };
   }
