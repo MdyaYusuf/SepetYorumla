@@ -3,5 +3,4 @@
 public sealed record UpsertedReviewResponseDto(
   Guid Id,
   decimal? StarRating,
-  bool? IsThumbsUp
-);
+  bool? IsThumbsUp);

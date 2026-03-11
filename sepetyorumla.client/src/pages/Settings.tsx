@@ -20,30 +20,17 @@ import { UserService } from '../api/userService';
 import { updateUser } from '../features/authentication/authSlice';
 import Sidebar from '../components/layout/Sidebar';
 import type { UpdateUserRequest } from '../models/User';
+import { getFullUrl } from '../helpers/imageHelper';
 
 const Settings: React.FC = () => {
-  const API_BASE_URL = "http://localhost:5222";
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const getFullUrl = (path: string | null | undefined) => {
-
-    if (!path) {
-
-      return undefined;
-    }
-
-    if (path.startsWith('http')) {
-
-      return path;
-    }
-
-    return `${API_BASE_URL}${path}`;
-  };
-
   const [bio, setBio] = useState(user?.bio || '');
+  const [username, setUsername] = useState(user?.username || '');
+  const [email, setEmail] = useState(user?.email || '');
   const [previewUrl, setPreviewUrl] = useState<string | null>(getFullUrl(user?.profileImageUrl) || null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [oldPassword, setOldPassword] = useState('');
@@ -68,8 +55,8 @@ const Settings: React.FC = () => {
 
     const request: UpdateUserRequest = {
       id: user.id,
-      username: user.username,
-      email: user.email,
+      username: username,
+      email: email,
       bio: bio,
       imageFile: imageFile || undefined
     };
@@ -78,6 +65,8 @@ const Settings: React.FC = () => {
       await UserService.update(request);
 
       dispatch(updateUser({
+        username: username,
+        email: email,
         bio: bio,
         profileImageUrl: previewUrl || user.profileImageUrl
       }));
@@ -201,14 +190,22 @@ const Settings: React.FC = () => {
                   </Stack>
 
                   <Stack spacing={2} sx={{ mt: 3 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 1.2, borderBottom: '1px solid var(--border-dark)', px: 1 }}>
-                      <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontWeight: 800 }}>KULLANICI ADI</Typography>
-                      <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600 }}>{user?.username}</Typography>
+                    <Box sx={{ pt: 1 }}>
+                      <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontWeight: 800, ml: 1, mb: 0.5, display: 'block' }}>KULLANICI ADI</Typography>
+                      <TextField
+                        fullWidth size="small" variant="filled"
+                        value={username} onChange={(e) => setUsername(e.target.value)}
+                        sx={{ '& .MuiFilledInput-root': { borderRadius: '12px' } }}
+                      />
                     </Box>
 
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 1.2, borderBottom: '1px solid var(--border-dark)', px: 1 }}>
-                      <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontWeight: 800 }}>E-POSTA</Typography>
-                      <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600 }}>{user?.email}</Typography>
+                    <Box sx={{ pt: 1 }}>
+                      <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontWeight: 800, ml: 1, mb: 0.5, display: 'block' }}>E-POSTA</Typography>
+                      <TextField
+                        fullWidth size="small" variant="filled"
+                        value={email} onChange={(e) => setEmail(e.target.value)}
+                        sx={{ '& .MuiFilledInput-root': { borderRadius: '12px' } }}
+                      />
                     </Box>
 
                     <Box sx={{ pt: 1 }}>

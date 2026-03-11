@@ -5,30 +5,15 @@ import SellIcon from '@mui/icons-material/Sell';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import type { BasketResponseDto } from '../../models/Basket';
+import { getFullUrl } from '../../helpers/imageHelper';
 
 interface BasketCardProps {
   basket: BasketResponseDto;
 }
 
 const BasketCard: React.FC<BasketCardProps> = ({ basket }) => {
-  const API_BASE_URL = "http://localhost:5222";
   const totalPrice = basket.products.reduce((sum: number, product) => sum + product.price, 0);
   const tags: string[] = Array.from(new Set(basket.products.map((p) => p.categoryName).filter(Boolean)));
-
-  const getFullUrl = (path: string | null | undefined) => {
-
-    if (!path) {
-
-      return undefined;
-    }
-
-    if (path.startsWith('http')) {
-
-      return path;
-    }
-
-    return `${API_BASE_URL}${path}`;
-  };
 
   const productImages = basket.products
     .map(p => getFullUrl(p.imageUrl))

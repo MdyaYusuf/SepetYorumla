@@ -22,29 +22,14 @@ import HomeIcon from '@mui/icons-material/Home';
 import ExploreIcon from '@mui/icons-material/Explore';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import { getFullUrl } from '../../helpers/imageHelper';
 
 const Sidebar = () => {
-  const API_BASE_URL = "http://localhost:5222";
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-
-  const getFullUrl = (path: string | null | undefined) => {
-
-    if (!path) {
-
-      return undefined;
-    }
-
-    if (path.startsWith('http')) {
-
-      return path;
-    }
-
-    return `${API_BASE_URL}${path}`;
-  };
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

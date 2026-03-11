@@ -1,7 +1,6 @@
 ﻿namespace SepetYorumla.Models.Dtos.Products.Responses;
 
 public sealed record ProductResponseDto(
-  Guid Id,
   string Name,
   string? Description,
   decimal Price,

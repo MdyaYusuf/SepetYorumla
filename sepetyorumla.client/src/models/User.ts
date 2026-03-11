@@ -21,7 +21,6 @@ export interface RegisterRequest {
 export interface CreatedUserResponseDto {
   id: string;
   username: string;
-  email: string;
 }
 
 export interface UpdateUserRequest {

@@ -148,7 +148,7 @@ public class UserService(
       existingUser.ProfileImageUrl = await FileHelper.SaveImageToDisk(
         request.ImageFile,
         "profiles",
-        existingUser.Username,
+        request.Username,
         cancellationToken);
     }
 

@@ -19,6 +19,7 @@ import { CommentService } from '../../api/commentService';
 import { useAppSelector } from '../../store/store';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { getFullUrl } from '../../helpers/imageHelper';
 
 interface BasketFeedCardProps {
   basket: BasketResponseDto;
@@ -26,7 +27,6 @@ interface BasketFeedCardProps {
 }
 
 const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = false }) => {
-  const API_BASE_URL = "http://localhost:5222";
   const totalPrice = basket.products.reduce((sum, p) => sum + p.price, 0);
   const tags = Array.from(new Set(basket.products.map(p => p.categoryName).filter(Boolean)));
   const navigate = useNavigate();
@@ -75,21 +75,6 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
     setCommentsCount(Number(basket.totalComments) || 0);
     setAvgRating(Number(basket.averageRating) || 0);
   }, [basket.id, basket.userStarRating, basket.userThumbsUp, basket.totalThumbsUp, basket.totalThumbsDown]);
-
-  const getFullUrl = (path: string | null | undefined) => {
-
-    if (!path) {
-
-      return undefined;
-    }
-
-    if (path.startsWith('http')) {
-
-      return path;
-    }
-
-    return `${API_BASE_URL}${path}`;
-  };
 
   const productImages = basket.products
     .map(p => getFullUrl(p.imageUrl))
