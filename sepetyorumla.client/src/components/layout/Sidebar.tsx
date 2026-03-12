@@ -12,31 +12,31 @@ import {
   Divider
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { logout } from '../../features/authentication/authSlice';
 import type { RootState } from '../../store/store';
 import LogoutIcon from '@mui/icons-material/Logout';
+import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import HomeIcon from '@mui/icons-material/Home';
-import ExploreIcon from '@mui/icons-material/Explore';
-import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import { getFullUrl } from '../../helpers/imageHelper';
 
 const Sidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useSelector((state: RootState) => state.auth);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = (event: React.MouseEvent | React.KeyboardEvent) => {
-    event.stopPropagation();
+  const handleClose = () => {
     setAnchorEl(null);
   };
 
@@ -48,6 +48,10 @@ const Sidebar = () => {
   const handleSettingsClick = () => {
     navigate('/settings');
     setAnchorEl(null);
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
   };
 
   return (
@@ -64,15 +68,23 @@ const Sidebar = () => {
         </Box>
 
         <List sx={{ px: 1 }}>
-          <SidebarItem icon={<HomeIcon />} label="Ana Sayfa" onClick={() => navigate('/home')} active />
-          <SidebarItem icon={<ExploreIcon />} label="Keşfet" />
-          <SidebarItem icon={<ShoppingBagIcon />} label="Sepetlerim" />
+          <SidebarItem
+            icon={<HomeIcon />}
+            label="Ana Sayfa"
+            onClick={() => navigate('/home')}
+            active={location.pathname === '/home'}
+          />
+          <SidebarItem
+            icon={<PersonIcon />}
+            label="Profilim"
+            onClick={handleProfileClick}
+            active={location.pathname === '/profile'}
+          />
         </List>
       </Box>
 
       <Box>
         <Box
-          onClick={handleOpen}
           sx={{
             p: 1.5,
             borderRadius: '16px',
@@ -80,26 +92,50 @@ const Sidebar = () => {
             display: 'flex',
             alignItems: 'center',
             gap: 1.5,
-            cursor: 'pointer',
+            transition: 'all 0.2s ease',
             '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' }
           }}
         >
-          <Avatar
-            src={getFullUrl(user?.profileImageUrl)}
-            sx={{ bgcolor: 'var(--primary)', width: 40, height: 40 }}
+          <Box
+            onClick={handleProfileClick}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              flex: 1,
+              minWidth: 0,
+              cursor: 'pointer'
+            }}
           >
-            {!user?.profileImageUrl && (user?.username?.[0].toUpperCase() || 'U')}
-          </Avatar>
+            <Avatar
+              src={getFullUrl(user?.profileImageUrl)}
+              sx={{ bgcolor: 'var(--primary)', width: 40, height: 40 }}
+            >
+              {!user?.profileImageUrl && (user?.username?.[0].toUpperCase() || 'U')}
+            </Avatar>
 
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography variant="subtitle2" noWrap sx={{ color: '#fff', fontWeight: 700 }}>
-              {user?.username || 'Kullanıcı'}
-            </Typography>
-            <Typography variant="caption" noWrap sx={{ color: 'var(--text-muted)', display: 'block' }}>
-              @{user?.username?.toLowerCase() || 'sepetsever'}
-            </Typography>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography variant="subtitle2" noWrap sx={{ color: '#fff', fontWeight: 700 }}>
+                {user?.username || 'Kullanıcı'}
+              </Typography>
+              <Typography variant="caption" noWrap sx={{ color: 'var(--text-muted)', display: 'block' }}>
+                @{user?.username?.toLowerCase() || 'sepetsever'}
+              </Typography>
+            </Box>
           </Box>
-          <MoreHorizIcon sx={{ color: 'var(--text-muted)' }} />
+
+          <Box
+            onClick={handleOpen}
+            sx={{
+              p: 0.5,
+              borderRadius: '8px',
+              display: 'flex',
+              cursor: 'pointer',
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' }
+            }}
+          >
+            <MoreHorizIcon sx={{ color: 'var(--text-muted)' }} />
+          </Box>
         </Box>
 
         <Menu

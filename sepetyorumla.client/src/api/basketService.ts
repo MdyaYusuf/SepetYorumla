@@ -13,5 +13,23 @@ export const BasketService = {
     requests.get<BasketResponseDto[]>("Baskets"),
 
   getById: (id: string) =>
-    requests.get<BasketResponseDto>(`Baskets/${id}`)
+    requests.get<BasketResponseDto>(`Baskets/${id}`),
+
+  getByUserId: (userId: string) =>
+    requests.get<BasketResponseDto[]>(`Baskets/user/${userId}`),
+
+  getMyBaskets: () =>
+    requests.get<BasketResponseDto[]>("Baskets/my-baskets"),
+
+  getMyLikedBaskets: () =>
+    requests.get<BasketResponseDto[]>("Baskets/my-liked-baskets"),
+
+  getMyCommentedBaskets: () =>
+    requests.get<BasketResponseDto[]>("Baskets/my-commented-baskets"),
+
+  getSavedBaskets: () =>
+    requests.get<BasketResponseDto[]>("SavedBaskets/my-saved"),
+
+  toggleSave: (basketId: string) =>
+    requests.post<null>("SavedBaskets/toggle", { basketId })
 };

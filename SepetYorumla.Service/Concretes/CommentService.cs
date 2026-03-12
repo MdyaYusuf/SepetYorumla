@@ -62,7 +62,7 @@ public class CommentService(
 
     if (comment == null)
     {
-      return new ReturnModel<CommentResponseDto>
+      return new ReturnModel<CommentResponseDto>()
       {
         Success = true,
         Message = "Eşleşen yorum bulunamadı.",

@@ -44,4 +44,8 @@ public interface IUserService
     ChangePasswordRequest request,
     Guid userId,
     CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<UserProfileStatsDto>> GetProfileStatsAsync(
+    Guid userId,
+    CancellationToken cancellationToken = default);
 }

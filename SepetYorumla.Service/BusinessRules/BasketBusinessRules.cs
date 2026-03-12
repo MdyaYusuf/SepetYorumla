@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using SepetYorumla.Core.Exceptions;
+﻿using SepetYorumla.Core.Exceptions;
 using SepetYorumla.DataAccess.Abstracts;
 using SepetYorumla.Models.Entities;
 

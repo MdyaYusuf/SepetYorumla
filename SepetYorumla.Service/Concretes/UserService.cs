@@ -190,4 +190,28 @@ public class UserService(
       StatusCode = 200
     };
   }
+
+  public async Task<ReturnModel<UserProfileStatsDto>> GetProfileStatsAsync(Guid userId, CancellationToken cancellationToken = default)
+  {
+    await _businessRules.UserIdMustExist(userId, cancellationToken);
+
+    var stats = await _userRepository.Query()
+      .Where(u => u.Id == userId)
+      .Select(u => new UserProfileStatsDto(
+        u.Baskets.Count(),
+        u.Baskets.SelectMany(b => b.Reviews).Count(r => r.IsThumbsUp == true),
+        u.SavedBaskets.Count(),
+        u.Comments.Count(),
+        u.CreatedDate
+      ))
+      .FirstAsync(cancellationToken);
+
+    return new ReturnModel<UserProfileStatsDto>()
+    {
+      Data = stats,
+      Success = true,
+      StatusCode = 200,
+      Message = "İstatistikler başarıyla getirildi."
+    };
+  }
 }

@@ -23,11 +23,21 @@ public static class BasketMappingHelper
 
   public static void PopulateUserInteraction(Basket basket, BasketResponseDto response, Guid? userId)
   {
-    if (userId.HasValue && basket.Reviews != null)
+    if (!userId.HasValue)
+    {
+      return;
+    }
+
+    if (basket.Reviews != null)
     {
       var userReview = basket.Reviews.FirstOrDefault(r => r.UserId == userId.Value);
       response.UserThumbsUp = userReview?.IsThumbsUp;
       response.UserStarRating = userReview?.StarRating;
+    }
+
+    if (basket.SavedBaskets != null)
+    {
+      response.IsSaved = basket.SavedBaskets.Any(sb => sb.UserId == userId.Value);
     }
   }
 }

@@ -113,6 +113,23 @@ public class EfBaseRepository<TContext, TEntity, TId> : IRepository<TEntity, TId
     return entity;
   }
 
+  public IQueryable<TEntity> Query(bool enableTracking = true, bool withDeleted = false)
+  {
+    IQueryable<TEntity> query = _context.Set<TEntity>();
+
+    if (!enableTracking)
+    {
+      query = query.AsNoTracking();
+    }
+
+    if (withDeleted)
+    {
+      query = query.IgnoreQueryFilters();
+    }
+
+    return query;
+  }
+
   public void Delete(TEntity entity)
   {
     _context.Set<TEntity>().Remove(entity);

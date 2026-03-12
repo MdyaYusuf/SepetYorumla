@@ -23,6 +23,16 @@ public class UserBusinessRules(IUserRepository _userRepository)
     return user;
   }
 
+  public async Task UserIdMustExist(Guid userId, CancellationToken cancellationToken)
+  {
+    bool exists = await _userRepository.AnyAsync(u => u.Id == userId, cancellationToken);
+
+    if (!exists)
+    {
+      throw new NotFoundException($"{userId} numaralı kullanıcı bulunamadı.");
+    }
+  }
+
   public async Task EmailMustBeUniqueAsync(string email, Guid? id = null, CancellationToken cancellationToken = default)
   {
     var exists = await _userRepository.AnyAsync(u => u.Email == email && (id == null || u.Id != id), cancellationToken);

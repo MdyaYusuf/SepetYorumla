@@ -31,6 +31,8 @@ public interface IRepository<TEntity, TId>
     Expression<Func<TEntity,bool>> predicate,
     CancellationToken cancellationToken = default);
 
+  IQueryable<TEntity> Query(bool enableTracking = true, bool withDeleted = false);
+
   Task<TEntity> AddAsync(
     TEntity entity,
     CancellationToken cancellationToken = default);

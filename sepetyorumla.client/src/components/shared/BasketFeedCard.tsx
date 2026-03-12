@@ -9,6 +9,7 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import CloseIcon from '@mui/icons-material/Close';
@@ -16,10 +17,12 @@ import type { BasketResponseDto } from '../../models/Basket';
 import { ReviewService } from '../../api/reviewService';
 import type { CommentResponseDto } from '../../models/Comment';
 import { CommentService } from '../../api/commentService';
-import { useAppSelector } from '../../store/store';
+import { useAppSelector, useAppDispatch } from '../../store/store';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getFullUrl } from '../../helpers/imageHelper';
+import { BasketService } from '../../api/basketService';
+import { toggleBasketSave } from '../../features/basket/basketSlice';
 
 interface BasketFeedCardProps {
   basket: BasketResponseDto;
@@ -30,6 +33,7 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
   const totalPrice = basket.products.reduce((sum, p) => sum + p.price, 0);
   const tags = Array.from(new Set(basket.products.map(p => p.categoryName).filter(Boolean)));
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [avgRating, setAvgRating] = useState<number>(Number(basket.averageRating) || 0);
   const [ratingsCount, setRatingsCount] = useState<number>(Number(basket.totalRatingsCount) || 0);
@@ -37,9 +41,21 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
   const [dislikesCount, setDislikesCount] = useState(Number(basket.totalThumbsDown) || 0);
   const [commentsCount, setCommentsCount] = useState(Number(basket.totalComments) || 0);
   const { user } = useAppSelector((state) => state.auth);
+
+  const isSaved = useAppSelector((state) => {
+
+    if (isDetailView && state.baskets.currentBasket?.id === basket.id) {
+
+      return state.baskets.currentBasket.isSaved;
+    }
+
+    return state.baskets.items.find((b) => b.id === basket.id)?.isSaved ?? basket.isSaved;
+  });
+
   const [userStarRating, setUserStarRating] = useState<number | null>(
     basket.userStarRating != null ? Number(basket.userStarRating) : null
   );
+
   const [isThumbsUp, setIsThumbsUp] = useState<boolean | null>(basket.userThumbsUp);
   const [comments, setComments] = useState<CommentResponseDto[]>([]);
   const [newCommentText, setNewCommentText] = useState('');
@@ -47,6 +63,7 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
   const [showComments, setShowComments] = useState(true);
   const [enlargedImageUrl, setEnlargedImageUrl] = useState<string | null>(null);
   const hasUserCommented = comments.some(c => c.userId === user?.id);
+  const [saveLoading, setSaveLoading] = useState(false);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -219,6 +236,33 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
 
   const handleCloseImageModal = () => {
     setEnlargedImageUrl(null);
+  };
+
+  const handleToggleSave = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!user) {
+
+      return;
+    }
+
+    if (saveLoading) {
+
+      return;
+    }
+
+    setSaveLoading(true);
+    try {
+      const response = await BasketService.toggleSave(basket.id);
+
+      if (response.success) {
+        dispatch(toggleBasketSave(basket.id));
+      }
+    } catch (error) {
+      // The axios interceptor already handles the toast notification
+    } finally {
+      setSaveLoading(false);
+    }
   };
 
   const goToDetail = () => navigate(`/basket/${basket.id}`);
@@ -452,9 +496,30 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
             <Typography variant="caption" sx={{ fontWeight: 700 }}>Paylaş</Typography>
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--text-muted)', cursor: 'pointer', '&:hover': { color: '#ffc107' } }}>
-            <BookmarkBorderIcon sx={{ fontSize: '1.1rem' }} />
-            <Typography variant="caption" sx={{ fontWeight: 700 }}>Kaydet</Typography>
+          <Box
+            onClick={handleToggleSave}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              color: isSaved ? 'var(--primary)' : 'var(--text-muted)',
+              cursor: saveLoading ? 'default' : 'pointer',
+              transition: 'all 0.2s ease',
+              opacity: saveLoading ? 0.6 : 1,
+              '&:hover': {
+                color: isSaved ? 'var(--text-muted)' : 'var(--primary)'
+              }
+            }}
+          >
+            {isSaved ? (
+              <BookmarkIcon sx={{ fontSize: '1.1rem' }} />
+            ) : (
+              <BookmarkBorderIcon sx={{ fontSize: '1.1rem' }} />
+            )}
+
+            <Typography variant="caption" sx={{ fontWeight: 700 }}>
+              {isSaved ? 'Kaydedildi' : 'Kaydet'}
+            </Typography>
           </Box>
         </Stack>
       </Box>

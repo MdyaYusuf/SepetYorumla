@@ -17,18 +17,21 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import type { BasketResponseDto } from '../models/Basket';
 import { BasketService } from '../api/basketService';
 import BasketFeedCard from '../components/shared/BasketFeedCard';
+import { useAppSelector, useAppDispatch } from '../store/store';
+import { setCurrentBasket } from '../features/basket/basketSlice';
 
 const BasketDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [basket, setBasket] = useState<BasketResponseDto | null>(null);
+  const dispatch = useAppDispatch();
+  const { currentBasket: basket } = useAppSelector((state) => state.baskets);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchBasketDetail = async () => {
+
       if (!id) {
 
         return;
@@ -37,7 +40,7 @@ const BasketDetailPage: React.FC = () => {
         const response = await BasketService.getById(id);
 
         if (response.data && response.data.id) {
-          setBasket(response.data);
+          dispatch(setCurrentBasket(response.data));
         }
       } catch (error) {
         // The axios interceptor already handles the toast notification
@@ -47,7 +50,11 @@ const BasketDetailPage: React.FC = () => {
     };
 
     fetchBasketDetail();
-  }, [id]);
+
+    return () => {
+      dispatch(setCurrentBasket(null));
+    };
+  }, [id, dispatch]);
 
   if (isLoading) {
 
@@ -69,7 +76,13 @@ const BasketDetailPage: React.FC = () => {
         separator={<NavigateNextIcon fontSize="small" />}
         sx={{ mb: 1.5, '& .MuiBreadcrumbs-separator': { color: 'var(--text-muted)' } }}
       >
-        <MuiLink href="/home" underline="hover" sx={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Ana Sayfa</MuiLink>
+        <MuiLink
+          onClick={() => navigate('/home')}
+          underline="hover"
+          sx={{ color: 'var(--text-muted)', fontSize: '0.75rem', cursor: 'pointer' }}
+        >
+          Ana Sayfa
+        </MuiLink>
         <Typography sx={{ color: 'var(--text-white)', fontSize: '0.75rem', fontWeight: 700 }}>{basket.title}</Typography>
       </Breadcrumbs>
 

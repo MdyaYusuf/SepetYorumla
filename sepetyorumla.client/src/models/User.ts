@@ -36,3 +36,11 @@ export interface ChangePasswordRequest {
   newPassword: string;
   confirmNewPassword: string;
 }
+
+export interface UserProfileStats {
+  totalBaskets: number;
+  totalLikesReceived: number;
+  totalSavedBaskets: number;
+  totalCommentsMade: number;
+  createdDate: string;
+}

@@ -36,7 +36,8 @@ public class BasketService(
         .Include(b => b.User)
         .Include(b => b.Products).ThenInclude(p => p.Category)
         .Include(b => b.Reviews)
-        .Include(b => b.Comments)),
+        .Include(b => b.Comments)
+        .Include(b => b.SavedBaskets)),
       orderBy,
       enableTracking,
       withDeleted,
@@ -72,7 +73,8 @@ public class BasketService(
         .Include(b => b.User)
         .Include(b => b.Products).ThenInclude(p => p.Category)
         .Include(b => b.Reviews)
-        .Include(b => b.Comments),
+        .Include(b => b.Comments)
+        .Include(b => b.SavedBaskets),
       enableTracking,
       cancellationToken);
 
@@ -114,7 +116,8 @@ public class BasketService(
         .Include(b => b.User)
         .Include(b => b.Products).ThenInclude(p => p.Category)
         .Include(b => b.Reviews)
-        .Include(b => b.Comments),
+        .Include(b => b.Comments)
+        .Include(b => b.SavedBaskets),
       enableTracking,
       cancellationToken);
 

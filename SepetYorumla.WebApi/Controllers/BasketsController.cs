@@ -64,12 +64,43 @@ public class BasketsController(IBasketService _basketService) : CustomBaseContro
     return CreateActionResult(result);
   }
 
-  [HttpGet("user/{userId:guid}")]
-  public async Task<IActionResult> GetByUserId(Guid userId, CancellationToken cancellationToken)
+  [HttpGet("my-baskets")]
+  [Authorize]
+  public async Task<IActionResult> GetMyBaskets(CancellationToken cancellationToken)
   {
+    var currentUserId = GetUserId();
+
     var result = await _basketService.GetAllAsync(
-      userId: TryGetUserId(),
-      filter: x => x.UserId == userId,
+      userId: currentUserId,
+      filter: x => x.UserId == currentUserId,
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("my-liked-baskets")]
+  [Authorize]
+  public async Task<IActionResult> GetMyLikedBaskets(CancellationToken cancellationToken)
+  {
+    var currentUserId = GetUserId();
+
+    var result = await _basketService.GetAllAsync(
+      userId: currentUserId,
+      filter: b => b.Reviews.Any(r => r.UserId == currentUserId && r.IsThumbsUp == true),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [HttpGet("my-commented-baskets")]
+  [Authorize]
+  public async Task<IActionResult> GetMyCommentedBaskets(CancellationToken cancellationToken)
+  {
+    var currentUserId = GetUserId();
+
+    var result = await _basketService.GetAllAsync(
+      userId: currentUserId,
+      filter: b => b.Comments.Any(c => c.UserId == currentUserId),
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);

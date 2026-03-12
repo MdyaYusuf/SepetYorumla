@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector, type TypedUseSelectorHook } from 'react-redux';
 import authReducer from '../features/authentication/authSlice';
+import basketReducer from '../features/basket/basketSlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    baskets: basketReducer,
   },
 });
 

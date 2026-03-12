@@ -15,8 +15,8 @@ import {
   MenuItem
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import type { RootState } from '../../store/store';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { setBaskets } from '../../features/basket/basketSlice';
 import { CategoryService } from '../../api/categoryService';
 import type { CategoryResponseDto } from '../../models/Category';
 import Sidebar from '../../components/layout/Sidebar';
@@ -24,21 +24,20 @@ import BasketFeedCard from '../../components/shared/BasketFeedCard';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import type { BasketResponseDto } from '../../models/Basket';
 import { BasketService } from '../../api/basketService';
 import ShareBasketModal from '../../components/shared/ShareBasketModal';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const dispatch = useAppDispatch();
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const baskets = useAppSelector((state) => state.baskets.items);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [baskets, setBaskets] = useState<BasketResponseDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState<CategoryResponseDto[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-
   const [sortBy, setSortBy] = useState<'date' | 'comments' | 'likes' | 'rating'>('date');
   const [sortAnchorEl, setSortAnchorEl] = useState<null | HTMLElement>(null);
   const isSortMenuOpen = Boolean(sortAnchorEl);
@@ -51,7 +50,7 @@ const Home: React.FC = () => {
         CategoryService.getAll()
       ]);
 
-      setBaskets(basketRes.data);
+      dispatch(setBaskets(basketRes.data));
       setCategories(categoryRes.data);
     } catch {
       // The axios interceptor already handles the toast notification

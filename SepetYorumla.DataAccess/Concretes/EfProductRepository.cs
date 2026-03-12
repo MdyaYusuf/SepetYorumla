@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SepetYorumla.Core.Repositories;
+﻿using SepetYorumla.Core.Repositories;
 using SepetYorumla.DataAccess.Abstracts;
 using SepetYorumla.DataAccess.Contexts;
 using SepetYorumla.Models.Entities;

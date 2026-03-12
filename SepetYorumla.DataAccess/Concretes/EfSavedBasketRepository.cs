@@ -5,10 +5,10 @@ using SepetYorumla.Models.Entities;
 
 namespace SepetYorumla.DataAccess.Concretes;
 
-public class EfCategoryRepository : EfBaseRepository<BaseDbContext, Category, int>, ICategoryRepository
+public class EfSavedBasketRepository : EfBaseRepository<BaseDbContext, SavedBasket, Guid>, ISavedBasketRepository
 {
-  public EfCategoryRepository(BaseDbContext context) : base(context)
+  public EfSavedBasketRepository(BaseDbContext context) : base(context)
   {
-    
+
   }
 }

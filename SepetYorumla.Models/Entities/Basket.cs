@@ -11,6 +11,7 @@ public class Basket : Entity<Guid>
     Products = new HashSet<Product>();
     Reviews = new HashSet<Review>();
     Comments = new HashSet<Comment>();
+    SavedBaskets = new HashSet<SavedBasket>();
 
     Title = default!;
   }
@@ -25,4 +26,5 @@ public class Basket : Entity<Guid>
   public virtual ICollection<Product> Products { get; set; }
   public virtual ICollection<Review> Reviews { get; set; }
   public virtual ICollection<Comment> Comments { get; set; }
+  public virtual ICollection<SavedBasket> SavedBaskets { get; set; }
 }

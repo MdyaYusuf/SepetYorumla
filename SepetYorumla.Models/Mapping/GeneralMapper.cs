@@ -11,6 +11,7 @@ using SepetYorumla.Models.Dtos.Reviews.Requests;
 using SepetYorumla.Models.Dtos.Reviews.Responses;
 using SepetYorumla.Models.Dtos.Roles.Requests;
 using SepetYorumla.Models.Dtos.Roles.Responses;
+using SepetYorumla.Models.Dtos.SavedBaskets.Requests;
 using SepetYorumla.Models.Dtos.Users.Requests;
 using SepetYorumla.Models.Dtos.Users.Responses;
 using SepetYorumla.Models.Entities;
@@ -83,4 +84,7 @@ public partial class GeneralMapper
   public partial UserResponseDto EntityToResponseDto(User entity);
   public partial CreatedUserResponseDto EntityToCreatedResponseDto(User entity);
   public partial List<UserResponseDto> EntityToResponseDtoList(List<User> entities);
+
+  // SavedBasket
+  public partial SavedBasket CreateToEntity(CreateSavedBasketRequest request, Guid userId);
 }

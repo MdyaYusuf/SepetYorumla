@@ -1,7 +1,8 @@
 import { requests } from './axiosInstance';
-import type { UpdateUserRequest, ChangePasswordRequest } from '../models/User';
+import type { UpdateUserRequest, ChangePasswordRequest, UserProfileStats } from '../models/User';
 
 export const UserService = {
+
   update: async (request: UpdateUserRequest) => {
     const formData = new FormData();
     formData.append('Id', request.id);
@@ -22,5 +23,10 @@ export const UserService = {
   changePassword: async (request: ChangePasswordRequest) => {
 
     return requests.post<null>('Users/change-password', request);
+  },
+
+  getStats: async (userId: string) => {
+
+    return requests.get<UserProfileStats>(`Users/${userId}/stats`);
   }
 };

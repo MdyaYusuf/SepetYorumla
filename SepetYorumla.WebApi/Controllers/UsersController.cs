@@ -61,4 +61,13 @@ public class UsersController(IUserService _userService) : CustomBaseController
 
     return CreateActionResult(result);
   }
+
+  [HttpGet("{id:guid}/stats")]
+  [Authorize]
+  public async Task<IActionResult> GetProfileStats(Guid id, CancellationToken cancellationToken)
+  {
+    var result = await _userService.GetProfileStatsAsync(id, cancellationToken);
+
+    return CreateActionResult(result);
+  }
 }

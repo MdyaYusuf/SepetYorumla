@@ -14,6 +14,7 @@ export interface BasketResponseDto {
   totalRatingsCount: number;
   userThumbsUp: boolean | null;
   userStarRating: number | null;
+  isSaved: boolean;
 }
 
 export interface ProductPreviewDto {

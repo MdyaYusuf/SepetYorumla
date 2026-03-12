@@ -19,4 +19,5 @@ public class BasketResponseDto
   public int TotalRatingsCount { get; set; }
   public bool? UserThumbsUp { get; set; }
   public decimal? UserStarRating { get; set; }
+  public bool IsSaved { get; set; }
 }
