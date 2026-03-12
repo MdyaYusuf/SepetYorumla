@@ -29,7 +29,7 @@ builder.Services.AddServiceDependencies();
 
 builder.Services.Configure<TokenOptions>(builder.Configuration.GetSection("TokenOptions"));
 
-var tokenOptions = builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>() ?? throw new InvalidOperationException("TokenOptions bölümü yapılandırma dosyasında (appsettings) bulunamadı.");
+var tokenOptions = builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>() ?? throw new InvalidOperationException("TokenOptions bölümü yapılandırma dosyasında appsettings bulunamadı.");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
   .AddJwtBearer(options => {

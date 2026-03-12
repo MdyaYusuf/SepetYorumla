@@ -7,8 +7,6 @@ public class UpdateUserRequestValidator : AbstractValidator<UpdateUserRequest>
 {
   public UpdateUserRequestValidator()
   {
-    RuleFor(u => u.Id).NotEmpty().WithMessage("Kullanıcı ID bilgisi gereklidir.");
-
     RuleFor(u => u.Username)
       .NotEmpty().WithMessage("Kullanıcı adı boş olamaz.")
       .MinimumLength(3).WithMessage("Kullanıcı adı en az 3 karakter olmalıdır.");

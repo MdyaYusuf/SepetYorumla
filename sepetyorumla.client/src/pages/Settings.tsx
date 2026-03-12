@@ -54,7 +54,6 @@ const Settings: React.FC = () => {
     }
 
     const request: UpdateUserRequest = {
-      id: user.id,
       username: username,
       email: email,
       bio: bio,
@@ -115,7 +114,7 @@ const Settings: React.FC = () => {
         }}>
           <Box sx={{ pt: 3, px: { xs: 2, md: 8 }, pb: 8 }}>
 
-            <Box sx={{ mb: 6 }}>
+            <Box sx={{ mb: 3 }}>
               <Breadcrumbs
                 separator={<NavigateNextIcon fontSize="small" />}
                 sx={{ mb: 2, '& .MuiBreadcrumbs-separator': { color: 'var(--text-muted)' } }}
@@ -146,11 +145,11 @@ const Settings: React.FC = () => {
               </Box>
             </Box>
 
-            <Grid container spacing={6}>
+            <Grid container spacing={3}>
               <Grid size={{ xs: 12, lg: 7 }}>
-                <Paper sx={{ p: 4, bgcolor: 'var(--surface-dark)', borderRadius: '32px', border: '1px solid var(--border-dark)', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
+                <Paper sx={{ p: 2.5, bgcolor: 'var(--surface-dark)', borderRadius: '32px', border: '1px solid var(--border-dark)', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
 
-                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
                     <Stack direction="row" spacing={1.5} alignItems="center">
                       <PersonIcon sx={{ color: 'var(--primary)' }} />
                       <Typography variant="h6" sx={{ fontWeight: 800, color: '#fff' }}>Profil Bilgileri</Typography>
@@ -158,7 +157,7 @@ const Settings: React.FC = () => {
                     <Box sx={{ bgcolor: 'rgba(13, 166, 242, 0.1)', color: 'var(--primary)', px: 2, py: 0.5, borderRadius: '20px', fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1 }}>Kişisel</Box>
                   </Stack>
 
-                  <Stack spacing={2} alignItems="center">
+                  <Stack spacing={1} alignItems="center">
                     <Box sx={{ position: 'relative' }}>
                       <Avatar
                         src={previewUrl || undefined}
@@ -189,7 +188,7 @@ const Settings: React.FC = () => {
                     <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontWeight: 600 }}>Profil fotoğrafını değiştirmek için tıklayın</Typography>
                   </Stack>
 
-                  <Stack spacing={2} sx={{ mt: 3 }}>
+                  <Stack spacing={2} sx={{ mt: 2 }}>
                     <Box sx={{ pt: 1 }}>
                       <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontWeight: 800, ml: 1, mb: 0.5, display: 'block' }}>KULLANICI ADI</Typography>
                       <TextField

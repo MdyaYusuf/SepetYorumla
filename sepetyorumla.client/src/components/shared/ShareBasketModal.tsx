@@ -10,8 +10,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { useSelector } from 'react-redux';
-import type { RootState } from '../../store/store';
 import type { CreateProductInBasketDto } from '../../models/BasketRequest';
 import type { CategoryResponseDto } from '../../models/Category';
 import { BasketService } from '../../api/basketService';
@@ -21,7 +19,6 @@ import { toast } from 'react-toastify';
 interface Props { open: boolean; onClose: () => void; }
 
 const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
-  const { user } = useSelector((state: RootState) => state.auth);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState('');
@@ -37,7 +34,7 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
     storeName: '',
     brand: '',
     model: '',
-    imageUrl: '',
+    imageFile: undefined,
     description: ''
   };
 
@@ -63,8 +60,10 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
   };
 
   const addProduct = () => {
+
     if (!curProduct.name || curProduct.price <= 0 || !curProduct.imageFile) {
       toast.warn("Lütfen ürün adı, fiyat ve görsel ekleyin.");
+
       return;
     }
     setProducts([...products, curProduct]);
@@ -77,15 +76,16 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
   };
 
   const handleSubmit = async () => {
+
     if (products.length < 2) {
       toast.error("En az iki ürün eklenmelidir.");
+
       return;
     }
 
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description || '');
-    formData.append('userId', user?.id || '');
 
     products.forEach((product, index) => {
       formData.append(`products[${index}].name`, product.name);

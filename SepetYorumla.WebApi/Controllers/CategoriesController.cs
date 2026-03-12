@@ -29,7 +29,7 @@ public class CategoriesController(ICategoryService _categoryService) : CustomBas
   public async Task<IActionResult> GetByName([FromQuery] string name, CancellationToken cancellationToken)
   {
     var result = await _categoryService.GetAsync(
-      predicate: c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase),
+      predicate: c => c.Name.ToLower() == name.ToLower(),
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);

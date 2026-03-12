@@ -254,10 +254,10 @@ const ProfilePage: React.FC = () => {
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
               {[
-                { label: 'SEPETLER', val: stats?.totalBaskets, icon: <ShoppingBagIcon /> },
-                { label: 'BEĞENİLER', val: stats?.totalLikesReceived, icon: <FavoriteIcon /> },
+                { label: 'SEPETLER', val: stats?.totalBaskets || 0, icon: <ShoppingBagIcon /> },
+                { label: 'BEĞENİLER', val: stats?.totalLikesReceived || 0, icon: <FavoriteIcon /> },
                 { label: 'KAYDEDİLEN', val: stats?.totalSavedBaskets || 0, icon: <BookmarkIcon /> },
-                { label: 'YORUMLAR', val: stats?.totalCommentsMade, icon: <ForumIcon /> }
+                { label: 'YORUMLAR', val: stats?.totalCommentsMade || 0, icon: <ForumIcon /> }
               ].map((stat, i) => (
                 <Grid key={i} size={{ xs: 12, sm: 6, md: 3 }}>
                   <Paper sx={{
@@ -308,7 +308,8 @@ const ProfilePage: React.FC = () => {
                 ) : (
                   <Typography sx={{ color: 'var(--text-muted)', p: 4, textAlign: 'center', width: '100%' }}>
                     {tabValue === 0 ? "Henüz sepet oluşturmadınız." :
-                      tabValue === 1 ? "Henüz bir sepeti beğenmediniz." : "Henüz bir sepete yorum yapmadınız."}
+                     tabValue === 1 ? "Henüz bir sepeti beğenmediniz." :
+                     tabValue === 2 ? "Henüz bir sepeti kaydetmediniz." : "Henüz bir sepete yorum yapmadınız."}
                   </Typography>
                 )}
               </Grid>

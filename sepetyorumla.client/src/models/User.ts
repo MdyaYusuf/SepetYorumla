@@ -24,7 +24,6 @@ export interface CreatedUserResponseDto {
 }
 
 export interface UpdateUserRequest {
-  id: string;
   username: string;
   email: string;
   bio?: string;

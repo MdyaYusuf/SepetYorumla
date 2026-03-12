@@ -29,8 +29,12 @@ public class ProductService(
     CancellationToken cancellationToken = default)
   {
     List<Product> products = await _productRepository.GetAllAsync(
-      include: p => p.Include(p => p.Category).Include(p => p.Basket),
-      cancellationToken: cancellationToken);
+      filter,
+      include: query => query.Include(p => p.Category).Include(p => p.Basket),
+      orderBy,
+      enableTracking,
+      withDeleted,
+      cancellationToken);
 
     List<ProductResponseDto> response = _mapper.EntityToResponseDtoList(products);
 
@@ -109,10 +113,10 @@ public class ProductService(
       throw new ValidationException(validationResult.Errors);
     }
 
+    await _businessRules.UserMustOwnBasketAsync(request.BasketId, userId, cancellationToken);
     await _businessRules.BasketMustExistAsync(request.BasketId, cancellationToken);
     await _businessRules.CategoryMustExistAsync(request.CategoryId, cancellationToken);
     await _businessRules.ProductNameMustBeUniqueAsync(request.Name, cancellationToken: cancellationToken);
-    await _businessRules.UserMustOwnBasketAsync(request.BasketId, userId, cancellationToken);
 
     Product createdProduct = _mapper.CreateToEntity(request);
 

@@ -49,12 +49,9 @@ public class AuthenticationService(
     {
       user.RefreshToken = GenerateRefreshToken();
       user.RefreshTokenExpiration = DateTime.Now.AddDays(_options.RefreshTokenExpiration);
-      SetRefreshTokenCookie(user.RefreshToken, user.RefreshTokenExpiration.Value);
     }
-    else
-    {
-      SetRefreshTokenCookie(user.RefreshToken!, user.RefreshTokenExpiration!.Value);
-    }
+
+    SetRefreshTokenCookie(user.RefreshToken!, user.RefreshTokenExpiration!.Value);
 
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -76,8 +73,20 @@ public class AuthenticationService(
 
     user!.RefreshToken = null;
     user.RefreshTokenExpiration = null;
-    _httpContextAccessor.HttpContext?.Response.Cookies.Delete("refreshToken");
 
+    var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
+    var cookieOptions = new CookieOptions()
+    {
+      HttpOnly = true,
+      Secure = !isDevelopment,
+      SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.Strict,
+      Path = "/"
+    };
+
+    _httpContextAccessor.HttpContext?.Response.Cookies.Delete("refreshToken", cookieOptions);
+
+    _userRepository.Update(user);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
     return new ReturnModel<NoData>()

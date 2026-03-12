@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using SepetYorumla.Core.Exceptions;
 using SepetYorumla.Core.Responses;
 using SepetYorumla.Core.Security;
 using SepetYorumla.DataAccess.Abstracts;
@@ -116,10 +115,8 @@ public class UserService(
     };
   }
 
-  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateUserRequest request, Guid currentUserId, string userRole, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<NoData>> UpdateAsync(UpdateUserRequest request, Guid currentUserId, CancellationToken cancellationToken = default)
   {
-    _businessRules.UserMustBeOwnerOrAdmin(request.Id, currentUserId, userRole);
-
     var validationResult = await _updateValidator.ValidateAsync(request, cancellationToken);
 
     if (!validationResult.IsValid)
@@ -127,16 +124,16 @@ public class UserService(
       throw new ValidationException(validationResult.Errors);
     }
 
-    User existingUser = await _businessRules.GetUserIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
+    User existingUser = await _businessRules.GetUserIfExistAsync(currentUserId, enableTracking: true, cancellationToken: cancellationToken);
 
     if (existingUser.Email != request.Email)
     {
-      await _businessRules.EmailMustBeUniqueAsync(request.Email, request.Id, cancellationToken);
+      await _businessRules.EmailMustBeUniqueAsync(request.Email, existingUser.Id, cancellationToken);
     }
 
     if (existingUser.Username != request.Username)
     {
-      await _businessRules.UsernameMustBeUniqueAsync(request.Username, request.Id, cancellationToken);
+      await _businessRules.UsernameMustBeUniqueAsync(request.Username, existingUser.Id, cancellationToken);
     }
 
     _mapper.UpdateEntityFromRequest(request, existingUser);

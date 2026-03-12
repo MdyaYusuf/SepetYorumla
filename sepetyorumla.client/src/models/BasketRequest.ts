@@ -12,6 +12,5 @@ export interface CreateProductInBasketDto {
 export interface CreateBasketRequest {
   title: string;
   description?: string;
-  userId: string;
   products: CreateProductInBasketDto[];
 }

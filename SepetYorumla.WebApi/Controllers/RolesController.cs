@@ -29,7 +29,7 @@ public class RolesController(IRoleService _roleService) : CustomBaseController
   public async Task<IActionResult> GetByName([FromQuery] string name, CancellationToken cancellationToken)
   {
     var result = await _roleService.GetAsync(
-      predicate: r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase),
+      predicate: r => r.Name.ToLower() == name.ToLower(),
       cancellationToken: cancellationToken);
 
     return CreateActionResult(result);

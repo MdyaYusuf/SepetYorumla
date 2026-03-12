@@ -37,7 +37,6 @@ public interface IUserService
   Task<ReturnModel<NoData>> UpdateAsync(
     UpdateUserRequest request,
     Guid currentUserId,
-    string userRole,
     CancellationToken cancellationToken = default);
 
   Task<ReturnModel<NoData>> ChangePasswordAsync(

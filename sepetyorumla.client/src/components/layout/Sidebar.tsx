@@ -11,10 +11,9 @@ import {
   ListItemButton,
   Divider
 } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../../store/store';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { logout } from '../../features/authentication/authSlice';
-import type { RootState } from '../../store/store';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -22,12 +21,13 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import HomeIcon from '@mui/icons-material/Home';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import { getFullUrl } from '../../helpers/imageHelper';
+import { requests } from '../../api/axiosInstance';
 
 const Sidebar = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -40,9 +40,16 @@ const Sidebar = () => {
     setAnchorEl(null);
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-    setAnchorEl(null);
+  const handleLogout = async () => {
+    try {
+      await requests.post("Authentication/logout", {});
+    } catch {
+      // The axios interceptor already handles the toast notification
+    } finally {
+      dispatch(logout());
+      setAnchorEl(null);
+      navigate('/');
+    }
   };
 
   const handleSettingsClick = () => {

@@ -32,9 +32,8 @@ public class UsersController(IUserService _userService) : CustomBaseController
   public async Task<IActionResult> Update([FromForm] UpdateUserRequest request, CancellationToken cancellationToken)
   {
     var userId = GetUserId();
-    var userRole = GetUserRole();
 
-    var result = await _userService.UpdateAsync(request, userId, userRole, cancellationToken);
+    var result = await _userService.UpdateAsync(request, userId, cancellationToken);
 
     return CreateActionResult(result);
   }

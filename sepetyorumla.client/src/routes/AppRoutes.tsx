@@ -13,9 +13,23 @@ import ProfilePage from '../pages/ProfilePage';
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
   if (!isAuthenticated) {
+
     return <Navigate to="/login" />;
   }
+
+  return children;
+};
+
+const PublicOnlyRoute = ({ children }: { children: JSX.Element }) => {
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  if (isAuthenticated) {
+
+    return <Navigate to="/home" />;
+  }
+
   return children;
 };
 
@@ -23,6 +37,7 @@ const AppRoutes = () => {
   const { isInitialized } = useSelector((state: RootState) => state.auth);
 
   if (!isInitialized) {
+
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress color="primary" />
@@ -33,8 +48,8 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+      <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
       <Route
         path="/home"
         element={
@@ -67,6 +82,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 };

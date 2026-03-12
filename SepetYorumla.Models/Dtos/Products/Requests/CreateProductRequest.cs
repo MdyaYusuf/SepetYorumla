@@ -1,11 +1,13 @@
-﻿namespace SepetYorumla.Models.Dtos.Products.Requests;
+﻿using Microsoft.AspNetCore.Http;
+
+namespace SepetYorumla.Models.Dtos.Products.Requests;
 
 public sealed record CreateProductRequest(
   string Name,
   string? Description,
   decimal Price,
   string? StoreName,
-  string? ImageUrl,
+  IFormFile? ImageFile,
   string? Brand,
   string? Model,
   Guid BasketId,

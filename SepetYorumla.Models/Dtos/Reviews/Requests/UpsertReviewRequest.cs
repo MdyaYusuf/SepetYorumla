@@ -3,5 +3,4 @@
 public sealed record UpsertReviewRequest(
   decimal? StarRating,
   bool? IsThumbsUp,
-  Guid BasketId
-);
+  Guid BasketId);
