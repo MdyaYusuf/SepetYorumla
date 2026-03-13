@@ -106,6 +106,25 @@ const BasketDetailPage: React.FC = () => {
         Geri Dön
       </Button>
 
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4" sx={{ color: 'var(--text-white)', fontWeight: 900, mb: 1 }}>
+          {basket.title}
+        </Typography>
+        {basket.description && (
+          <Typography
+            variant="body1"
+            sx={{
+              color: 'var(--text-muted)',
+              lineHeight: 1.6,
+              maxWidth: '800px',
+              fontWeight: 500
+            }}
+          >
+            {basket.description}
+          </Typography>
+        )}
+      </Box>
+
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, lg: 8 }}>
           <BasketFeedCard basket={basket} isDetailView={true} />

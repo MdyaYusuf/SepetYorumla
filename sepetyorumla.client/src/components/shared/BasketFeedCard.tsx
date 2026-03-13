@@ -358,8 +358,110 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
         <Chip icon={<PaymentsIcon style={{ fontSize: 16, color: 'inherit' }} />} label={`Toplam: ${totalPrice.toLocaleString('tr-TR')} TL`} size="small" sx={{ bgcolor: 'rgba(13, 166, 242, 0.1)', color: 'var(--primary)', fontWeight: 800 }} />
       </Box>
 
+      <Box sx={{ mt: 1 }} onClick={(e) => e.stopPropagation()}>
+        <Box sx={{ display: 'flex', mb: 2, gap: 1 }}>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Yorum yap..."
+            value={newCommentText}
+            onChange={(e) => setNewCommentText(e.target.value)}
+            onKeyDown={(e) => {
+
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleAddComment();
+              }
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                bgcolor: 'rgba(255,255,255,0.05)',
+                borderRadius: '12px',
+                '& fieldset': { borderColor: 'transparent' },
+                '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+              }
+            }}
+          />
+          <IconButton onClick={handleAddComment} color="primary" sx={{ bgcolor: 'rgba(13, 166, 242, 0.1)' }}>
+            <SendIcon fontSize="small" />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+          <Stack direction="row" spacing={2.5}>
+            <Box onClick={() => handleVote(true)} sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: isThumbsUp === true ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', '&:hover': { color: 'var(--primary)' } }}>
+              {isThumbsUp === true ? <ThumbUpIcon fontSize="small" /> : <ThumbUpOffAltIcon fontSize="small" />}
+              <Typography variant="caption" sx={{ fontWeight: 700 }}>{likesCount}</Typography>
+            </Box>
+
+            <Box onClick={() => handleVote(false)} sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: isThumbsUp === false ? '#ff4b4b' : 'var(--text-muted)', cursor: 'pointer', '&:hover': { color: '#ff4b4b' } }}>
+              {isThumbsUp === false ? <ThumbDownIcon fontSize="small" /> : <ThumbDownOffAltIcon fontSize="small" />}
+              <Typography variant="caption" sx={{ fontWeight: 700 }}>{dislikesCount}</Typography>
+            </Box>
+
+            <Box
+              onClick={() => setShowComments(!showComments)}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                color: hasUserCommented ? 'var(--primary)' : 'var(--text-muted)',
+                cursor: 'pointer',
+                '&:hover': { color: 'var(--primary)' }
+              }}
+            >
+              {hasUserCommented ? <ChatBubbleIcon fontSize="small" /> : <ChatBubbleOutlineIcon fontSize="small" />}
+              <Typography variant="caption" sx={{ fontWeight: 700 }}>{commentsCount}</Typography>
+            </Box>
+          </Stack>
+
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Box
+              onClick={handleShare}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                '&:hover': { color: 'var(--primary)' }
+              }}
+            >
+              <ShareIcon sx={{ fontSize: '1.1rem' }} />
+              <Typography variant="caption" sx={{ fontWeight: 700 }}>Paylaş</Typography>
+            </Box>
+
+            <Box
+              onClick={handleToggleSave}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                color: isSaved ? 'var(--primary)' : 'var(--text-muted)',
+                cursor: saveLoading ? 'default' : 'pointer',
+                transition: 'all 0.2s ease',
+                opacity: saveLoading ? 0.6 : 1,
+                '&:hover': {
+                  color: isSaved ? 'var(--text-muted)' : 'var(--primary)'
+                }
+              }}
+            >
+              {isSaved ? (
+                <BookmarkIcon sx={{ fontSize: '1.1rem' }} />
+              ) : (
+                <BookmarkBorderIcon sx={{ fontSize: '1.1rem' }} />
+              )}
+              <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                {isSaved ? 'Kaydedildi' : 'Kaydet'}
+              </Typography>
+            </Box>
+          </Stack>
+        </Box>
+      </Box>
+
       {showComments && (
-        <Box sx={{ mt: 2, mb: 2 }} onClick={(e) => e.stopPropagation()}>
+        <Box sx={{ mt: 1 }} onClick={(e) => e.stopPropagation()}>
           <Divider sx={{ borderColor: 'var(--border-dark)', mb: 2 }} />
 
           {isCommentsLoading ? (
@@ -372,7 +474,18 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
                 </Typography>
               )}
 
-              {(isDetailView ? comments : comments.slice(-1)).map((comment) => (
+                {(() => {
+
+                  if (!isDetailView) {
+
+                    return comments.slice(-1);
+                  }
+
+                  const myComments = comments.filter(c => c.userId === user?.id).reverse();
+                  const otherComments = comments.filter(c => c.userId !== user?.id).reverse();
+
+                  return [...myComments, ...otherComments];
+                })().map((comment) => (
                 <Box key={comment.id} sx={{ p: 1.2, borderRadius: '12px', bgcolor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', mb: 1 }}>
                   <Stack direction="row" spacing={1} alignItems="flex-start" justifyContent="space-between">
                     <Stack direction="row" spacing={1} alignItems="flex-start">
@@ -421,108 +534,8 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
               )}
             </>
           )}
-
-          <Box sx={{ display: 'flex', mt: 2, gap: 1 }}>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder="Yorum yap..."
-              value={newCommentText}
-              onChange={(e) => setNewCommentText(e.target.value)}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  color: 'white',
-                  bgcolor: 'rgba(255,255,255,0.05)',
-                  borderRadius: '12px',
-                  '& fieldset': { borderColor: 'transparent' },
-                  '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
-                }
-              }}
-            />
-            <IconButton onClick={handleAddComment} color="primary" sx={{ bgcolor: 'rgba(13, 166, 242, 0.1)' }}>
-              <SendIcon fontSize="small" />
-            </IconButton>
-          </Box>
         </Box>
       )}
-
-      <Divider sx={{ borderColor: 'var(--border-dark)', mb: 2 }} />
-
-      <Box
-        sx={{ display: 'flex', justifyContent: 'space-between' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Stack direction="row" spacing={2.5}>
-          <Box onClick={() => handleVote(true)} sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: isThumbsUp === true ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', '&:hover': { color: 'var(--primary)' } }}>
-            {isThumbsUp === true ? <ThumbUpIcon fontSize="small" /> : <ThumbUpOffAltIcon fontSize="small" />}
-            <Typography variant="caption" sx={{ fontWeight: 700 }}>{likesCount}</Typography>
-          </Box>
-
-          <Box onClick={() => handleVote(false)} sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: isThumbsUp === false ? '#ff4b4b' : 'var(--text-muted)', cursor: 'pointer', '&:hover': { color: '#ff4b4b' } }}>
-            {isThumbsUp === false ? <ThumbDownIcon fontSize="small" /> : <ThumbDownOffAltIcon fontSize="small" />}
-            <Typography variant="caption" sx={{ fontWeight: 700 }}>{dislikesCount}</Typography>
-          </Box>
-
-          <Box
-            onClick={() => setShowComments(!showComments)}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              color: hasUserCommented ? 'var(--primary)' : 'var(--text-muted)',
-              cursor: 'pointer',
-              '&:hover': { color: 'var(--primary)' }
-            }}
-          >
-            {hasUserCommented ? <ChatBubbleIcon fontSize="small" /> : <ChatBubbleOutlineIcon fontSize="small" />}
-            <Typography variant="caption" sx={{ fontWeight: 700 }}>{commentsCount}</Typography>
-          </Box>
-        </Stack>
-
-        <Stack direction="row" spacing={2} alignItems="center">
-
-          <Box
-            onClick={handleShare}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              color: 'var(--text-muted)',
-              cursor: 'pointer',
-              '&:hover': { color: 'var(--primary)' }
-            }}
-          >
-            <ShareIcon sx={{ fontSize: '1.1rem' }} />
-            <Typography variant="caption" sx={{ fontWeight: 700 }}>Paylaş</Typography>
-          </Box>
-
-          <Box
-            onClick={handleToggleSave}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              color: isSaved ? 'var(--primary)' : 'var(--text-muted)',
-              cursor: saveLoading ? 'default' : 'pointer',
-              transition: 'all 0.2s ease',
-              opacity: saveLoading ? 0.6 : 1,
-              '&:hover': {
-                color: isSaved ? 'var(--text-muted)' : 'var(--primary)'
-              }
-            }}
-          >
-            {isSaved ? (
-              <BookmarkIcon sx={{ fontSize: '1.1rem' }} />
-            ) : (
-              <BookmarkBorderIcon sx={{ fontSize: '1.1rem' }} />
-            )}
-
-            <Typography variant="caption" sx={{ fontWeight: 700 }}>
-              {isSaved ? 'Kaydedildi' : 'Kaydet'}
-            </Typography>
-          </Box>
-        </Stack>
-      </Box>
 
       {isDetailView && (
         <Modal

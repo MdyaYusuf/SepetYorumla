@@ -69,7 +69,7 @@ const ProfilePage: React.FC = () => {
         BasketService.getMyBaskets()
       ]);
       setStats(statsRes.data);
-      setDisplayBaskets(basketsRes.data);
+      setDisplayBaskets([...basketsRes.data].reverse());
     } catch (error) {
       // The axios interceptor handles the toast notification
     } finally {
@@ -107,7 +107,7 @@ const ProfilePage: React.FC = () => {
       }
 
       if (res) {
-        setDisplayBaskets(res.data);
+        setDisplayBaskets([...res.data].reverse());
       }
     } catch (error) {
       // The axios interceptor already handles the toast notification

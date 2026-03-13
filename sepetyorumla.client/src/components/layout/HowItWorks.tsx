@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Typography, Grid, Stack } from '@mui/material';
+import { Box, Container, Typography, Grid, Stack, Button } from '@mui/material';
 import ShareIcon from '@mui/icons-material/Share';
 import ForumIcon from '@mui/icons-material/Forum';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -24,30 +24,46 @@ const steps = [
 
 const HowItWorks: React.FC = () => {
   return (
-    <Box sx={{ py: 12, bgcolor: 'var(--surface-dark)', borderTop: '1px solid var(--border-dark)' }}>
-      <Container maxWidth="lg">
+    <Box
+      id="how-it-works"
+      sx={{
+        pt: 15,
+        pb: 8,
+        background: 'radial-gradient(circle at 50% 120%, #1e3a4a 0%, var(--bg-dark) 75%)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    >
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         <Typography
           variant="h4"
           textAlign="center"
-          sx={{ color: 'var(--text-white)', fontWeight: 800, mb: 8 }}
+          sx={{ color: 'var(--text-white)', fontWeight: 800, mb: 10 }}
         >
           Nasıl Çalışır?
         </Typography>
 
         <Grid container spacing={6}>
           {steps.map((step, index) => (
-            <Grid size={{ xs: 12, md: 4 }} key={index}>
+            <Grid key={index} size={{ xs: 12, md: 4 }}>
               <Stack alignItems="center" spacing={3} textAlign="center">
                 <Box
                   sx={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: '50%',
-                    bgcolor: 'rgba(13, 166, 242, 0.1)',
+                    width: 84,
+                    height: 84,
+                    borderRadius: '24px',
+                    bgcolor: 'rgba(13, 166, 242, 0.03)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '1px solid rgba(13, 166, 242, 0.2)'
+                    border: '1px solid rgba(13, 166, 242, 0.15)',
+                    backdropFilter: 'blur(10px)',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-5px) rotate(5deg)',
+                      borderColor: 'var(--primary)',
+                      boxShadow: '0 10px 30px rgba(13, 166, 242, 0.2)'
+                    }
                   }}
                 >
                   {step.icon}
@@ -55,13 +71,38 @@ const HowItWorks: React.FC = () => {
                 <Typography variant="h6" sx={{ color: 'var(--text-white)', fontWeight: 700 }}>
                   {step.title}
                 </Typography>
-                <Typography sx={{ color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                <Typography sx={{ color: 'var(--text-muted)', lineHeight: 1.7, px: 2 }}>
                   {step.description}
                 </Typography>
               </Stack>
             </Grid>
           ))}
         </Grid>
+
+        <Box sx={{ mt: 10, textAlign: 'center' }}>
+          <Button
+            variant="outlined"
+            sx={{
+              color: 'var(--text-white)',
+              borderColor: 'rgba(255,255,255,0.1)',
+              borderRadius: '16px',
+              px: 5,
+              py: 1,
+              textTransform: 'none',
+              fontWeight: 800,
+              fontSize: '1rem',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                borderColor: 'var(--primary)',
+                bgcolor: 'rgba(13, 166, 242, 0.05)',
+                transform: 'translateY(-3px)',
+                boxShadow: '0 8px 25px rgba(13, 166, 242, 0.15)'
+              }
+            }}
+          >
+            Detaylı Bilgi İçin
+          </Button>
+        </Box>
       </Container>
     </Box>
   );

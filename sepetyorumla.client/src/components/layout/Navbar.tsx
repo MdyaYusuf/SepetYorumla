@@ -2,9 +2,27 @@ import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Container, IconButton } from '@mui/material';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const scrollToSection = (sectionId: string) => {
+
+    if (location.pathname !== '/') {
+      navigate(`/#${sectionId}`);
+
+      return;
+    }
+
+    const element = document.getElementById(sectionId);
+
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <AppBar
       position="sticky"
@@ -65,9 +83,27 @@ const Navbar: React.FC = () => {
           </Box>
 
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
-            <Button sx={navButtonStyle}>Keşfet</Button>
-            <Button sx={navButtonStyle}>Topluluk</Button>
-            <Button sx={navButtonStyle}>Nasıl Çalışır?</Button>
+            <Button
+              sx={navButtonStyle}
+              onClick={() => scrollToSection('featured-baskets')}
+            >
+              Keşfet
+            </Button>
+
+            <Button
+              sx={navButtonStyle}
+              onClick={() => scrollToSection('how-it-works')}
+            >
+              Nasıl Çalışır?
+            </Button>
+
+            <Button
+              component={RouterLink}
+              to="/about"
+              sx={navButtonStyle}
+            >
+              Hakkımızda
+            </Button>
 
             <Box sx={{ width: '1px', height: '20px', bgcolor: 'var(--border-dark)', mx: 2 }} />
 

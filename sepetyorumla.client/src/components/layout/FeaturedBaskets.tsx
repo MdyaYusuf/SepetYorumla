@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Container, Typography, Grid, Button, CircularProgress } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import BasketCard from '../shared/BasketCard';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import type { BasketResponseDto } from '../../models/Basket';
@@ -13,7 +14,12 @@ const FeaturedBaskets: React.FC = () => {
     const fetchBaskets = async () => {
       try {
         const response = await BasketService.getAll();
-        setBaskets(response.data.slice(0, 3));
+
+        const topRated = [...response.data]
+          .sort((a, b) => (Number(b.averageRating) || 0) - (Number(a.averageRating) || 0))
+          .slice(0, 3);
+
+        setBaskets(topRated);
       } catch (error) {
         // The axios interceptor already handles the toast notification
       } finally {
@@ -25,7 +31,7 @@ const FeaturedBaskets: React.FC = () => {
   }, []);
 
   return (
-    <Box sx={{ py: 10, bgcolor: 'var(--bg-dark)' }}>
+    <Box id="featured-baskets" sx={{ py: 10, bgcolor: 'var(--bg-dark)' }}>
       <Container maxWidth="lg">
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 5 }}>
           <Box>
@@ -33,14 +39,21 @@ const FeaturedBaskets: React.FC = () => {
               Öne Çıkan Sepetler
             </Typography>
             <Typography sx={{ color: 'var(--text-muted)' }}>
-              Topluluğun en çok beğendiği sepetler.
+              Topluluğun en yüksek puan verdiği sepetler.
             </Typography>
           </Box>
           <Button
+            component={RouterLink}
+            to="/register"
             endIcon={<ArrowForwardIcon />}
-            sx={{ color: 'var(--primary)', textTransform: 'none', fontWeight: 700 }}
+            sx={{
+              color: 'var(--primary)',
+              textTransform: 'none',
+              fontWeight: 700,
+              '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' }
+            }}
           >
-            Hepsini Gör
+            Daha Fazlası İçin Üye Ol
           </Button>
         </Box>
 

@@ -10,6 +10,7 @@ import type { JSX } from 'react';
 import BasketDetailPage from '../pages/BasketDetailPage';
 import Settings from '../pages/Settings';
 import ProfilePage from '../pages/ProfilePage';
+import NotFoundPage from '../pages/NotFoundPage';
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -82,7 +83,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="*" element={<Navigate to="/" />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };
