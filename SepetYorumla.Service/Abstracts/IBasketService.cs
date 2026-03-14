@@ -31,6 +31,11 @@ public interface IBasketService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<List<BasketResponseDto>>> GetTopRatedAsync(
+    int count,
+    Guid? userId = null,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<CreatedBasketResponseDto>> AddAsync(
     CreateBasketRequest request,
     Guid userId,

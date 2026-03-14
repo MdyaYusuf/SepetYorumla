@@ -13,13 +13,9 @@ const FeaturedBaskets: React.FC = () => {
   useEffect(() => {
     const fetchBaskets = async () => {
       try {
-        const response = await BasketService.getAll();
+        const response = await BasketService.getTopRated(3);
 
-        const topRated = [...response.data]
-          .sort((a, b) => (Number(b.averageRating) || 0) - (Number(a.averageRating) || 0))
-          .slice(0, 3);
-
-        setBaskets(topRated);
+        setBaskets(response.data);
       } catch (error) {
         // The axios interceptor already handles the toast notification
       } finally {

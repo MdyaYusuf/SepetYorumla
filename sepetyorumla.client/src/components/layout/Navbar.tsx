@@ -2,27 +2,9 @@ import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Container, IconButton } from '@mui/material';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const scrollToSection = (sectionId: string) => {
-
-    if (location.pathname !== '/') {
-      navigate(`/#${sectionId}`);
-
-      return;
-    }
-
-    const element = document.getElementById(sectionId);
-
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <AppBar
       position="sticky"
@@ -35,7 +17,6 @@ const Navbar: React.FC = () => {
     >
       <Container maxWidth="lg">
         <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 0 } }}>
-
           <Box
             component={RouterLink}
             to="/"
@@ -45,8 +26,6 @@ const Navbar: React.FC = () => {
               gap: 1.5,
               cursor: 'pointer',
               textDecoration: 'none',
-              '&:active': { color: 'var(--primary)', opacity: 1 },
-              '&:visited': { color: 'var(--primary)' }
             }}
           >
             <Box
@@ -70,12 +49,7 @@ const Navbar: React.FC = () => {
                 opacity: 0.85,
                 letterSpacing: '-0.5px',
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                  opacity: 1,
-                  color: 'var(--primary)',
-                  textShadow: '0 0 12px rgba(13, 166, 242, 0.6), 0 0 20px rgba(13, 166, 242, 0.2)'
-                }
+                '&:hover': { opacity: 1 }
               }}
             >
               SepetYorumla
@@ -84,17 +58,11 @@ const Navbar: React.FC = () => {
 
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
             <Button
+              component={RouterLink}
+              to="/intro"
               sx={navButtonStyle}
-              onClick={() => scrollToSection('featured-baskets')}
             >
-              Keşfet
-            </Button>
-
-            <Button
-              sx={navButtonStyle}
-              onClick={() => scrollToSection('how-it-works')}
-            >
-              Nasıl Çalışır?
+              Tanıtım
             </Button>
 
             <Button
@@ -121,10 +89,7 @@ const Navbar: React.FC = () => {
                 fontWeight: 700,
                 fontSize: '0.95rem',
                 mr: 1,
-                '&:hover': {
-                  borderColor: 'var(--text-muted)',
-                  bgcolor: 'rgba(255, 255, 255, 0.05)'
-                }
+                '&:hover': { borderColor: 'var(--text-muted)', bgcolor: 'rgba(255, 255, 255, 0.05)' }
               }}
             >
               Kayıt Ol
@@ -154,7 +119,6 @@ const Navbar: React.FC = () => {
           <IconButton sx={{ display: { xs: 'flex', md: 'none' }, color: 'var(--text-white)' }}>
             <MenuIcon />
           </IconButton>
-
         </Toolbar>
       </Container>
     </AppBar>

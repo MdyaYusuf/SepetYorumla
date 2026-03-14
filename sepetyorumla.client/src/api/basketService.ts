@@ -30,6 +30,9 @@ export const BasketService = {
   getSavedBaskets: () =>
     requests.get<BasketResponseDto[]>("SavedBaskets/my-saved"),
 
+  getTopRated: (count: number) =>
+    requests.get<BasketResponseDto[]>(`Baskets/top-rated/${count}`),
+
   toggleSave: (basketId: string) =>
     requests.post<null>("SavedBaskets/toggle", { basketId })
 };

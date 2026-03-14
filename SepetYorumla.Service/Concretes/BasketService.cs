@@ -135,6 +135,40 @@ public class BasketService(
     };
   }
 
+  public async Task<ReturnModel<List<BasketResponseDto>>> GetTopRatedAsync(
+    int count,
+    Guid? userId = null,
+    CancellationToken cancellationToken = default)
+  {
+    var query = _basketRepository.Query(enableTracking: false)
+      .Include(b => b.User)
+      .Include(b => b.Products).ThenInclude(p => p.Category)
+      .Include(b => b.Reviews)
+      .Include(b => b.Comments)
+      .Include(b => b.SavedBaskets)
+      .OrderByDescending(b => b.Reviews.Average(r => (decimal?)r.StarRating) ?? 0)
+      .ThenByDescending(b => b.CreatedDate)
+      .Take(count);
+
+    var baskets = await query.ToListAsync(cancellationToken);
+
+    var response = _mapper.EntityToResponseDtoList(baskets);
+
+    for (int i = 0; i < baskets.Count; i++)
+    {
+      BasketMappingHelper.PopulateSummaryFields(baskets[i], response[i]);
+      BasketMappingHelper.PopulateUserInteraction(baskets[i], response[i], userId);
+    }
+
+    return new ReturnModel<List<BasketResponseDto>>()
+    {
+      Success = true,
+      Message = $"Öne çıkan {count} sepet başarıyla getirildi.",
+      Data = response,
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<CreatedBasketResponseDto>> AddAsync(CreateBasketRequest request, Guid userId, CancellationToken cancellationToken = default)
   {
     var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);

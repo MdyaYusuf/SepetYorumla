@@ -30,6 +30,17 @@ public class BasketsController(IBasketService _basketService) : CustomBaseContro
     return CreateActionResult(result);
   }
 
+  [HttpGet("top-rated/{count:int}")]
+  public async Task<IActionResult> GetTopRated(int count, CancellationToken cancellationToken)
+  {
+    var result = await _basketService.GetTopRatedAsync(
+      count: count,
+      userId: TryGetUserId(),
+      cancellationToken: cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpPost]
   [Authorize]
   public async Task<IActionResult> Add([FromForm] CreateBasketRequest request, CancellationToken cancellationToken)

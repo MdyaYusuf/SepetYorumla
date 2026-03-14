@@ -1,32 +1,10 @@
 import React from 'react';
 import { Box, Typography, Grid, Link, Divider, Container } from '@mui/material';
-import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 const Footer: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const scrollToSection = (sectionId: string) => {
-
-    if (location.pathname !== '/') {
-      navigate(`/#${sectionId}`);
-
-      return;
-    }
-    const element = document.getElementById(sectionId);
-
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
-    <Box sx={{
-      bgcolor: 'var(--bg-dark)',
-      pt: 8,
-      pb: 4,
-      borderTop: 'none'
-    }}>
+    <Box sx={{ bgcolor: 'var(--bg-dark)', pt: 8, pb: 4, borderTop: 'none' }}>
       <Container maxWidth="xl">
         <Grid container spacing={4} sx={{ mb: 6 }}>
           <Grid size={{ xs: 12, md: 4 }}>
@@ -43,9 +21,6 @@ const Footer: React.FC = () => {
             <Typography variant="subtitle2" sx={{ color: 'var(--text-white)', fontWeight: 700, mb: 3 }}>
               Platform
             </Typography>
-            <FooterLink onClick={() => scrollToSection('featured-baskets')}>
-              Keşfet
-            </FooterLink>
             <FooterLink component={RouterLink} to="/intro">
               Tanıtım
             </FooterLink>
@@ -59,7 +34,7 @@ const Footer: React.FC = () => {
               Hakkımızda
             </FooterLink>
             <FooterLink component={RouterLink} to="/legal">
-              Yasal Metinler
+              Kullanım Şartları
             </FooterLink>
           </Grid>
         </Grid>
@@ -81,16 +56,14 @@ const Footer: React.FC = () => {
 
 interface FooterLinkProps {
   children: React.ReactNode;
-  onClick?: () => void;
   component?: any;
   to?: string;
 }
 
-const FooterLink = ({ children, onClick, component, to }: FooterLinkProps) => (
+const FooterLink = ({ children, component, to }: FooterLinkProps) => (
   <Link
     component={component}
     to={to}
-    onClick={onClick}
     underline="none"
     sx={{
       display: 'block',

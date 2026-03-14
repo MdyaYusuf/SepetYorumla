@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, Stack, Button } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import ShareIcon from '@mui/icons-material/Share';
 import ForumIcon from '@mui/icons-material/Forum';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -81,6 +82,8 @@ const HowItWorks: React.FC = () => {
 
         <Box sx={{ mt: 10, textAlign: 'center' }}>
           <Button
+            component={RouterLink}
+            to="/intro"
             variant="outlined"
             sx={{
               color: 'var(--text-white)',
