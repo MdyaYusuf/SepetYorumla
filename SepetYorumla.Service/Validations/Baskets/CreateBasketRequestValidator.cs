@@ -14,9 +14,10 @@ public class CreateBasketRequestValidator : AbstractValidator<CreateBasketReques
     RuleFor(b => b.Description)
       .MaximumLength(500).WithMessage("Açıklama en fazla 500 karakter olabilir.");
 
-    RuleFor(b => b.Products)
-      .NotEmpty().WithMessage("Bir sepet oluşturmak için ürün eklemelisiniz.")
-      .Must(p => p != null && p.Count >= 2).WithMessage("Bir sepet oluşturmak için en az iki ürün eklenmelidir.");
+    RuleFor(x => x.Products)
+      .NotEmpty().WithMessage("Sepette en az bir ürün bulunmalıdır.")
+      .Must(p => p.Count >= 2 && p.Count <= 4)
+      .WithMessage("Bir sepet en az 2, en fazla 4 ürün içerebilir.");
 
     RuleForEach(b => b.Products).ChildRules(product =>
     {

@@ -331,23 +331,32 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
         sx={{ borderRadius: '16px', overflow: 'hidden', mb: 2, bgcolor: 'rgba(0,0,0,0.2)' }}
         onClick={isDetailView ? (e) => e.stopPropagation() : undefined}
       >
-        <Grid container spacing={1}>
-          {productImages.slice(0, 3).map((img, idx) => (
-            <Grid key={idx} size={productImages.length === 1 ? 12 : productImages.length === 2 ? 6 : 4}>
-              <Box
-                component="img"
-                src={img}
-                sx={{
-                  width: '100%',
-                  height: 140,
-                  objectFit: 'cover',
-                  display: 'block',
-                  cursor: isDetailView ? 'zoom-in' : 'pointer'
-                }}
-                onClick={(e) => isDetailView ? handleOpenImageModal(img, e) : undefined}
-              />
-            </Grid>
-          ))}
+        <Grid container spacing={0.5}>
+          {productImages.slice(0, 4).map((img, idx) => {
+            const gridSize = productImages.length === 1 ? 12
+                           : productImages.length === 2 ? 6
+                           : productImages.length === 3 ? 4
+                           : 6;
+
+            return (
+              <Grid key={idx} size={gridSize}>
+                <Box
+                  component="img"
+                  src={img}
+                  sx={{
+                    width: '100%',
+                    height: 180,
+                    objectFit: 'cover',
+                    display: 'block',
+                    cursor: isDetailView ? 'zoom-in' : 'pointer',
+                    transition: 'opacity 0.2s',
+                    '&:hover': { opacity: 0.9 }
+                  }}
+                  onClick={(e) => isDetailView ? handleOpenImageModal(img, e) : undefined}
+                />
+              </Grid>
+            );
+          })}
         </Grid>
       </Box>
 

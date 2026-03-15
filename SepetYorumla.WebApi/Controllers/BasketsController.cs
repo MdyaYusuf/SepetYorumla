@@ -54,7 +54,7 @@ public class BasketsController(IBasketService _basketService) : CustomBaseContro
 
   [HttpPut]
   [Authorize]
-  public async Task<IActionResult> Update(UpdateBasketRequest request, CancellationToken cancellationToken)
+  public async Task<IActionResult> Update([FromForm] UpdateBasketRequest request, CancellationToken cancellationToken)
   {
     var userId = GetUserId();
 

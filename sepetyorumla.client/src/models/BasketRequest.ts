@@ -14,3 +14,22 @@ export interface CreateBasketRequest {
   description?: string;
   products: CreateProductInBasketDto[];
 }
+
+export interface UpdateProductInBasketDto {
+  id?: string;
+  name: string;
+  description?: string;
+  price: number;
+  storeName?: string;
+  brand?: string;
+  model?: string;
+  categoryId: number;
+  imageFile?: File;
+}
+
+export interface UpdateBasketRequest {
+  id: string;
+  title: string;
+  description?: string;
+  products: UpdateProductInBasketDto[];
+}

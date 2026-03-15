@@ -17,17 +17,22 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import EditIcon from '@mui/icons-material/Edit';
 import { BasketService } from '../api/basketService';
 import BasketFeedCard from '../components/shared/BasketFeedCard';
 import { useAppSelector, useAppDispatch } from '../store/store';
 import { setCurrentBasket } from '../features/basket/basketSlice';
+import ShareBasketModal from '../components/shared/ShareBasketModal';
 
 const BasketDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { currentBasket: basket } = useAppSelector((state) => state.baskets);
+  const { user } = useAppSelector((state) => state.auth);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const isOwner = user?.id === basket?.userId;
 
   useEffect(() => {
     const fetchBasketDetail = async () => {
@@ -106,22 +111,47 @@ const BasketDetailPage: React.FC = () => {
         Geri Dön
       </Button>
 
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" sx={{ color: 'var(--text-white)', fontWeight: 900, mb: 1 }}>
-          {basket.title}
-        </Typography>
-        {basket.description && (
-          <Typography
-            variant="body1"
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2 }}>
+        <Box>
+          <Typography variant="h4" sx={{ color: 'var(--text-white)', fontWeight: 900, mb: 1 }}>
+            {basket.title}
+          </Typography>
+          {basket.description && (
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'var(--text-muted)',
+                lineHeight: 1.6,
+                maxWidth: '800px',
+                fontWeight: 500
+              }}
+            >
+              {basket.description}
+            </Typography>
+          )}
+        </Box>
+
+        {isOwner && (
+          <Button
+            variant="outlined"
+            startIcon={<EditIcon />}
+            onClick={() => setIsEditModalOpen(true)}
             sx={{
-              color: 'var(--text-muted)',
-              lineHeight: 1.6,
-              maxWidth: '800px',
-              fontWeight: 500
+              borderRadius: '12px',
+              fontWeight: 800,
+              textTransform: 'none',
+              borderColor: 'rgba(255,255,255,0.1)',
+              color: 'var(--text-white)',
+              px: 3,
+              '&:hover': {
+                borderColor: 'var(--primary)',
+                bgcolor: 'rgba(13, 166, 242, 0.05)',
+                color: 'var(--primary)'
+              }
             }}
           >
-            {basket.description}
-          </Typography>
+            Sepeti Düzenle
+          </Button>
         )}
       </Box>
 
@@ -137,11 +167,11 @@ const BasketDetailPage: React.FC = () => {
             </Typography>
 
             <Stack spacing={1.5}>
-              {basket.products.map((product, idx) => {
+              {basket.products.map((product) => {
                 const hasTechInfo = !!(product.brand?.trim() || product.model?.trim() || product.storeName?.trim() || product.description?.trim());
 
                 return (
-                  <Paper key={idx} sx={{ p: 2, bgcolor: 'var(--surface-dark)', border: '1px solid var(--border-dark)', borderRadius: '16px' }}>
+                  <Paper key={product.id} sx={{ p: 2, bgcolor: 'var(--surface-dark)', border: '1px solid var(--border-dark)', borderRadius: '16px' }}>
                     <Typography variant="body2" sx={{ color: 'var(--primary)', fontWeight: 800, mb: 1 }}>
                       {product.name}
                     </Typography>
@@ -199,6 +229,12 @@ const BasketDetailPage: React.FC = () => {
           </Box>
         </Grid>
       </Grid>
+
+      <ShareBasketModal
+        open={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        editData={basket}
+      />
     </Container>
   );
 };

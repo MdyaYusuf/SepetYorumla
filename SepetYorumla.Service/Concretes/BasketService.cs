@@ -219,12 +219,26 @@ public class BasketService(
 
   public async Task<ReturnModel<NoData>> RemoveAsync(Guid id, Guid userId, string userRole, CancellationToken cancellationToken = default)
   {
-    var basket = await _businessRules.GetBasketIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
+    var basket = await _businessRules.GetBasketIfExistAsync(
+      id,
+      include: q => q.Include(b => b.Products),
+      enableTracking: true,
+      cancellationToken: cancellationToken);
 
     _businessRules.UserMustOwnBasketOrBeAdmin(basket, userId, userRole);
 
+    var productImages = basket.Products
+      .Where(p => !string.IsNullOrEmpty(p.ImageUrl))
+      .Select(p => p.ImageUrl)
+      .ToList();
+
     _basketRepository.Delete(basket);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    foreach (var imagePath in productImages)
+    {
+      FileHelper.DeleteImageFromDisk(imagePath);
+    }
 
     return new ReturnModel<NoData>()
     {
@@ -243,11 +257,19 @@ public class BasketService(
       throw new ValidationException(validationResult.Errors);
     }
 
-    var existingBasket = await _businessRules.GetBasketIfExistAsync(request.Id, enableTracking: true, cancellationToken: cancellationToken);
+    var existingBasket = await _businessRules.GetBasketIfExistAsync(
+      request.Id,
+      include: q => q.Include(b => b.Products),
+      enableTracking: true,
+      cancellationToken: cancellationToken);
 
     _businessRules.OnlyUserCanEditBasket(existingBasket, userId);
 
+    await _businessRules.ValidateCategoriesExistAsync(request.Products.Select(p => p.CategoryId).ToList(), cancellationToken);
+
     _mapper.UpdateEntityFromRequest(request, existingBasket);
+
+    await SyncProductsAsync(existingBasket, request.Products, cancellationToken);
 
     _basketRepository.Update(existingBasket);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -258,5 +280,56 @@ public class BasketService(
       Message = "Sepet başarıyla güncellendi.",
       StatusCode = 200
     };
+  }
+
+  private async Task SyncProductsAsync(Basket basket, List<UpdateProductInBasketDto> dtos, CancellationToken cancellationToken)
+  {
+    var dtoIds = dtos
+      .Where(d => d.Id.HasValue && d.Id.Value != Guid.Empty)
+      .Select(d => d.Id!.Value)
+      .ToHashSet();
+
+    var toDelete = basket.Products
+      .Where(p => !dtoIds.Contains(p.Id))
+      .ToList();
+
+    foreach (var product in toDelete)
+    {
+      FileHelper.DeleteImageFromDisk(product.ImageUrl);
+      basket.Products.Remove(product);
+    }
+
+    foreach (var dto in dtos)
+    {
+      if (dto.Id.HasValue && dto.Id.Value != Guid.Empty)
+      {
+        var existing = basket.Products.FirstOrDefault(p => p.Id == dto.Id.Value);
+
+        if (existing != null)
+        {
+          _mapper.UpdateProductFromDto(dto, existing);
+
+          existing.ImageUrl = await FileHelper.ReplaceImageOnDisk(
+            dto.ImageFile,
+            existing.ImageUrl,
+            "products",
+            dto.Name,
+            cancellationToken);
+        }
+      }
+      else
+      {
+        var newProduct = _mapper.UpdateProductInBasketDtoToProduct(dto);
+
+        newProduct.ImageUrl = await FileHelper.ReplaceImageOnDisk(
+          dto.ImageFile,
+          null,
+          "products",
+          dto.Name,
+          cancellationToken);
+
+        basket.Products.Add(newProduct);
+      }
+    }
   }
 }

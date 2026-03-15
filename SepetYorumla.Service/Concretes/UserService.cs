@@ -104,8 +104,12 @@ public class UserService(
 
     User user = await _businessRules.GetUserIfExistAsync(id, enableTracking: true, cancellationToken: cancellationToken);
 
+    string? imagePathToDelete = user.ProfileImageUrl;
+
     _userRepository.Delete(user);
     await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+    FileHelper.DeleteImageFromDisk(imagePathToDelete);
 
     return new ReturnModel<NoData>()
     {
@@ -138,16 +142,12 @@ public class UserService(
 
     _mapper.UpdateEntityFromRequest(request, existingUser);
 
-    if (request.ImageFile != null && request.ImageFile.Length > 0)
-    {
-      FileHelper.ValidateImage(request.ImageFile);
-
-      existingUser.ProfileImageUrl = await FileHelper.SaveImageToDisk(
-        request.ImageFile,
-        "profiles",
-        request.Username,
-        cancellationToken);
-    }
+    existingUser.ProfileImageUrl = await FileHelper.ReplaceImageOnDisk(
+      request.ImageFile,
+      existingUser.ProfileImageUrl,
+      "profiles",
+      request.Username,
+      cancellationToken);
 
     _userRepository.Update(existingUser);
     await _unitOfWork.SaveChangesAsync(cancellationToken);

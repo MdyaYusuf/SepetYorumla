@@ -48,7 +48,13 @@ public partial class GeneralMapper
   public partial Basket CreateToEntity(CreateBasketRequest request);
   [MapProperty("Category.Name", nameof(ProductPreviewDto.CategoryName))]
   public partial ProductPreviewDto ProductToPreviewDto(Product entity);
+  [MapperIgnoreTarget(nameof(Basket.Products))]
   public partial void UpdateEntityFromRequest(UpdateBasketRequest request, Basket entity);
+  [MapperIgnoreTarget(nameof(Product.ImageUrl))]
+  [MapperIgnoreTarget(nameof(Product.Id))]
+  public partial void UpdateProductFromDto(UpdateProductInBasketDto dto, Product entity);
+  [MapperIgnoreTarget(nameof(Product.ImageUrl))]
+  public partial Product UpdateProductInBasketDtoToProduct(UpdateProductInBasketDto dto);
   [MapProperty("User.Username", nameof(BasketResponseDto.Username))]
   [MapProperty("User.ProfileImageUrl", nameof(BasketResponseDto.UserProfileImageUrl))]
   public partial BasketResponseDto EntityToResponseDto(Basket entity);

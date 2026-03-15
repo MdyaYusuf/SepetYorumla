@@ -9,6 +9,9 @@ export const BasketService = {
   create: (basket: CreateBasketRequest | FormData) =>
     requests.post<CreatedBasketResponseDto>("Baskets", basket),
 
+  update: (basket: FormData) =>
+    requests.put<null>("Baskets", basket),
+
   getAll: () =>
     requests.get<BasketResponseDto[]>("Baskets"),
 

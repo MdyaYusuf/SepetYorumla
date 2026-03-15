@@ -1,10 +1,11 @@
 ﻿using SepetYorumla.Core.Exceptions;
 using SepetYorumla.DataAccess.Abstracts;
 using SepetYorumla.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace SepetYorumla.Service.BusinessRules;
 
-public class BasketBusinessRules(IBasketRepository _basketRepository)
+public class BasketBusinessRules(IBasketRepository _basketRepository, ICategoryRepository _categoryRepository)
 {
   public async Task<Basket> GetBasketIfExistAsync(
     Guid id,
@@ -35,6 +36,19 @@ public class BasketBusinessRules(IBasketRepository _basketRepository)
     if (basket.UserId != userId)
     {
       throw new ForbiddenException("Sepeti sadece sahibi düzenleyebilir.");
+    }
+  }
+
+  public async Task ValidateCategoriesExistAsync(List<int> categoryIds, CancellationToken cancellationToken)
+  {
+    var distinctIds = categoryIds.Distinct().ToList();
+
+    var count = await _categoryRepository.Query()
+      .CountAsync(c => distinctIds.Contains(c.Id), cancellationToken);
+
+    if (count != distinctIds.Count)
+    {
+      throw new BusinessException("Seçilen kategorilerden biri veya birkaçı geçersiz.");
     }
   }
 }

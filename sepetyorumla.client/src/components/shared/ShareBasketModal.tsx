@@ -12,18 +12,26 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import type { CreateProductInBasketDto } from '../../models/BasketRequest';
 import type { CategoryResponseDto } from '../../models/Category';
+import type { BasketResponseDto } from '../../models/Basket';
 import { BasketService } from '../../api/basketService';
 import { CategoryService } from '../../api/categoryService';
 import { toast } from 'react-toastify';
 
-interface Props { open: boolean; onClose: () => void; }
+interface ProductFormState extends CreateProductInBasketDto {
+  id?: string;
+}
 
-const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  editData?: BasketResponseDto | null;
+}
+
+const ShareBasketModal: React.FC<Props> = ({ open, onClose, editData }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [products, setProducts] = useState<CreateProductInBasketDto[]>([]);
+  const [products, setProducts] = useState<ProductFormState[]>([]);
   const [backendCategories, setBackendCategories] = useState<CategoryResponseDto[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -41,17 +49,43 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
   const [curProduct, setCurProduct] = useState<CreateProductInBasketDto>(initialProductState);
 
   useEffect(() => {
+
     if (open) {
       CategoryService.getAll().then(res => {
         setBackendCategories(res.data);
+
         if (res.data.length > 0) {
-          setCurProduct(prev => ({ ...prev, categoryId: res.data[0].id }));
+
+          if (editData && editData.products.length > 0) {
+            setCurProduct(prev => ({ ...prev, categoryId: editData.products[0].categoryId }));
+          } else {
+            setCurProduct(prev => ({ ...prev, categoryId: res.data[0].id }));
+          }
         }
       });
+
+      if (editData) {
+        setTitle(editData.title);
+        setDescription(editData.description || '');
+
+        const initialProducts: ProductFormState[] = editData.products.map(p => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          categoryId: Number(p.categoryId),
+          storeName: p.storeName || '',
+          brand: p.brand || '',
+          model: p.model || '',
+          description: p.description || '',
+          imageFile: undefined
+        }));
+        setProducts(initialProducts);
+      }
     }
-  }, [open]);
+  }, [open, editData]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setSelectedFile(file);
@@ -60,6 +94,12 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
   };
 
   const addProduct = () => {
+
+    if (products.length >= 4) {
+      toast.warn("Bir sepet en fazla 4 ürün içermelidir.");
+
+      return;
+    }
 
     if (!curProduct.name || curProduct.price <= 0 || !curProduct.imageFile) {
       toast.warn("Lütfen ürün adı, fiyat ve görsel ekleyin.");
@@ -77,17 +117,27 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
 
   const handleSubmit = async () => {
 
-    if (products.length < 2) {
-      toast.error("En az iki ürün eklenmelidir.");
+    if (products.length < 2 || products.length > 4) {
+      toast.error("Sepet en az 2, en fazla 4 ürün içermelidir.");
 
       return;
     }
 
     const formData = new FormData();
+
+    if (editData?.id) {
+      formData.append('id', editData.id);
+    }
+
     formData.append('title', title);
     formData.append('description', description || '');
 
     products.forEach((product, index) => {
+
+      if (product.id) {
+        formData.append(`products[${index}].id`, product.id);
+      }
+
       formData.append(`products[${index}].name`, product.name);
       formData.append(`products[${index}].price`, product.price.toString());
       formData.append(`products[${index}].categoryId`, product.categoryId.toString());
@@ -102,9 +152,16 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
     });
 
     try {
-      await BasketService.create(formData);
+
+      if (editData) {
+        await BasketService.update(formData);
+
+        window.location.reload();
+      } else {
+        await BasketService.create(formData);
+      }
       resetAndClose();
-    } catch {
+    } catch (error) {
       // The axios interceptor already handles the toast notification
     }
   };
@@ -114,6 +171,7 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
     setDescription('');
     setProducts([]);
     setSelectedFile(null);
+    setCurProduct(initialProductState);
     onClose();
   };
 
@@ -121,13 +179,13 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm"
       slotProps={{ paper: { sx: { bgcolor: 'var(--bg-dark)', color: '#fff', borderRadius: '24px' } } }}>
       <DialogTitle sx={{ fontWeight: 800, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        Yeni Sepet Paylaş
+        {editData ? 'Sepeti Düzenle' : 'Yeni Sepet Paylaş'}
         <IconButton onClick={onClose} sx={{ color: 'var(--text-muted)' }}><CloseIcon /></IconButton>
       </DialogTitle>
 
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField fullWidth label="Sepet Başlığı (Örn: 2026 Gaming Setup)" variant="filled" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <TextField fullWidth label="Sepet Başlığı" variant="filled" value={title} onChange={(e) => setTitle(e.target.value)} />
           <TextField fullWidth multiline rows={2} label="Sepet Açıklaması" variant="filled" value={description} onChange={(e) => setDescription(e.target.value)} />
 
           <Divider sx={{ borderColor: 'var(--border-dark)', my: 1 }} />
@@ -135,11 +193,11 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(13, 166, 242, 0.05)', p: 1.5, borderRadius: '12px', border: '1px solid rgba(13, 166, 242, 0.2)' }}>
             <InfoOutlinedIcon sx={{ color: 'var(--primary)', fontSize: 18 }} />
             <Typography variant="caption" sx={{ color: 'var(--text-white)', fontWeight: 600 }}>
-              En az iki ürün eklenmelidir. Her ürün için görsel zorunludur.
+              En az iki, en fazla dört ürün eklenmelidir. {editData ? 'Sadece değişen görselleri tekrar yükleyin.' : 'Her ürün için görsel zorunludur.'}
             </Typography>
           </Box>
 
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'var(--primary)' }}>Ürün Ekle</Typography>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'var(--primary)' }}>Yeni Ürün Ekle</Typography>
 
           <Grid container spacing={1.5}>
             <Grid size={{ xs: 12, sm: 8 }}>
@@ -215,7 +273,7 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
                 <Box>
                   <Typography variant="body2" sx={{ fontWeight: 700 }}>{p.name} {p.brand ? `(${p.brand})` : ''}</Typography>
                   <Typography variant="caption" sx={{ color: 'var(--text-muted)' }}>
-                    {backendCategories.find(c => c.id === p.categoryId)?.name} • {p.price.toLocaleString('tr-TR')} TL {p.imageFile ? '📷' : ''}
+                    {backendCategories.find(c => c.id === p.categoryId)?.name} • {p.price.toLocaleString('tr-TR')} TL {(p.imageFile || p.id) ? '📷' : ''}
                   </Typography>
                 </Box>
                 <IconButton size="small" onClick={() => removeProduct(i)} sx={{ color: '#ff4b4b' }}><DeleteIcon /></IconButton>
@@ -226,8 +284,13 @@ const ShareBasketModal: React.FC<Props> = ({ open, onClose }) => {
       </DialogContent>
 
       <DialogActions sx={{ p: 3, borderTop: '1px solid var(--border-dark)' }}>
-        <Button variant="contained" onClick={handleSubmit} disabled={!title} sx={{ borderRadius: '24px', px: 6, py: 1.5, fontWeight: 900, textTransform: 'none', ml: 'auto' }}>
-          Sepeti Paylaş
+        <Button
+          variant="contained"
+          onClick={handleSubmit}
+          disabled={!title || products.length < 2 || products.length > 4}
+          sx={{ borderRadius: '24px', px: 6, py: 1.5, fontWeight: 900, textTransform: 'none', ml: 'auto' }}
+        >
+          {editData ? 'Değişiklikleri Kaydet' : 'Sepeti Paylaş'}
         </Button>
       </DialogActions>
     </Dialog>

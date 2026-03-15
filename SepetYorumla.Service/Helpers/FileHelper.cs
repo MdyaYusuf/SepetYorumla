@@ -49,6 +49,49 @@ public static class FileHelper
     return $"/images/{subFolder}/{fileName}";
   }
 
+  public static void DeleteImageFromDisk(string? relativePath)
+  {
+    if (string.IsNullOrEmpty(relativePath))
+    {
+      return;
+    }
+
+    string fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath.TrimStart('/'));
+
+    try
+    {
+      if (File.Exists(fullPath))
+      {
+        File.Delete(fullPath);
+      }
+    }
+    catch
+    {
+      // We catch but don't throw here. If a file deletion fails, we don't want to crash the whole update process.
+    }
+  }
+
+  public static async Task<string?> ReplaceImageOnDisk(
+    IFormFile? file,
+    string? oldRelativePath,
+    string subFolder,
+    string name,
+    CancellationToken cancellationToken)
+  {
+    if (file == null || file.Length == 0)
+    {
+      return oldRelativePath;
+    }
+
+    ValidateImage(file);
+
+    string newPath = await SaveImageToDisk(file, subFolder, name, cancellationToken);
+
+    DeleteImageFromDisk(oldRelativePath);
+
+    return newPath;
+  }
+
   private static string GetSlug(string name)
   {
     if (string.IsNullOrWhiteSpace(name))

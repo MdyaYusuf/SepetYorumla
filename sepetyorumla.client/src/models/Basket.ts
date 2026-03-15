@@ -18,6 +18,8 @@ export interface BasketResponseDto {
 }
 
 export interface ProductPreviewDto {
+  id: string;
+  categoryId: number;
   name: string;
   imageUrl?: string;
   price: number;
