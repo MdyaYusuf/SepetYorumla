@@ -12,6 +12,8 @@ public class User : Entity<Guid>
     Reviews = new HashSet<Review>();
     Comments = new HashSet<Comment>();
     SavedBaskets = new HashSet<SavedBasket>();
+    Followers = new HashSet<Follow>();
+    Following = new HashSet<Follow>();
 
     Username = default!;
     Email = default!;
@@ -36,4 +38,6 @@ public class User : Entity<Guid>
   public virtual ICollection<Review> Reviews { get; set; }
   public virtual ICollection<Comment> Comments { get; set; }
   public virtual ICollection<SavedBasket> SavedBaskets { get; set; }
+  public virtual ICollection<Follow> Followers { get; set; }
+  public virtual ICollection<Follow> Following { get; set; }
 }

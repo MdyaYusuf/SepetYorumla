@@ -91,25 +91,23 @@ const BasketDetailPage: React.FC = () => {
         <Typography sx={{ color: 'var(--text-white)', fontSize: '0.75rem', fontWeight: 700 }}>{basket.title}</Typography>
       </Breadcrumbs>
 
-      <Button
-        startIcon={<ArrowBackIcon sx={{ fontSize: '1rem' }} />}
-        onClick={() => navigate(-1)}
-        sx={{
-          mb: 2,
-          color: 'var(--text-muted)',
-          fontSize: '0.8rem',
-          fontWeight: 700,
-          textTransform: 'none',
-          px: 0,
-          minWidth: 'auto',
-          '&:hover': {
-            color: 'var(--primary)',
-            bgcolor: 'transparent'
-          }
-        }}
-      >
-        Geri Dön
-      </Button>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate(-1)}
+          sx={{
+            color: 'var(--text-muted)',
+            textTransform: 'none',
+            fontWeight: 700,
+            fontSize: '1rem',
+            px: 0,
+            minWidth: 'auto',
+            '&:hover': { color: 'var(--text-white)', bgcolor: 'transparent' }
+          }}
+        >
+          Geri Dön
+        </Button>
+      </Box>
 
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2 }}>
         <Box>

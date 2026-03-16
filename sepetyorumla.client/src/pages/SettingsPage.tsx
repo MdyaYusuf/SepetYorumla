@@ -22,7 +22,7 @@ import Sidebar from '../components/layout/Sidebar';
 import type { UpdateUserRequest } from '../models/User';
 import { getFullUrl } from '../helpers/imageHelper';
 
-const Settings: React.FC = () => {
+const SettingsPage: React.FC = () => {
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -127,16 +127,17 @@ const Settings: React.FC = () => {
                 </Typography>
               </Breadcrumbs>
 
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                 <Button
                   startIcon={<ArrowBackIcon />}
-                  onClick={() => navigate('/home')}
+                  onClick={() => navigate(-1)}
                   sx={{
                     color: 'var(--text-muted)',
                     textTransform: 'none',
                     fontWeight: 700,
-                    fontSize: '0.9rem',
+                    fontSize: '1rem',
                     px: 0,
+                    minWidth: 'auto',
                     '&:hover': { color: 'var(--text-white)', bgcolor: 'transparent' }
                   }}
                 >
@@ -281,4 +282,4 @@ const Settings: React.FC = () => {
   );
 };
 
-export default Settings;
+export default SettingsPage;

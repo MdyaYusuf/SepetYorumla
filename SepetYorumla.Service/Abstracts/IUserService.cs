@@ -28,6 +28,11 @@ public interface IUserService
     bool enableTracking = false,
     CancellationToken cancellationToken = default);
 
+  Task<ReturnModel<ProfileResponseDto>> GetByUsernameAsync(
+    string username,
+    Guid? currentUserId = null,
+    CancellationToken cancellationToken = default);
+
   Task<ReturnModel<NoData>> RemoveAsync(
     Guid id,
     Guid currentUserId,
@@ -44,7 +49,7 @@ public interface IUserService
     Guid userId,
     CancellationToken cancellationToken = default);
 
-  Task<ReturnModel<UserProfileStatsDto>> GetProfileStatsAsync(
+  Task<ReturnModel<UserActivityStatsDto>> GetProfileStatsAsync(
     Guid userId,
     CancellationToken cancellationToken = default);
 }

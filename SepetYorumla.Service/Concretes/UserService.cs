@@ -98,6 +98,63 @@ public class UserService(
     };
   }
 
+  public async Task<ReturnModel<ProfileResponseDto>> GetByUsernameAsync(string username, Guid? currentUserId = null, CancellationToken cancellationToken = default)
+  {
+    var user = await _userRepository.Query()
+      .Include(u => u.Baskets).ThenInclude(b => b.Reviews)
+      .Include(u => u.Baskets).ThenInclude(b => b.Products).ThenInclude(p => p.Category)
+      .Include(u => u.Baskets).ThenInclude(b => b.Comments)
+      .Include(u => u.Followers)
+      .Include(u => u.Following)
+      .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+
+    if (user == null)
+    {
+      return new ReturnModel<ProfileResponseDto>()
+      {
+        Data = null,
+        Success = false,
+        Message = "Kullanıcı bulunamadı.",
+        StatusCode = 404
+      };
+    }
+
+    bool isFollowing = currentUserId.HasValue && user.Followers.Any(f => f.FollowerId == currentUserId.Value);
+
+    var topBasketsEntities = user.Baskets
+      .OrderByDescending(b => b.Reviews.Count(r => r.IsThumbsUp == true))
+      .Take(3)
+      .ToList();
+
+    var basketDtos = _mapper.EntityToResponseDtoList(topBasketsEntities);
+
+    for (int i = 0; i < topBasketsEntities.Count; i++)
+    {
+      BasketMappingHelper.PopulateSummaryFields(topBasketsEntities[i], basketDtos[i]);
+    }
+
+    var response = new ProfileResponseDto(
+      user.Id,
+      user.Username,
+      user.ProfileImageUrl,
+      user.Bio,
+      user.CreatedDate,
+      user.Followers.Count,
+      user.Following.Count,
+      user.Baskets.SelectMany(b => b.Comments).Count(),
+      user.Baskets.SelectMany(b => b.Reviews).Count(r => r.IsThumbsUp == true),
+      isFollowing,
+      basketDtos);
+
+    return new ReturnModel<ProfileResponseDto>()
+    {
+      Data = response,
+      Success = true,
+      Message = "Profil başarıyla getirildi.",
+      StatusCode = 200
+    };
+  }
+
   public async Task<ReturnModel<NoData>> RemoveAsync(Guid id, Guid currentUserId, string userRole, CancellationToken cancellationToken = default)
   {
     _businessRules.UserMustBeOwnerOrAdmin(id, currentUserId, userRole);
@@ -188,22 +245,22 @@ public class UserService(
     };
   }
 
-  public async Task<ReturnModel<UserProfileStatsDto>> GetProfileStatsAsync(Guid userId, CancellationToken cancellationToken = default)
+  public async Task<ReturnModel<UserActivityStatsDto>> GetProfileStatsAsync(Guid userId, CancellationToken cancellationToken = default)
   {
     await _businessRules.UserIdMustExist(userId, cancellationToken);
 
     var stats = await _userRepository.Query()
       .Where(u => u.Id == userId)
-      .Select(u => new UserProfileStatsDto(
+      .Select(u => new UserActivityStatsDto(
         u.Baskets.Count(),
-        u.Baskets.SelectMany(b => b.Reviews).Count(r => r.IsThumbsUp == true),
+        u.Reviews.Count(r => r.IsThumbsUp == true),
         u.SavedBaskets.Count(),
         u.Comments.Count(),
         u.CreatedDate
       ))
       .FirstAsync(cancellationToken);
 
-    return new ReturnModel<UserProfileStatsDto>()
+    return new ReturnModel<UserActivityStatsDto>()
     {
       Data = stats,
       Success = true,

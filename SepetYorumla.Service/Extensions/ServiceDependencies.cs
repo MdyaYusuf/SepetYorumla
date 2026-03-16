@@ -24,6 +24,7 @@ public static class ServiceDependencies
     services.AddScoped<AuthenticationBusinessRules>();
     services.AddScoped<RoleBusinessRules>();
     services.AddScoped<SavedBasketBusinessRules>();
+    services.AddScoped<FollowBusinessRules>();
 
     services.AddScoped<ICategoryService, CategoryService>();
     services.AddScoped<IProductService, ProductService>();
@@ -34,6 +35,7 @@ public static class ServiceDependencies
     services.AddScoped<IAuthenticationService, AuthenticationService>();
     services.AddScoped<IRoleService, RoleService>();
     services.AddScoped<ISavedBasketService, SavedBasketService>();
+    services.AddScoped<IFollowService, FollowService>();
 
     services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 

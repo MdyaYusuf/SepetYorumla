@@ -17,6 +17,8 @@ public class BaseDbContext : DbContext
   public DbSet<Review> Reviews { get; set; }
   public DbSet<User> Users { get; set; }
   public DbSet<Comment> Comments { get; set; }
+  public DbSet<SavedBasket> SavedBaskets { get; set; }
+  public DbSet<Follow> Follows { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box, Avatar, Chip, Divider, Stack, Grid, Rating } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import SellIcon from '@mui/icons-material/Sell';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
@@ -12,6 +13,7 @@ interface BasketCardProps {
 }
 
 const BasketCard: React.FC<BasketCardProps> = ({ basket }) => {
+  const navigate = useNavigate();
   const totalPrice = basket.products.reduce((sum: number, product) => sum + product.price, 0);
   const tags: string[] = Array.from(new Set(basket.products.map((p) => p.categoryName).filter(Boolean)));
 
@@ -19,8 +21,16 @@ const BasketCard: React.FC<BasketCardProps> = ({ basket }) => {
     .map(p => getFullUrl(p.imageUrl))
     .filter((url): url is string => !!url);
 
+  const goToDetail = () => navigate(`/basket/${basket.id}`);
+
+  const handleProfileClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/user/${basket.username}`);
+  };
+
   return (
     <Card
+      onClick={goToDetail}
       sx={{
         bgcolor: 'var(--surface-dark)',
         border: '1px solid var(--border-dark)',
@@ -28,6 +38,7 @@ const BasketCard: React.FC<BasketCardProps> = ({ basket }) => {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        cursor: 'pointer',
         transition: 'all 0.3s ease',
         '&:hover': {
           transform: 'translateY(-4px)',
@@ -38,14 +49,25 @@ const BasketCard: React.FC<BasketCardProps> = ({ basket }) => {
     >
       <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            onClick={handleProfileClick}
+            sx={{
+              cursor: 'pointer',
+              zIndex: 2,
+              '&:hover': { opacity: 0.8, color: 'var(--primary)' },
+              transition: 'all 0.2s ease'
+            }}
+          >
             <Avatar
               src={getFullUrl(basket.userProfileImageUrl)}
               sx={{ width: 24, height: 24, border: '1px solid rgba(255,255,255,0.1)' }}
             >
               {basket.username[0]}
             </Avatar>
-            <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontWeight: 600 }}>
+            <Typography variant="caption" sx={{ color: 'inherit', fontWeight: 600 }}>
               {basket.username}
             </Typography>
           </Stack>

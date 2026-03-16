@@ -1,3 +1,5 @@
+import type { BasketResponseDto } from "./Basket";
+
 export interface User {
   id: string;
   username: string;
@@ -36,10 +38,24 @@ export interface ChangePasswordRequest {
   confirmNewPassword: string;
 }
 
-export interface UserProfileStats {
+export interface UserActivityStats {
   totalBaskets: number;
-  totalLikesReceived: number;
+  totalBasketsLiked: number;
   totalSavedBaskets: number;
   totalCommentsMade: number;
   createdDate: string;
+}
+
+export interface ProfileResponse {
+  id: string;
+  username: string;
+  profileImageUrl: string | null;
+  bio: string | null;
+  createdDate: string;
+  followersCount: number;
+  followingCount: number;
+  totalCommentsReceived: number;
+  totalLikesReceived: number;
+  isFollowing: boolean;
+  topBaskets: BasketResponseDto[];
 }

@@ -20,6 +20,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import HomeIcon from '@mui/icons-material/Home';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import HistoryIcon from '@mui/icons-material/History';
 import { getFullUrl } from '../../helpers/imageHelper';
 import { requests } from '../../api/axiosInstance';
 
@@ -58,7 +59,16 @@ const Sidebar = () => {
   };
 
   const handleProfileClick = () => {
-    navigate('/profile');
+
+    if (user?.username) {
+      navigate(`/user/${user.username}`);
+      setAnchorEl(null);
+    }
+  };
+
+  const handleActivitiesClick = () => {
+    navigate('/activities');
+    setAnchorEl(null);
   };
 
   return (
@@ -82,10 +92,16 @@ const Sidebar = () => {
             active={location.pathname === '/home'}
           />
           <SidebarItem
+            icon={<HistoryIcon />}
+            label="Aktivitelerim"
+            onClick={handleActivitiesClick}
+            active={location.pathname === '/activities'}
+          />
+          <SidebarItem
             icon={<PersonIcon />}
             label="Profilim"
             onClick={handleProfileClick}
-            active={location.pathname === '/profile'}
+            active={location.pathname === `/user/${user?.username}`}
           />
         </List>
       </Box>
@@ -168,6 +184,14 @@ const Sidebar = () => {
           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
           transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
+          <MenuItem onClick={handleActivitiesClick} sx={{ py: 1.2 }}>
+            <ListItemIcon><HistoryIcon fontSize="small" sx={{ color: 'var(--text-muted)' }} /></ListItemIcon>
+            Aktivitelerim
+          </MenuItem>
+          <MenuItem onClick={handleProfileClick} sx={{ py: 1.2 }}>
+            <ListItemIcon><PersonIcon fontSize="small" sx={{ color: 'var(--text-muted)' }} /></ListItemIcon>
+            Profilim
+          </MenuItem>
           <MenuItem onClick={handleSettingsClick} sx={{ py: 1.2 }}>
             <ListItemIcon><SettingsIcon fontSize="small" sx={{ color: 'var(--text-muted)' }} /></ListItemIcon>
             Ayarlar

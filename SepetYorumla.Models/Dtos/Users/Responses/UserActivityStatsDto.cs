@@ -1,8 +1,8 @@
 ﻿namespace SepetYorumla.Models.Dtos.Users.Responses;
 
-public sealed record UserProfileStatsDto(
+public sealed record UserActivityStatsDto(
   int TotalBaskets,
-  int TotalLikesReceived,
+  int TotalBasketsLiked,
   int TotalSavedBaskets,
   int TotalCommentsMade,
   DateTime CreatedDate);

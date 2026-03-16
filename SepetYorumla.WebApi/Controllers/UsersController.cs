@@ -27,6 +27,17 @@ public class UsersController(IUserService _userService) : CustomBaseController
     return CreateActionResult(result);
   }
 
+  [HttpGet("profile/{username}")]
+  [AllowAnonymous]
+  public async Task<IActionResult> GetByUsername(string username, CancellationToken cancellationToken)
+  {
+    var currentUserId = TryGetUserId();
+
+    var result = await _userService.GetByUsernameAsync(username, currentUserId, cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
   [HttpPut]
   [Authorize]
   public async Task<IActionResult> Update([FromForm] UpdateUserRequest request, CancellationToken cancellationToken)

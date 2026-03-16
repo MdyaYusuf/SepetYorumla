@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using SepetYorumla.Core.Responses;
 using SepetYorumla.DataAccess.Abstracts;

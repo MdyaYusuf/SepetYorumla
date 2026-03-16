@@ -22,6 +22,7 @@ public static class DataAccessDependencies
     services.AddScoped<IUserRepository, EfUserRepository>();
     services.AddScoped<IRoleRepository, EfRoleRepository>();
     services.AddScoped<ISavedBasketRepository, EfSavedBasketRepository>();
+    services.AddScoped<IFollowRepository, EfFollowRepository>();
 
     return services;
   }

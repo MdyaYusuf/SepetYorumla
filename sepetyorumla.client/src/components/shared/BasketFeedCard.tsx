@@ -267,6 +267,11 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
 
   const goToDetail = () => navigate(`/basket/${basket.id}`);
 
+  const handleProfileClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/user/${basket.username}`);
+  };
+
   return (
     <Paper
       onClick={!isDetailView ? goToDetail : undefined}
@@ -285,7 +290,17 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Stack direction="row" spacing={1.5} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={1.5}
+          alignItems="center"
+          onClick={handleProfileClick}
+          sx={{
+            cursor: 'pointer',
+            '&:hover': { opacity: 0.8 },
+            transition: 'opacity 0.2s'
+          }}
+        >
           <Avatar
             src={getFullUrl(basket.userProfileImageUrl)}
             sx={{ width: 40, height: 40, border: '1px solid rgba(255,255,255,0.1)' }}

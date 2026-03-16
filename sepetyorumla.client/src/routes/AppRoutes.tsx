@@ -7,12 +7,13 @@ import Register from '../features/authentication/Register';
 import Home from '../features/feed/Home';
 import type { ReactNode } from 'react';
 import BasketDetailPage from '../pages/BasketDetailPage';
-import Settings from '../pages/Settings';
-import ProfilePage from '../pages/ProfilePage';
+import SettingsPage from '../pages/SettingsPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import AboutPage from '../pages/AboutPage';
 import IntroPage from '../pages/IntroPage';
 import LegalPage from '../pages/LegalPage';
+import ActivitiesPage from '../pages/ActivitiesPage';
+import ProfilePage from '../pages/ProfilePage';
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -67,6 +68,10 @@ export const router = createBrowserRouter([
         element: <LegalPage />
       },
       {
+        path: 'user/:username',
+        element: <ProfilePage />
+      },
+      {
         path: 'login',
         element: <PublicOnlyRoute><Login /></PublicOnlyRoute>
       },
@@ -83,10 +88,10 @@ export const router = createBrowserRouter([
         )
       },
       {
-        path: 'profile',
+        path: 'activities',
         element: (
           <ProtectedRoute>
-            <ProfilePage />
+            <ActivitiesPage />
           </ProtectedRoute>
         )
       },
@@ -94,7 +99,7 @@ export const router = createBrowserRouter([
         path: 'settings',
         element: (
           <ProtectedRoute>
-            <Settings />
+            <SettingsPage />
           </ProtectedRoute>
         )
       },

@@ -1,11 +1,10 @@
 import { requests } from './axiosInstance';
-import type { UpdateUserRequest, ChangePasswordRequest, UserProfileStats } from '../models/User';
+import type { UpdateUserRequest, ChangePasswordRequest, UserActivityStats, ProfileResponse } from '../models/User';
 
 export const UserService = {
 
   update: async (request: UpdateUserRequest) => {
     const formData = new FormData();
-    formData.append('Id', request.id);
     formData.append('Username', request.username);
     formData.append('Email', request.email);
 
@@ -27,6 +26,11 @@ export const UserService = {
 
   getStats: async (userId: string) => {
 
-    return requests.get<UserProfileStats>(`Users/${userId}/stats`);
-  }
+    return requests.get<UserActivityStats>(`Users/${userId}/stats`);
+  },
+
+  getByUsername: async (username: string) => {
+
+    return requests.get<ProfileResponse>(`Users/profile/${username}`);
+  },
 };
