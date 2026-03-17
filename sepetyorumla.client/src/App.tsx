@@ -8,7 +8,7 @@ import type { AppDispatch, RootState } from './store/store';
 import { initializeAuth } from './features/authentication/authSlice';
 import { router } from './routes/AppRoutes';
 
-const darkTheme = createTheme({
+const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: { main: '#0da6f2' },
@@ -41,7 +41,7 @@ function App() {
   }
 
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{
         backgroundColor: 'var(--bg-dark)',
