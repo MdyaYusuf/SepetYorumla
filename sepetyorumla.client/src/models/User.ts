@@ -58,4 +58,18 @@ export interface ProfileResponse {
   totalLikesReceived: number;
   isFollowing: boolean;
   topBaskets: BasketResponseDto[];
+  recentComments: CommentListItem[];
+}
+
+export interface CommentListItem {
+  basketId: string;
+  basketTitle: string;
+  text: string;
+  createdDate: string;
+}
+
+export interface UserListItem {
+  id: string;
+  username: string;
+  profileImageUrl: string | null;
 }

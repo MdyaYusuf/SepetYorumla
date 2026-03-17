@@ -1,8 +1,10 @@
 ﻿using SepetYorumla.Core.Responses;
 using SepetYorumla.DataAccess.Abstracts;
+using SepetYorumla.Models.Dtos.Users.Responses;
 using SepetYorumla.Models.Entities;
 using SepetYorumla.Service.Abstracts;
 using SepetYorumla.Service.BusinessRules;
+using Microsoft.EntityFrameworkCore;
 
 namespace SepetYorumla.Service.Concretes;
 
@@ -41,6 +43,44 @@ public class FollowService(
       Success = true,
       Message = message,
       Data = null,
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<List<UserListItemResponseDto>>> GetFollowersAsync(Guid userId, CancellationToken cancellationToken = default)
+  {
+    var followers = await _followRepository.Query()
+      .Where(f => f.FollowingId == userId)
+      .Select(f => new UserListItemResponseDto(
+        f.Follower.Id,
+        f.Follower.Username,
+        f.Follower.ProfileImageUrl))
+      .ToListAsync(cancellationToken);
+
+    return new ReturnModel<List<UserListItemResponseDto>>()
+    {
+      Data = followers,
+      Success = true,
+      Message = "Takipçi listesi başarıyla getirildi.",
+      StatusCode = 200
+    };
+  }
+
+  public async Task<ReturnModel<List<UserListItemResponseDto>>> GetFollowingAsync(Guid userId, CancellationToken cancellationToken = default)
+  {
+    var following = await _followRepository.Query()
+      .Where(f => f.FollowerId == userId)
+      .Select(f => new UserListItemResponseDto(
+        f.Following.Id,
+        f.Following.Username,
+        f.Following.ProfileImageUrl))
+      .ToListAsync(cancellationToken);
+
+    return new ReturnModel<List<UserListItemResponseDto>>()
+    {
+      Data = following,
+      Success = true,
+      Message = "Takip edilenler listesi başarıyla getirildi.",
       StatusCode = 200
     };
   }

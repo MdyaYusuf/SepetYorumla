@@ -16,4 +16,22 @@ public class FollowsController(IFollowService _followService) : CustomBaseContro
 
     return CreateActionResult(result);
   }
+
+  [AllowAnonymous]
+  [HttpGet("{userId:guid}/followers")]
+  public async Task<IActionResult> GetFollowers(Guid userId, CancellationToken cancellationToken)
+  {
+    var result = await _followService.GetFollowersAsync(userId, cancellationToken);
+
+    return CreateActionResult(result);
+  }
+
+  [AllowAnonymous]
+  [HttpGet("{userId:guid}/following")]
+  public async Task<IActionResult> GetFollowing(Guid userId, CancellationToken cancellationToken)
+  {
+    var result = await _followService.GetFollowingAsync(userId, cancellationToken);
+
+    return CreateActionResult(result);
+  }
 }

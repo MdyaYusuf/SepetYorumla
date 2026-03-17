@@ -1,5 +1,5 @@
 import { requests } from './axiosInstance';
-import type { UpdateUserRequest, ChangePasswordRequest, UserActivityStats, ProfileResponse } from '../models/User';
+import type { UpdateUserRequest, ChangePasswordRequest, UserActivityStats, ProfileResponse, UserListItem } from '../models/User';
 
 export const UserService = {
 
@@ -33,4 +33,9 @@ export const UserService = {
 
     return requests.get<ProfileResponse>(`Users/profile/${username}`);
   },
+
+  getPopularUsers: async (count: number) => {
+
+    return requests.get<UserListItem[]>(`Users/popular?count=${count}`);
+  }
 };

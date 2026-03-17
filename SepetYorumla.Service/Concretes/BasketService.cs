@@ -140,7 +140,7 @@ public class BasketService(
     Guid? userId = null,
     CancellationToken cancellationToken = default)
   {
-    var query = _basketRepository.Query(enableTracking: false)
+    var query = _basketRepository.Query()
       .Include(b => b.User)
       .Include(b => b.Products).ThenInclude(p => p.Category)
       .Include(b => b.Reviews)

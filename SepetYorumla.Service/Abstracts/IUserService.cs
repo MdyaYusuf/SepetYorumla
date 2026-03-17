@@ -52,4 +52,8 @@ public interface IUserService
   Task<ReturnModel<UserActivityStatsDto>> GetProfileStatsAsync(
     Guid userId,
     CancellationToken cancellationToken = default);
+
+  Task<ReturnModel<List<UserListItemResponseDto>>> GetPopularUsersAsync(
+    int count,
+    CancellationToken cancellationToken = default);
 }

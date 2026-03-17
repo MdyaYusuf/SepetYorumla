@@ -125,7 +125,7 @@ const ActivitiesPage: React.FC = () => {
                 onClick={() => navigate('/home')}
                 sx={{
                   color: 'var(--text-muted)',
-                  fontSize: '0.7rem',
+                  fontSize: '0.75rem',
                   cursor: 'pointer',
                   textDecoration: 'none',
                   '&:hover': { textDecoration: 'underline' }
@@ -133,7 +133,7 @@ const ActivitiesPage: React.FC = () => {
               >
                 Ana Sayfa
               </MuiLink>
-              <Typography sx={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 700 }}>
+              <Typography sx={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700 }}>
                 Aktivitelerim
               </Typography>
             </Breadcrumbs>

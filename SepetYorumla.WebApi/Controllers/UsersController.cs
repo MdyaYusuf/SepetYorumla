@@ -80,4 +80,13 @@ public class UsersController(IUserService _userService) : CustomBaseController
 
     return CreateActionResult(result);
   }
+
+  [HttpGet("popular")]
+  [AllowAnonymous]
+  public async Task<IActionResult> GetPopularUsers([FromQuery] int count = 4, CancellationToken cancellationToken = default)
+  {
+    var result = await _userService.GetPopularUsersAsync(count, cancellationToken);
+
+    return CreateActionResult(result);
+  }
 }

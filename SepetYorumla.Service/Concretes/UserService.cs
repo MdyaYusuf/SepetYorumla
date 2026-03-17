@@ -106,6 +106,7 @@ public class UserService(
       .Include(u => u.Baskets).ThenInclude(b => b.Comments)
       .Include(u => u.Followers)
       .Include(u => u.Following)
+      .Include(u => u.Comments).ThenInclude(c => c.Basket)
       .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
 
     if (user == null)
@@ -133,6 +134,16 @@ public class UserService(
       BasketMappingHelper.PopulateSummaryFields(topBasketsEntities[i], basketDtos[i]);
     }
 
+    var recentComments = user.Comments
+      .OrderByDescending(c => c.CreatedDate)
+      .Take(3)
+      .Select(c => new CommentListItemResponseDto(
+        c.BasketId,
+        c.Basket.Title,
+        c.Text,
+        c.CreatedDate))
+      .ToList();
+
     var response = new ProfileResponseDto(
       user.Id,
       user.Username,
@@ -144,7 +155,8 @@ public class UserService(
       user.Baskets.SelectMany(b => b.Comments).Count(),
       user.Baskets.SelectMany(b => b.Reviews).Count(r => r.IsThumbsUp == true),
       isFollowing,
-      basketDtos);
+      basketDtos,
+      recentComments);
 
     return new ReturnModel<ProfileResponseDto>()
     {
@@ -266,6 +278,26 @@ public class UserService(
       Success = true,
       StatusCode = 200,
       Message = "İstatistikler başarıyla getirildi."
+    };
+  }
+
+  public async Task<ReturnModel<List<UserListItemResponseDto>>> GetPopularUsersAsync(int count, CancellationToken cancellationToken = default)
+  {
+    var popularUsers = await _userRepository.Query()
+      .OrderByDescending(u => u.Followers.Count)
+      .Take(count)
+      .Select(u => new UserListItemResponseDto(
+        u.Id,
+        u.Username,
+        u.ProfileImageUrl))
+      .ToListAsync(cancellationToken);
+
+    return new ReturnModel<List<UserListItemResponseDto>>
+    {
+      Data = popularUsers,
+      Success = true,
+      Message = "Popüler kullanıcılar başarıyla getirildi.",
+      StatusCode = 200
     };
   }
 }

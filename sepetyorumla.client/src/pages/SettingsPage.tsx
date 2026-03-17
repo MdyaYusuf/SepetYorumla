@@ -119,10 +119,10 @@ const SettingsPage: React.FC = () => {
                 separator={<NavigateNextIcon fontSize="small" />}
                 sx={{ mb: 2, '& .MuiBreadcrumbs-separator': { color: 'var(--text-muted)' } }}
               >
-                <MuiLink href="/home" underline="hover" sx={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>
+                <MuiLink href="/home" underline="hover" sx={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
                   Ana Sayfa
                 </MuiLink>
-                <Typography sx={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 700 }}>
+                <Typography sx={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700 }}>
                   Ayarlar
                 </Typography>
               </Breadcrumbs>

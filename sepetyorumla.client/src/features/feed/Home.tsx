@@ -12,7 +12,8 @@ import {
   Stack,
   CircularProgress,
   Menu,
-  MenuItem
+  MenuItem,
+  Avatar
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/store';
@@ -26,6 +27,9 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { BasketService } from '../../api/basketService';
 import ShareBasketModal from '../../components/shared/ShareBasketModal';
+import { UserService } from '../../api/userService';
+import type { UserListItem } from '../../models/User';
+import { getFullUrl } from '../../helpers/imageHelper';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -40,18 +44,21 @@ const Home: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'comments' | 'likes' | 'rating'>('date');
   const [sortAnchorEl, setSortAnchorEl] = useState<null | HTMLElement>(null);
+  const [popularUsers, setPopularUsers] = useState<UserListItem[]>([]);
   const isSortMenuOpen = Boolean(sortAnchorEl);
 
   const fetchInitialData = async () => {
     setIsLoading(true);
     try {
-      const [basketRes, categoryRes] = await Promise.all([
+      const [basketRes, categoryRes, popularRes] = await Promise.all([
         BasketService.getAll(),
-        CategoryService.getAll()
+        CategoryService.getAll(),
+        UserService.getPopularUsers(4)
       ]);
 
       dispatch(setBaskets(basketRes.data));
       setCategories(categoryRes.data);
+      setPopularUsers(popularRes.data);
     } catch {
       // The axios interceptor already handles the toast notification
     } finally {
@@ -249,6 +256,69 @@ const Home: React.FC = () => {
                   />
                 );
               })}
+            </Stack>
+          </Box>
+          <Box sx={{
+            bgcolor: 'var(--surface-dark)',
+            borderRadius: '24px',
+            p: 3,
+            border: '1px solid var(--border-dark)',
+            mt: 3
+          }}>
+            <Typography variant="h6" sx={{ color: 'var(--text-white)', fontWeight: 800, mb: 3 }}>
+              Popüler Kullanıcılar
+            </Typography>
+
+            <Stack direction="row" justifyContent="space-around" spacing={1}>
+              {popularUsers.map((user) => (
+                <Box
+                  key={user.id}
+                  onClick={() => navigate(`/user/${user.username}`)}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      '& .MuiAvatar-root': {
+                        borderColor: 'var(--primary)',
+                        boxShadow: '0 0 15px rgba(13, 166, 242, 0.4)'
+                      }
+                    }
+                  }}
+                >
+                  <Avatar
+                    src={getFullUrl(user.profileImageUrl)}
+                    sx={{
+                      width: 60,
+                      height: 60,
+                      mb: 1.5,
+                      border: '2px solid transparent',
+                      bgcolor: 'var(--bg-dark)',
+                      fontSize: '1.2rem',
+                      fontWeight: 800
+                    }}
+                  >
+                    {user.username[0].toUpperCase()}
+                  </Avatar>
+
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: 'var(--text-white)',
+                      fontWeight: 700,
+                      maxWidth: '80px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    @{user.username}
+                  </Typography>
+                </Box>
+              ))}
             </Stack>
           </Box>
         </Grid>

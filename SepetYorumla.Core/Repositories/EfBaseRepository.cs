@@ -113,7 +113,7 @@ public class EfBaseRepository<TContext, TEntity, TId> : IRepository<TEntity, TId
     return entity;
   }
 
-  public IQueryable<TEntity> Query(bool enableTracking = true, bool withDeleted = false)
+  public IQueryable<TEntity> Query(bool enableTracking = false, bool withDeleted = false)
   {
     IQueryable<TEntity> query = _context.Set<TEntity>();
 

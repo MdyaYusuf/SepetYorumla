@@ -297,7 +297,7 @@ const BasketFeedCard: React.FC<BasketFeedCardProps> = ({ basket, isDetailView = 
           onClick={handleProfileClick}
           sx={{
             cursor: 'pointer',
-            '&:hover': { opacity: 0.8 },
+            '&:hover': { opacity: 0.8, color: 'var(--primary)' },
             transition: 'opacity 0.2s'
           }}
         >

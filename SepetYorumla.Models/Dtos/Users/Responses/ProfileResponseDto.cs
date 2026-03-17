@@ -13,4 +13,5 @@ public sealed record ProfileResponseDto(
   int TotalCommentsReceived,
   int TotalLikesReceived,
   bool IsFollowing,
-  List<BasketResponseDto> TopBaskets);
+  List<BasketResponseDto> TopBaskets,
+  List<CommentListItemResponseDto> RecentComments);

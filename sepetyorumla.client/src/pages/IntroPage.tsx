@@ -1,9 +1,8 @@
 import React from 'react';
-import { Box, Container, Typography, Grid, Stack, Button } from '@mui/material';
+import { Box, Container, Typography, Stack, Button, Grid } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ForumIcon from '@mui/icons-material/Forum';
 import StarRateIcon from '@mui/icons-material/StarRate';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -14,10 +13,11 @@ import ShareIcon from '@mui/icons-material/Share';
 import LinkIcon from '@mui/icons-material/Link';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import ShareBasketImg from '../assets/share-basket.png';
+import GroupIcon from '@mui/icons-material/Group';
 import BasketFeedImg from '../assets/basket-feed.png';
 import BasketDetailImg from '../assets/basket-detail.png';
 import SavedBasketsImg from '../assets/saved-baskets.png';
+import ProfilePageImg from '../assets/profile-page.png';
 
 const IntroPage: React.FC = () => {
   return (
@@ -63,20 +63,26 @@ const IntroPage: React.FC = () => {
         <Box sx={{ py: 12, bgcolor: 'rgba(24, 40, 48, 0.3)' }}>
           <Container maxWidth="lg">
             <Grid container spacing={10} alignItems="center">
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Box component="img" src={ShareBasketImg} alt="Share basket" sx={{ width: '100%', height: 'auto', borderRadius: '24px', border: '1px solid rgba(13, 166, 242, 0.1)', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }} />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Typography variant="h2" sx={{ fontWeight: 800, mb: 3 }}>Sepetinizi Paylaşın</Typography>
+              <Grid size={{ xs: 12, md: 5 }}>
+                <Typography variant="h2" sx={{ fontWeight: 800, mb: 3 }}>Topluluğa Katılın</Typography>
                 <Box sx={{ width: '60px', height: '4px', bgcolor: '#0da6f2', borderRadius: '2px', mb: 4 }} />
-                <Typography sx={{ color: '#94a3b8', fontSize: '1.15rem', lineHeight: 1.8, mb: 4 }}>
-                  Alışveriş listelerinizi tek bir dokunuşla modal arayüzü üzerinden paylaşın. Ürünlerinizi kategorize edin ve alışveriş hikayenizi anlatın.
+                <Typography sx={{ color: '#94a3b8', fontSize: '1.15rem', lineHeight: 1.8, mb: 6 }}>
+                  Canlı akışımızda diğer kullanıcıların sepetlerini görün. Yorum yapın, beğenin ve puanlama sistemiyle en iyi alışverişleri öne çıkarın.
                 </Typography>
-                <Stack spacing={2.5}>
-                  <CheckItem text="Hızlı ürün ekleme ve düzenleme" />
-                  <CheckItem text="Kategori bazlı sepet organizasyonu" />
-                  <CheckItem text="Tek tıkla sosyal medyada paylaşım" />
-                </Stack>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 4 }}>
+                    <FeatureSmallCard icon={<StarRateIcon />} title="Yıldızlar" />
+                  </Grid>
+                  <Grid size={{ xs: 4 }}>
+                    <FeatureSmallCard icon={<FavoriteIcon />} title="Beğeniler" />
+                  </Grid>
+                  <Grid size={{ xs: 4 }}>
+                    <FeatureSmallCard icon={<ForumIcon />} title="Yorumlar" />
+                  </Grid>
+                </Grid>
+              </Grid>
+              <Grid size={{ xs: 12, md: 7 }}>
+                <Box component="img" src={BasketFeedImg} alt="Basket feed" sx={{ width: '100%', height: 'auto', borderRadius: '24px', border: '1px solid rgba(13, 166, 242, 0.1)', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }} />
               </Grid>
             </Grid>
           </Container>
@@ -85,39 +91,11 @@ const IntroPage: React.FC = () => {
         <Box sx={{ py: 12 }}>
           <Container maxWidth="lg">
             <Grid container spacing={10} alignItems="center">
-              <Grid size={{ xs: 12, md: 4 }}>
-                <Typography variant="h2" sx={{ fontWeight: 800, mb: 3 }}>Topluluğa Katılın</Typography>
-                <Box sx={{ width: '60px', height: '4px', bgcolor: '#0da6f2', borderRadius: '2px', mb: 4 }} />
-                <Typography sx={{ color: '#94a3b8', fontSize: '1.15rem', lineHeight: 1.8, mb: 6 }}>
-                  Canlı akışımızda diğer kullanıcıların sepetlerini görün. Yorum yapın, beğenin ve puanlama sistemiyle en iyi alışverişleri öne çıkarın.
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 4 }}>
-                    <FeatureSmallCard icon={<StarRateIcon />} title="Yıldızlar" />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 4 }}>
-                    <FeatureSmallCard icon={<FavoriteIcon />} title="Beğeniler" />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 4 }}>
-                    <FeatureSmallCard icon={<ForumIcon />} title="Yorumlar" />
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid size={{ xs: 12, md: 8 }}>
-                <Box component="img" src={BasketFeedImg} alt="Basket feed" sx={{ width: '100%', height: 'auto', borderRadius: '24px', border: '1px solid rgba(13, 166, 242, 0.1)', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }} />
-              </Grid>
-            </Grid>
-          </Container>
-        </Box>
-
-        <Box sx={{ py: 12, bgcolor: 'rgba(24, 40, 48, 0.3)' }}>
-          <Container maxWidth="lg">
-            <Grid container spacing={10} alignItems="center">
-              <Grid size={{ xs: 12, md: 8 }}>
+              <Grid size={{ xs: 12, md: 7 }}>
                 <Box component="img" src={BasketDetailImg} alt="Basket detail" sx={{ width: '100%', height: 'auto', borderRadius: '24px', border: '1px solid rgba(13, 166, 242, 0.1)', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }} />
               </Grid>
-              <Grid size={{ xs: 12, md: 4 }}>
-                <Typography variant="h2" sx={{ fontWeight: 800, mb: 3 }}>Detayları İnceleyin</Typography>
+              <Grid size={{ xs: 12, md: 5 }}>
+                <Typography variant="h2" sx={{ fontWeight: 800, mb: 3 }}>Sepetleri İnceleyin</Typography>
                 <Box sx={{ width: '60px', height: '4px', bgcolor: '#0da6f2', borderRadius: '2px', mb: 4 }} />
                 <Typography sx={{ color: '#94a3b8', fontSize: '1.15rem', lineHeight: 1.8, mb: 6 }}>
                   Her sepetin derinliklerine inin. Ürün özelliklerini, market karşılaştırmalarını ve kullanıcı tavsiyelerini detaylı görünümde inceleyin.
@@ -131,10 +109,10 @@ const IntroPage: React.FC = () => {
           </Container>
         </Box>
 
-        <Box sx={{ py: 12 }}>
+        <Box sx={{ py: 12, bgcolor: 'rgba(24, 40, 48, 0.3)' }}>
           <Container maxWidth="lg">
             <Grid container spacing={10} alignItems="center">
-              <Grid size={{ xs: 12, md: 4 }}>
+              <Grid size={{ xs: 12, md: 5 }}>
                 <Typography variant="h2" sx={{ fontWeight: 800, mb: 3 }}>Kaydedin ve Paylaşın</Typography>
                 <Box sx={{ width: '60px', height: '4px', bgcolor: '#0da6f2', borderRadius: '2px', mb: 4 }} />
                 <Typography sx={{ color: '#94a3b8', fontSize: '1.15rem', lineHeight: 1.8, mb: 6 }}>
@@ -146,22 +124,35 @@ const IntroPage: React.FC = () => {
                   <ActionIconBox icon={<LinkIcon />} label="Bağlantı" />
                 </Stack>
               </Grid>
-              <Grid size={{ xs: 12, md: 8 }}>
+              <Grid size={{ xs: 12, md: 7 }}>
                 <Box component="img" src={SavedBasketsImg} alt="Saved baskets" sx={{ width: '100%', height: 'auto', borderRadius: '24px', border: '1px solid rgba(13, 166, 242, 0.1)', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }} />
               </Grid>
             </Grid>
           </Container>
         </Box>
 
-        <Box
-          sx={{
-            py: 10,
-            background: 'radial-gradient(circle at 50% 120%, rgba(13, 166, 242, 0.12) 0%, transparent 60%)',
-            textAlign: 'center',
-            position: 'relative',
-            overflow: 'hidden'
-          }}
-        >
+        <Box sx={{ py: 12 }}>
+          <Container maxWidth="lg">
+            <Grid container spacing={10} alignItems="center">
+              <Grid size={{ xs: 12, md: 7 }}>
+                <Box component="img" src={ProfilePageImg} alt="Profile preview" sx={{ width: '100%', height: 'auto', borderRadius: '24px', border: '1px solid rgba(13, 166, 242, 0.1)', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }} />
+              </Grid>
+              <Grid size={{ xs: 12, md: 5 }}>
+                <Typography variant="h2" sx={{ fontWeight: 800, mb: 3 }}>Profillere Göz Atın</Typography>
+                <Box sx={{ width: '60px', height: '4px', bgcolor: '#0da6f2', borderRadius: '2px', mb: 4 }} />
+                <Typography sx={{ color: '#94a3b8', fontSize: '1.15rem', lineHeight: 1.8, mb: 6 }}>
+                  Diğer kullanıcıların dünyasına konuk olun. Favori küratörlerinizi takip edin, başarılarını görün ve topluluk içindeki etkileşimlerini keşfedin.
+                </Typography>
+                <Stack spacing={4}>
+                  <DetailFeatureRow icon={<GroupIcon />} title="Sosyal Takip Sistemi" desc="Diğer kullanıcıları takip ederek haberdar olun." />
+                  <DetailFeatureRow icon={<QuestionAnswerIcon />} title="Son Yorumlar" desc="Kullanıcıların son yorumlarını inceleyin." />
+                </Stack>
+              </Grid>
+            </Grid>
+          </Container>
+        </Box>
+
+        <Box sx={{ py: 10, background: 'radial-gradient(circle at 50% 120%, rgba(13, 166, 242, 0.12) 0%, transparent 60%)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
           <Container maxWidth="md">
             <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, letterSpacing: '-1px' }}>Alışverişin Sosyal Haline Hazır Mısınız?</Typography>
             <Typography sx={{ color: '#94a3b8', fontSize: '1.1rem', mb: 5, maxWidth: '600px', mx: 'auto' }}>
@@ -179,17 +170,10 @@ const IntroPage: React.FC = () => {
   );
 };
 
-const CheckItem = ({ text }: { text: string }) => (
-  <Stack direction="row" spacing={2} alignItems="center">
-    <CheckCircleIcon sx={{ color: '#0da6f2', fontSize: 24 }} />
-    <Typography sx={{ color: '#cbd5e1', fontWeight: 600, fontSize: '1.1rem' }}>{text}</Typography>
-  </Stack>
-);
-
 const FeatureSmallCard = ({ icon, title }: { icon: any, title: string }) => (
-  <Box sx={{ p: 2.5, borderRadius: '20px', bgcolor: 'rgba(24, 40, 48, 0.8)', border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', transition: 'all 0.3s ease', '&:hover': { transform: 'translateY(-10px) scale(1.03)', borderColor: '#0da6f2', bgcolor: 'rgba(13, 166, 242, 0.03)', boxShadow: '0 0 25px rgba(13, 166, 242, 0.2)' } }}>
-    <Box sx={{ color: '#0da6f2', mb: 1.5, display: 'flex', justifyContent: 'center' }}>{icon}</Box>
-    <Typography sx={{ fontWeight: 800, color: '#fff', mb: 0, fontSize: '0.9rem' }}>{title}</Typography>
+  <Box sx={{ p: 2, borderRadius: '20px', bgcolor: 'rgba(24, 40, 48, 0.8)', border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', transition: '0.3s', '&:hover': { transform: 'translateY(-10px)', borderColor: '#0da6f2', bgcolor: 'rgba(13, 166, 242, 0.03)' } }}>
+    <Box sx={{ color: '#0da6f2', mb: 1, display: 'flex', justifyContent: 'center' }}>{icon}</Box>
+    <Typography sx={{ fontWeight: 800, color: '#fff', fontSize: '0.85rem' }}>{title}</Typography>
   </Box>
 );
 
