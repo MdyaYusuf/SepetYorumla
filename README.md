@@ -33,7 +33,8 @@ The solution is organized into separate projects for core abstractions, compile-
   - View a user's last three comments directly on their profile.
 
 - 👤 **Authentication & Security**
-  - ASP.NET Core Identity with custom user attributes.
+  - Custom JWT authentication.
+  - Tokens stored in secure HttpOnly cookies to prevent XSS attacks.
   - JWT token generation and validation.
   - Compile-time DTO mapping via **Riok.Mapperly**.
   - **FluentValidation** for strict request DTO validation.
