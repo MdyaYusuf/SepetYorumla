@@ -50,8 +50,7 @@ The solution is organized into separate projects for core abstractions, compile-
   - .NET 10 (ASP.NET Core Web API)
   - Entity Framework Core 10
   - SQL Server
-  - ASP.NET Core Identity
-  - JWT authentication
+  - Custom JWT Authentication
   - Riok.Mapperly (Source-generated mapping)
   - FluentValidation
 
