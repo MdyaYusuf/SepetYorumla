@@ -34,7 +34,8 @@ The solution is organized into separate projects for core abstractions, compile-
 
 - 👤 **Authentication & Security**
   - Custom JWT authentication.
-  - Tokens stored in secure HttpOnly cookies to prevent XSS attacks.
+  - Access tokens stored in secure HttpOnly cookies to prevent XSS attacks.
+  - Refresh token rotation for persistent and secure sessions.
   - JWT token generation and validation.
   - Compile-time DTO mapping via **Riok.Mapperly**.
   - **FluentValidation** for strict request DTO validation.
